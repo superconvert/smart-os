@@ -11,14 +11,14 @@
 由于内核需要编译，需要安装内核编译所需要的环境
 由于 busybox 需要编译，根据需要自行安装所需环境
 
-2. 准备网络环境
-./01_run_nat.sh
+2. 编译源码 ( kernel, glibc, busyboxy, libgcc, lbidns ) 还没整理
+./01_build_src.sh
 
-3. 制作扩展盘 （ 此步可以省略，只是演示挂载怎么样挂载多个盘 ）
-./02_make_sdb.sh
+3. 制作系统盘 （ 重要，此步骤把系统安装到一个系统文件内 )
+./02_build_disk.sh
 
-4. 制作系统盘 （ 重要，此步骤把系统安装到一个系统文件内 )
-./03_build_disk.sh
+4. 制作扩展盘 （ 此步可以省略，只是演示挂载怎么样挂载多个盘 ）
+./03_make_sdb.sh
 
 5. 运行 smart-os 系统
 ./04_run_qemu.sh 或 ./04_run_docker.sh
