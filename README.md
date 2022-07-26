@@ -15,13 +15,10 @@
 ./01_build_src.sh
 
 3. 制作系统盘 （ 重要，此步骤把系统安装到一个系统文件内 )  
-./02_build_disk.sh
+./02_build_img.sh
 
-4. 制作扩展盘 （ 此步可以省略，只是演示挂载怎么样挂载多个盘 ） 
-./03_make_sdb.sh
-
-5. 运行 smart-os 系统  
-./04_run_qemu.sh 或 ./04_run_docker.sh
+4. 运行 smart-os 系统  
+./03_run_qemu.sh 或 ./04_run_docker.sh
 
 是不是制作一个操作系统很简单！
 磁盘空间可以任意扩展，可以上网，可以根据需要扩展自己想要的组件，我已经试验成功，在 smart-os 内运行流媒体服务器 smart_rtmpd 了
