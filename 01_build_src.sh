@@ -107,8 +107,8 @@ fi
 if [ ! -d "libgcc_install" ]; then 
   mkdir -pv libgcc_install && cd gcc-7.5.0
   ./contrib/download_prerequisites
-  ./configure --prefix=${glibc_install} --enable-languages=c,c++ --disable-multilib --disable-static --disable-libquadmath --enable-shared
-  CFLAGS="-L${glibc_install}/lib $CFLAGS" make -j8 all-gcc && make -j8 && make install -j8 DESTDIR=${libgcc_install}
+  ./configure --prefix=${libgcc_install} --enable-languages=c,c++ --disable-multilib --disable-static --disable-libquadmath --enable-shared
+  CFLAGS="-L${glibc_install}/lib $CFLAGS" make -j8 all-gcc && make -j8 && make install -j8
   cd ..
 fi
 
