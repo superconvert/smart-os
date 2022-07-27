@@ -9,7 +9,7 @@
 
 1. 准备系统环境  
 由于内核需要编译，需要安装内核编译所需要的环境
-由于 busybox 需要编译，根据需要自行安装所需环境
+由于 busybox 需要编译，根据需要自行安装所需环境  
 ./env.sh
 
 2. 编译源码 ( kernel, glibc, busyboxy, libgcc, libdns ) 还没整理    
