@@ -193,7 +193,7 @@ cat - > ${diskfs}/boot/grub/grub.cfg << EOF
 set timeout=6
 menuentry "smart-os" {
     root=(hd0,msdos1)
-    linux /boot/bzImage console=tty1
+    linux /boot/bzImage console=tty0 console=ttyS0
     initrd /boot/initrd
 }
 EOF
