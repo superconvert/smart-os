@@ -151,7 +151,6 @@ cat<<"EOF">etc/inittab
 ::restart:/sbin/init
 ::ctrlaltdel:/sbin/reboot
 ::shutdown:/bin/umount -a -r
-::respawn:/bin/cttyhack /bin/sh
 tty1::once:echo "hello smart-os tty1"
 tty1::respawn:/bin/sh
 tty2::once:echo "hello smart-os tty2"
@@ -193,7 +192,7 @@ cat - > ${diskfs}/boot/grub/grub.cfg << EOF
 set timeout=6
 menuentry "smart-os" {
     root=(hd0,msdos1)
-    linux /boot/bzImage console=tty0 console=ttyS0
+    linux /boot/bzImage console=tty0
     initrd /boot/initrd
 }
 EOF
