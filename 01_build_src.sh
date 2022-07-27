@@ -56,6 +56,10 @@ if [ ! -d "./work/gcc-7.5.0" ]; then
   tar xvf source/gcc-7.5.0.tar.xz -C work/
 fi
 
+if [ ! -d "./work/binutils-2.36" ]; then
+  tar xvf source/binutils-2.36.tar.xz -C work/
+fi
+
 #---------------------------------------------
 #
 # 编译源码 
@@ -67,6 +71,7 @@ kernel_install=`pwd`"/kernel_install"
 glibc_install=`pwd`"/glibc_install"
 busybox_install=`pwd`"/busybox_install"
 libgcc_install=`pwd`"/libgcc_install"
+binutils_install=`pwd`"/binutils_install"
 
 # 编译内核, 最终所有模块都装到目录 /lib/modules/4.14.9
 if [ ! -d "kernel_install" ]; then 
@@ -75,8 +80,7 @@ if [ ! -d "kernel_install" ]; then
   # 网络需要 TUN/TAP 驱动 [ Device Drivers ] ---> [ Network device support ] ---> [ Universal TUN/TAP device driver support ]
   make x86_64_defconfig && sed -i "s/.*CONFIG_FB_VESA.*/CONFIG_FB_VESA=y/" .config && make bzImage -j8
   #cd linux-4.14.9 && make x86_64_defconfig && make bzImage -j8 && make modules && make modules_install && cd ..
-  make INSTALL_HDR_PATH=${kernel_install} headers_install -j8 && cp arch/x86_64/boot/bzImage ${kernel_install} 
-  cd ..
+  make INSTALL_HDR_PATH=${kernel_install} headers_install -j8 && cp arch/x86_64/boot/bzImage ${kernel_install} && cd ..
 fi
 
 # 编译glibc
@@ -89,8 +93,7 @@ if [ ! -d "glibc_install" ]; then
     --without-gd \
     --without-selinux \
     --disable-werror
-  make -j8 && make install -j8 DESTDIR=${glibc_install}
-  cd .. && cd ..
+  make -j8 && make install -j8 DESTDIR=${glibc_install} && cd .. && cd ..
 fi
 
 # 编译 busybox 
@@ -108,7 +111,14 @@ if [ ! -d "libgcc_install" ]; then
   mkdir -pv libgcc_install && cd gcc-7.5.0 && make distclean && rm ./config.cache
   ./contrib/download_prerequisites
   ./configure --prefix= --enable-languages=c,c++ --disable-multilib --disable-static --disable-libquadmath --enable-shared
-  CFLAGS="-L${glibc_install}/lib $CFLAGS" make -j8 && make install -j8 DESTDIR=${libgcc_install}
+  CFLAGS="-L${glibc_install}/lib $CFLAGS" make -j8 && make install -j8 DESTDIR=${libgcc_install} && cd ..
+fi
+
+# 编译 binutils
+if [ ! -d "binutils_install" ]; then
+  mkdir -pv binutils_install && cd binutils-2.36 && make distclean
+  ./configure --prefix=
+  CFLAGS="-L${glibc_install}/lib $CFLAGS" make -j8 && make install -j8 DESTDIR=${binutils_install} && cd ..
   cd ..
 fi
 
