@@ -70,7 +70,7 @@ libgcc_install=`pwd`"/libgcc_install"
 
 # 编译内核, 最终所有模块都装到目录 /lib/modules/4.14.9
 if [ ! -d "kernel_install" ]; then 
-  mkdir -pv kernel_install && cd linux-4.14.9
+  mkdir -pv kernel_install && cd linux-4.14.9 && make mrproper
   # Enable the VESA framebuffer for graphics support.
   # 网络需要 TUN/TAP 驱动 [ Device Drivers ] ---> [ Network device support ] ---> [ Universal TUN/TAP device driver support ]
   make x86_64_defconfig && sed -i "s/.*CONFIG_FB_VESA.*/CONFIG_FB_VESA=y/" .config && make bzImage -j8
@@ -105,10 +105,10 @@ fi
 
 # 编译 libgcc
 if [ ! -d "libgcc_install" ]; then 
-  mkdir -pv libgcc_install && cd gcc-7.5.0
+  mkdir -pv libgcc_install && cd gcc-7.5.0 && make distclean && rm ./config.cache
   ./contrib/download_prerequisites
-  ./configure --prefix=${libgcc_install} --enable-languages=c,c++ --disable-multilib --disable-static --disable-libquadmath --enable-shared
-  CFLAGS="-L${glibc_install}/lib $CFLAGS" make -j8 all-gcc && make -j8 && make install -j8
+  ./configure --prefix= --enable-languages=c,c++ --disable-multilib --disable-static --disable-libquadmath --enable-shared
+  CFLAGS="-L${glibc_install}/lib $CFLAGS" make -j8 && make install -j8 DESTDIR=${libgcc_install}
   cd ..
 fi
 
