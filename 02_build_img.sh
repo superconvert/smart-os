@@ -21,7 +21,7 @@ NC='\e[0m' # 没有颜色
 #
 #----------------------------------------------
 # 创建磁盘 64M
-dd if=/dev/zero of=disk.img bs=1M count=128
+dd if=/dev/zero of=disk.img bs=1M count=256
 # 对磁盘进行分区一个主分区
 fdisk disk.img << EOF
 n
@@ -72,7 +72,6 @@ cp work/kernel_install/bzImage ${diskfs}/boot/bzImage
 # 拷贝 glibc 到 rootfs
 cp work/glibc_install/* rootfs/ -r
 rm -rf rootfs/lib/*.a 
-rm -rf rootfs/lib/*.o 
 rm -rf rootfs/lib/gconv 
 rm -rf rootfs/bin/*
 rm -rf rootfs/share
@@ -180,6 +179,8 @@ cd ..
 #--------------------------------------------------------------
 echo "${CYAN}开始制作diskfs...${NC}"
 cp rootfs/* ${diskfs} -r
+cp work/libgcc_install/* ${diskfs} -r
+cp work/binutils_install/* ${diskfs} -r
 rm -rf ${diskfs}/init && rm -rf ${diskfs}/linuxrc && rm -rf ${diskfs}/lost+found
 
 # 我们测试驱动, 制作的镜像启动后，我们进入此目录 insmod hello_world.ko 即可 
