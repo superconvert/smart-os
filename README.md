@@ -28,7 +28,7 @@
 由于 busybox 需要编译，根据需要自行安装所需环境  
 ./00_build_env.sh
 
-2. 编译源码 ( kernel, glibc, busyboxy, libgcc, libdns ) 还没整理    
+2. 编译源码 ( kernel, glibc, busyboxy, gcc, binutils)     
 ./01_build_src.sh
 
 3. 制作系统盘 （ 重要，此步骤把系统安装到一个系统文件内 )  
