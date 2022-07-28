@@ -1,6 +1,57 @@
 #!/bin/sh
 
-SYSROOT=`pwd`"/rootfs"
+core_num=`nproc`
+kernel_install=`pwd`"/work/kernel_install"
+glibc_install=`pwd`"/work/glibc_install"
+busybox_install=`pwd`"/work/busybox_install"
+libgcc_install=`pwd`"/work/libgcc_install"
+binutils_install=`pwd`"/work/binutils_install"
+
+#-----------------------------------------------
+#
+# 重新生成目标文件
+#
+#----------------------------------------------- 
+if [ "$1" != "" ]; then
+  if [ $1 != "rebuild" ]; then
+    exit
+  fi
+  echo "rebuild"
+  cd work
+  rm -rf kernel_install glibc_install busybox_install libgcc_install binutils_install
+  # 编译内核, 最终所有模块都装到目录 /lib/modules/4.14.9
+  if [ ! -d "kernel_install" ]; then
+    mkdir -pv kernel_install && cd linux-4.14.9 
+    make INSTALL_HDR_PATH=${kernel_install} headers_install -j8 && cp arch/x86_64/boot/bzImage ${kernel_install} && cd ..
+  fi
+
+  # 编译glibc
+  if [ ! -d "glibc_install" ]; then
+    mkdir -pv glibc_install && cd glibc-2.32
+    mkdir -pv build && cd build
+    make install -j8 DESTDIR=${glibc_install} && cd .. && cd ..
+  fi
+
+  # 编译 busybox 
+  if [ ! -d "busybox_install" ]; then
+    mkdir -pv busybox_install && cd busybox-1.34.1
+    make CONFIG_PREFIX=${busybox_install} install && cd ..
+  fi
+
+  # 编译 libgcc
+  if [ ! -d "libgcc_install" ]; then
+    mkdir -pv libgcc_install && cd gcc-7.5.0
+    make install -j8 DESTDIR=${libgcc_install} && cd ..
+  fi
+
+  # 编译 binutils
+  if [ ! -d "binutils_install" ]; then
+    mkdir -pv binutils_install && cd binutils-2.36
+    make install -j8 DESTDIR=${binutils_install} && cd ..
+  fi  
+  cd ..
+  exit
+fi
 
 #----------------------------------------------
 #
@@ -31,6 +82,11 @@ if [ ! -f "gcc-7.5.0.tar.xz" ]; then
   wget $GCC_SOURCE_URL 
 fi
 
+BINUTILS_SOURCE_URL=https://ftp.gnu.org/gnu/binutils/binutils-2.36.tar.xz
+if [ ! -f "binutils-2.36.tar.xz" ]; then
+  wget $BINUTILS_SOURCE_URL
+fi
+
 cd ..
 
 #---------------------------------------------
@@ -41,23 +97,28 @@ cd ..
 mkdir -pv work
 
 if [ ! -d "./work/linux-4.14.9" ]; then
-  tar xvf source/linux-4.14.9.tar.xz -C work/
+  echo "unzip kernel source"
+  tar xf source/linux-4.14.9.tar.xz -C work/
 fi
 
 if [ ! -d "./work/glibc-2.32" ]; then
-  tar xvf source/glibc-2.32.tar.bz2 -C work/
+  echo "unzip glibc source"
+  tar xf source/glibc-2.32.tar.bz2 -C work/
 fi
 
 if [ ! -d "./work/busybox-1.34.1" ]; then
-  tar xvf source/busybox-1.34.1.tar.bz2 -C work/
+  echo "unzip busybox source"
+  tar xf source/busybox-1.34.1.tar.bz2 -C work/
 fi
 
 if [ ! -d "./work/gcc-7.5.0" ]; then
-  tar xvf source/gcc-7.5.0.tar.xz -C work/
+  echo "unzip gcc source"
+  tar xf source/gcc-7.5.0.tar.xz -C work/
 fi
 
 if [ ! -d "./work/binutils-2.36" ]; then
-  tar xvf source/binutils-2.36.tar.xz -C work/
+  echo "unzip binutils source"
+  tar xf source/binutils-2.36.tar.xz -C work/
 fi
 
 #---------------------------------------------
@@ -66,12 +127,6 @@ fi
 #
 #---------------------------------------------
 cd work
-
-kernel_install=`pwd`"/kernel_install"
-glibc_install=`pwd`"/glibc_install"
-busybox_install=`pwd`"/busybox_install"
-libgcc_install=`pwd`"/libgcc_install"
-binutils_install=`pwd`"/binutils_install"
 
 # 编译内核, 最终所有模块都装到目录 /lib/modules/4.14.9
 if [ ! -d "kernel_install" ]; then 
@@ -85,7 +140,6 @@ fi
 
 # 编译glibc
 if [ ! -d "glibc_install" ]; then
-  echo $PATH
   mkdir -pv glibc_install && cd glibc-2.32
   mkdir -pv build && cd build && make distclean
   ../configure --prefix= \
@@ -102,7 +156,6 @@ if [ ! -d "busybox_install" ]; then
   # 静态编译 sed -i "s/# CONFIG_STATIC is not set/CONFIG_STATIC=y/g" .config
   sed -i "s|.*CONFIG_SYSROOT.*|CONFIG_SYSROOT=\"${glibc_install}\"|" .config
   sed -i "s|.*CONFIG_EXTRA_CFLAGS.*|CONFIG_EXTRA_CFLAGS=\"$CFLAGS -I${kernel_install}/include -I${glibc_install}/include -L${glibc_install}/lib\"|" .config
-  export PATH=/sbin:/bin:/usr/sbin:/usr/bin
   make busybox -j8 && make CONFIG_PREFIX=${busybox_install} install && cd ..
 fi
 
@@ -123,3 +176,5 @@ if [ ! -d "binutils_install" ]; then
 fi
 
 cd ..
+
+echo "Run the next script: 02_build_img.sh"

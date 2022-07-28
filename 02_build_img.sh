@@ -15,13 +15,28 @@ CYAN='\e[1;36m'
 WHITE='\e[1;37m' # 白色
 NC='\e[0m' # 没有颜色
 
+# ./02_build_img.sh gcc 这样就能编译带 gcc 的系统
+with_gcc=$1
+
+#----------------------------------------------
+#
+# 进行目录瘦身
+#
+#----------------------------------------------
+./mk_strip.sh
+
 #----------------------------------------------
 #
 # 制作磁盘
 #
 #----------------------------------------------
+echo "${CYAN}--- build disk --- ${NC}"
 # 创建磁盘 64M
-dd if=/dev/zero of=disk.img bs=1M count=256
+if [ ! -n "${with_gcc}" ]; then
+  dd if=/dev/zero of=disk.img bs=1M count=64
+else
+  dd if=/dev/zero of=disk.img bs=1M count=512
+fi
 # 对磁盘进行分区一个主分区
 fdisk disk.img << EOF
 n
@@ -31,7 +46,7 @@ p
 
 w
 EOF
-echo ".........................................................."
+echo "${GREEN}+++ build disk ok +++${NC}"
 
 # 磁盘镜像挂载到具体设备
 loop_dev=$(losetup -f)
@@ -44,7 +59,6 @@ diskfs="diskfs"
 # 挂载磁盘到本地目录
 mkdir -pv ${diskfs} 
 mount -t ext3 ${loop_dev} ${diskfs} 
-
 # 安装grub 引导
 grub-install --boot-directory=${diskfs}/boot/ --target=i386-pc --modules=part_msdos disk.img
 
@@ -76,13 +90,15 @@ rm -rf rootfs/lib/gconv
 rm -rf rootfs/bin/*
 rm -rf rootfs/share
 rm -rf rootfs/var/db 
-rm -rf rootfs/include
-rm -rf rootfs/lib/ld-linux-x86-64.so.2
-ln -s ../lib rootfs/usr/lib
-ln -s ../lib/ld-2.32.so rootfs/lib64/ld-linux-x86-64.so.2
+# 编译的镜像带有 gcc 编译器
+if [ ! -n "${with_gcc}" ]; then
+  rm -rf rootfs/include
+else
+  echo "${RED} with-gcc tools --- you can build your world${NC}"
+  cp work/glibc_install/lib/libc_nonshared.a rootfs/lib 
+fi
 
 # 拷贝 busybox 到 rootfs
-echo "${CYAN}开始制作rootfs...${NC}"
 cp work/busybox_install/* rootfs/ -r
 
 #-----------------------------------------------
@@ -91,6 +107,7 @@ cp work/busybox_install/* rootfs/ -r
 #
 #-----------------------------------------------
 cd rootfs
+echo "${CYAN}--- build initrd ---${NC}"
 
 # 这种方法也可以 mkinitramfs -k -o ./${diskfs}/boot/initrd 4.14.9
 # 利用 Busybox 采用脚本制作 init 脚本 https://blog.csdn.net/embeddedman/article/details/7721926
@@ -128,8 +145,7 @@ EOF
 
 # /sbin/init [switch_root 执行] ---> /etc/inittab [定义了启动顺序] ---> 
 # /etc/init.d/rcS [系统 mount, 安装驱动，配置网络] --->
-# /etc/init.d/rc.local [文件配置应用程序需要的环境变量] ---> 
-# /etc/profile [部分初始化]
+# /etc/init.d/rc.local [文件配置应用程序需要的环境变量] ---> /etc/profile [部分初始化]
 chmod +x init
 
 }
@@ -158,18 +174,8 @@ tty3::once:echo "hello smart-os tty3"
 tty3::respawn:/bin/sh
 EOF
 
-# dns 测试
-# 0. 启动脚本 run_nat.sh
-# 1. busybox 必须动态编译
-# 2. ifconfig eth0 192.168.100.6 && ifconfig eth0 up
-# 3. route add default gw 192.168.100.1
-# 4. echo "nameserver 114.114.114.114" >> /etc/resolv.conf
-# cp -rf ../fixed/lib* lib/ && cp ../fixed/ld-linux-x86-64.so.2 lib64/
-strip -g bin/* sbin/* lib/* 
-
 find . | cpio -R root:root -H newc -o | gzip -9 > ../${diskfs}/boot/initrd
-echo "${GREEN}rootfs制作成功!!!${NC}"
-echo ".........................................................."
+echo "${GREEN}+++ build initrd ok +++${NC}"
 cd ..
 
 #--------------------------------------------------------------
@@ -177,11 +183,15 @@ cd ..
 # 生成磁盘文件系统(利用 busybox 结构，省的自己创建了)
 #
 #--------------------------------------------------------------
-echo "${CYAN}开始制作diskfs...${NC}"
+echo "${CYAN}--- build diskfs ---${NC}"
 cp rootfs/* ${diskfs} -r
-cp work/libgcc_install/* ${diskfs} -r
-cp work/binutils_install/* ${diskfs} -r
-rm -rf ${diskfs}/init && rm -rf ${diskfs}/linuxrc && rm -rf ${diskfs}/lost+found
+# 带有 gcc 编译器
+if [ "${with_gcc}" ]; then
+  echo "${RED} with-gcc tools --- you can build your world${NC}"
+  cp work/libgcc_install/* ${diskfs} -r
+  cp work/binutils_install/* ${diskfs} -r
+fi
+rm -rf ${diskfs}/init ${diskfs}/linuxrc ${diskfs}/lost+found ${diskfs}/share
 
 # 我们测试驱动, 制作的镜像启动后，我们进入此目录 insmod hello_world.ko 即可 
 ./make_driver.sh $(pwd)/${diskfs}/lib/modules 
@@ -198,7 +208,7 @@ menuentry "smart-os" {
 }
 EOF
 
-# 生成 rcS 文件
+# 生成 /etc/init.d/rcS 文件
 title=$(cat<<EOF
 \e[0;36m
 ..######..##.....##....###....########..########..........#######...######.
@@ -219,7 +229,7 @@ echo -e "\n“${title}”\n"
 # 测试驱动加载 
 cd /lib/modules && insmod hello_world.ko
 
-# dns 测试
+# dns 测试 busybox 必须动态编译 动态编译 glibc 已经集成 dns 功能
 ifconfig eth0 192.168.100.6 && ifconfig eth0 up
 route add default gw 192.168.100.1
 echo "nameserver 114.114.114.114" >> /etc/resolv.conf
@@ -227,10 +237,17 @@ echo "nameserver 114.114.114.114" >> /etc/resolv.conf
 # exec 执行 /etc/init.d/rc.local 脚本
 EOF
 chmod +x  ${diskfs}/etc/init.d/rcS
-
-echo "${GREEN}diskfs制作成功!!!${NC}"
-echo ".........................................................."
+echo "${GREEN}+++ build diskfs ok +++${NC}"
 
 # 卸载映射
 umount ${loop_dev} 
 losetup -d ${loop_dev}
+
+#---------------------------------------------------------------
+#
+# 查看磁盘内容
+#
+#---------------------------------------------------------------
+./cat_img.sh
+
+echo "Run the next script: 03_run_qemu.sh or 04_run_docker.sh"
