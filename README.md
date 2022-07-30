@@ -1,5 +1,5 @@
 # smart-os 一个小巧的 linux 系统
-本项目给大家演示了怎么样快速制作一个小巧的 linux 操作系统
+本项目给大家演示了怎么样快速制作一个小巧切功能齐全的 linux 操作系统
 
 # 项目地址
 https://github.com/superconvert/smart-os
@@ -17,9 +17,10 @@ https://github.com/superconvert/smart-os
 
 # 用途与场景
 1. 操作系统原理教学
-2. IoT场景操作系统定制
+2. 云主机系统
 3. 流媒体服务器定制
-4. 云主机系统
+4. 嵌入式设备定制
+5. IoT场景操作系统定制
 
 # 环境说明
 本脚本 Ubuntu 18.04 上做的，别的系统应该改动不大，有需要的朋友可以自行修改。
@@ -27,22 +28,22 @@ https://github.com/superconvert/smart-os
 1. 准备系统环境  
 由于内核需要编译，需要安装内核编译所需要的环境
 由于 busybox 需要编译，根据需要自行安装所需环境  
-```shell
-./00_build_env.sh
-```
+    ```shell
+    ./00_build_env.sh
+    ```
 
 2. 编译源码 ( kernel, glibc, busyboxy, gcc, binutils)     
-```shell
-./01_build_src.sh
-```
+    ```shell
+    ./01_build_src.sh
+    ```
 3. 制作系统盘 （ 重要，此步骤把系统安装到一个系统文件内 )  
-```shell
-./02_build_img.sh
-```
+    ```shell
+    ./02_build_img.sh
+    ```
 4. 运行 smart-os 系统  
-```shell
-./03_run_qemu.sh 或 ./04_run_docker.sh
-```
+    ```shell
+    ./03_run_qemu.sh 或 ./04_run_docker.sh
+    ```
 是不是制作一个操作系统很简单！
 磁盘空间可以任意扩展，可以上网，可以根据需要扩展自己想要的组件，我已经试验成功，在 smart-os 内运行流媒体服务器 smart_rtmpd 了
 
