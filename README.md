@@ -49,6 +49,25 @@ https://github.com/superconvert/smart-os
 
 2. qemu 一般启动后窗口比较小，一旦出现错误，基本上没办法看错误日志，那么就需要在 grub 的启动项内增加 console=ttyS0，同时 qemu-system-x86_64 增加串口输出到文件 -serial file:./qemu.log，这样调试就方便多了，调试完毕需要去掉 console=ttyS0 否则，/etc/init.d/rcS 里面的内容可能输出不显示
 
+3. 我们编译 glibc 的版本一般都比较高，通常情况下版本都会高于系统自带的版本，我们可以编写测试程序测试 main.c 用来glibc 是否编译成功。比如：
+'''
+#include <stdio.h>
+int main() {
+  printf("Hello glibc\n");
+  return 0 ;
+}
+'''
+比如:  
+编译 gcc -o test main.c -Wl,-rpath=/root/smart-os/work/glibc_install/usr/lib64
+在当前系统下，我们执行 ./test 程序，通常会报类似于这样的错误 /lib64/libc.so.6: version `GLIBC_2.28' not found 或者直接 crash 了
+其实这是没有指定动态库加载器/链接器和系统环境的原因，通常我们编译 glibc 的时候，会自动给我们生成一个 testrun.sh，我们在 testrun.sh 所在的目录内执行程序
+./testrun.sh ./test 通常就成功了。当然我们也可以把下面一句保存到一个脚本中，直接执行就成功了。
+'''
+exec env /root/smart-os/work/glibc_install/lib64/ld-linux-x86-64.so.2 --library-path /root/smart-os/work/glibc_install/lib64 ./test
+'''
+
+4. 我们怎么跟踪一个可执行程序的加载那些库，利用 LD_DEBUG=libs ./test  就可以了
+
 # TODO 列表
 1. 增加 arm 版本
 2. 增加图形界面演示  
