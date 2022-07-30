@@ -42,7 +42,7 @@ https://github.com/superconvert/smart-os
 磁盘空间可以任意扩展，可以上网，可以根据需要扩展自己想要的组件，我已经试验成功，在 smart-os 内运行流媒体服务器 smart_rtmpd 了
 
 # 注意事项
-1. 由于smart-os安装了 glibc 动态库，这个严重依赖动态库加载器/链接器 ld-linux-x86-64.so.2 ，由于应用程序都是通过动态编译链接的，当一个需要动态链接的应用被操作系统加载时，系统必须要定位然后加载它所需要的所有动态库文件。ld-linux-x86-64.so.2 其实是一个软链，必须存在于 /lib64/ld-linux-x86-64.so.2 和 /lib/ld-linux-x86-64.so.2 下，否则，我们动态编译的 busybox 依赖 glibc，glibc 的加载需要这个，如果不存在导致<font color=red>系统启动时会直接 crash</font>，这个需要特别注意！！！
+1. 由于smart-os安装了 glibc 动态库，这个严重依赖动态库加载器/链接器 ld-linux-x86-64.so.2 ，由于应用程序都是通过动态编译链接的，当一个需要动态链接的应用被操作系统加载时，系统必须要定位然后加载它所需要的所有动态库文件。这项工作是由 ld-linux.so.2 来负责完成的，当程序加载时，操作系统会将控制权交给 ld-linux.so 而不是交给程序正常的入口地址。 ld-linux.so.2 会寻找然后加载所有需要的库文件，然后再将控制权交给应用的起始入口。ld-linux-x86-64.so.2 其实就是 ld-linux.so.2 的软链，它必须存在于 /lib64/ld-linux-x86-64.so.2 下，否则，我们动态编译的 busybox 依赖 glibc 库，glibc 库的加载需要 ld-linux-x86-64.so，如果/lib64目录下不存在它，就会导致<font color=red>系统启动时会直接 panic</font>，这个问题需要特别注意！！！
 
 2. qemu 一般启动后窗口比较小，一旦出现错误，基本上没办法看错误日志，那么就需要在 grub 的启动项内增加 console=ttyS0，同时 qemu-system-x86_64 增加串口输出到文件 -serial file:./qemu.log，这样调试就方便多了，调试完毕需要去掉 console=ttyS0 否则，/etc/init.d/rcS 里面的内容可能输出不显示
 
