@@ -9,11 +9,11 @@ https://github.com/superconvert/smart-os
 2. 支持网络功能
 3. 支持 DNS 域名解析
 4. 支持 GCC 编译器
-5. 支持 smart_rtmpd 运行
-6. 支持 qemu 启动
-7. 支持 docker 启动
-8. 最精简模式 64 M
-9. 支持驱动相关演示
+5. 支持 qemu 启动
+6. 支持 docker 启动
+7. 最精简模式 64 M
+8. 支持驱动相关演示
+9. 支持 smart_rtmpd 流媒体服务器运行
 
 # 用途与场景
 1. 操作系统原理教学
@@ -27,17 +27,22 @@ https://github.com/superconvert/smart-os
 1. 准备系统环境  
 由于内核需要编译，需要安装内核编译所需要的环境
 由于 busybox 需要编译，根据需要自行安装所需环境  
+```shell
 ./00_build_env.sh
+```
 
 2. 编译源码 ( kernel, glibc, busyboxy, gcc, binutils)     
+```shell
 ./01_build_src.sh
-
+```
 3. 制作系统盘 （ 重要，此步骤把系统安装到一个系统文件内 )  
+```shell
 ./02_build_img.sh
-
+```
 4. 运行 smart-os 系统  
+```shell
 ./03_run_qemu.sh 或 ./04_run_docker.sh
-
+```
 是不是制作一个操作系统很简单！
 磁盘空间可以任意扩展，可以上网，可以根据需要扩展自己想要的组件，我已经试验成功，在 smart-os 内运行流媒体服务器 smart_rtmpd 了
 
@@ -47,24 +52,26 @@ https://github.com/superconvert/smart-os
 2. qemu 一般启动后窗口比较小，一旦出现错误，基本上没办法看错误日志，那么就需要在 grub 的启动项内增加 console=ttyS0，同时 qemu-system-x86_64 增加串口输出到文件 -serial file:./qemu.log，这样调试就方便多了，调试完毕需要去掉 console=ttyS0 否则，/etc/init.d/rcS 里面的内容可能输出不显示
 
 3. 我们编译的 glibc ，通常情况下版本都会高于系统自带的版本，我们可以编写测试程序 main.c 用来测试 glibc 是否编译成功。比如：  
-```cpp
-#include <stdio.h>
-int main() {
-  printf("Hello glibc\n");
-  return 0 ;
-}
-```
-我们进行编译  
-```shell
-gcc -o test main.c -Wl,-rpath=/root/smart-os/work/glibc_install/usr/lib64  
-```
-编译成功，我们执行 ./test 程序，通常会报类似于这样的错误 /lib64/libc.so.6: version `GLIBC_2.28' not found 或者程序直接 segment 了  
-其实这是没有指定动态库加载器/链接器和系统环境的原因，通常我们编译 glibc 库的时候，编译目录会自动生成一个 testrun.sh 脚本文件，我们在编译目录内执行程序  
-./testrun.sh ./test  
-通常这样就可以成功执行。我们也可以把下面一句话保存到一个脚本中，执行测试也是可以的。  
-```shell
-exec env /root/smart-os/work/glibc_install/lib64/ld-linux-x86-64.so.2 --library-path /root/smart-os/work/glibc_install/lib64 ./test
-```
+    ```cpp
+    #include <stdio.h>
+    int main() {
+        printf("Hello glibc\n");
+        return 0 ;
+    }
+    ```
+    我们进行编译  
+    ```shell
+    gcc -o test main.c -Wl,-rpath=/root/smart-os/work/glibc_install/usr/lib64  
+    ```
+    编译成功，我们执行 ./test 程序，通常会报类似于这样的错误 /lib64/libc.so.6: version `GLIBC_2.28' not found 或者程序直接 segment 了  
+    其实这是没有指定动态库加载器/链接器和系统环境的原因，通常我们编译 glibc 库的时候，编译目录会自动生成一个 testrun.sh 脚本文件，我们在编译目录内执行程序  
+    ```shell
+    ./testrun.sh ./test  
+    ```
+    通常这样就可以成功执行。我们也可以把下面一句话保存到一个脚本中，执行测试也是可以的。  
+    ```shell
+    exec env /root/smart-os/work/glibc_install/lib64/ld-linux-x86-64.so.2 --library-path /root/smart-os/work/glibc_install/lib64 ./test
+    ```
 
 4. 我们怎么跟踪一个可执行程序的加载那些库，利用 LD_DEBUG=libs ./test  就可以了, 我们预加载库可以利用 LD_PRELOAD 强制预加载库
 
