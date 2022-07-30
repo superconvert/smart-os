@@ -21,9 +21,6 @@ https://github.com/superconvert/smart-os
 3. 流媒体服务器定制
 4. 云主机系统
 
-# 说明
-由于初版比较着急，脚本及代码还有说明做的都比较粗糙，后续会慢慢完善！
-
 # 环境说明
 本脚本 Ubuntu 18.04 上做的，别的系统应该改动不大，有需要的朋友可以自行修改。
 
@@ -45,12 +42,11 @@ https://github.com/superconvert/smart-os
 磁盘空间可以任意扩展，可以上网，可以根据需要扩展自己想要的组件，我已经试验成功，在 smart-os 内运行流媒体服务器 smart_rtmpd 了
 
 # 注意事项
-1. 由于装了 glibc 动态库，这是系统的基础库之一，这个严重依赖 ld-linux-x86-64.so.2 动态库加载器/链接器，很多现代应用都是通过动态编译链接的，当一个需要动态链接的应用被操作系统加载时，系统必须要定位然后加载它所需要的所有动态库文件。ld-linux-x86-64.so.2 其实是一个软链，必须存在于 /lib64/ld-linux-x86-64.so.2 和 /lib/ld-linux-x86-64.so.2 下，否则，我们动态编译的 busybox 依赖 glibc，glibc 的加载需要这个，如果不存在导致<font color=red>系统启动时会直接 crash</font>，这个需要特别注意！！！
+1. 由于smart-os安装了 glibc 动态库，这个严重依赖动态库加载器/链接器 ld-linux-x86-64.so.2 ，由于应用程序都是通过动态编译链接的，当一个需要动态链接的应用被操作系统加载时，系统必须要定位然后加载它所需要的所有动态库文件。ld-linux-x86-64.so.2 其实是一个软链，必须存在于 /lib64/ld-linux-x86-64.so.2 和 /lib/ld-linux-x86-64.so.2 下，否则，我们动态编译的 busybox 依赖 glibc，glibc 的加载需要这个，如果不存在导致<font color=red>系统启动时会直接 crash</font>，这个需要特别注意！！！
 
 2. qemu 一般启动后窗口比较小，一旦出现错误，基本上没办法看错误日志，那么就需要在 grub 的启动项内增加 console=ttyS0，同时 qemu-system-x86_64 增加串口输出到文件 -serial file:./qemu.log，这样调试就方便多了，调试完毕需要去掉 console=ttyS0 否则，/etc/init.d/rcS 里面的内容可能输出不显示
 
-3. 我们编译 glibc 的版本一般都比较高，通常情况下版本都会高于系统自带的版本，我们可以编写测试程序测试 main.c 用来glibc 是否编译成功。比如：  
-
+3. 我们编译的 glibc ，通常情况下版本都会高于系统自带的版本，我们可以编写测试程序 main.c 用来测试 glibc 是否编译成功。比如：  
 ```cpp
 #include <stdio.h>
 int main() {
@@ -58,17 +54,14 @@ int main() {
   return 0 ;
 }
 ```
-
-比如编译
-
+我们进行编译  
 ```shell
 gcc -o test main.c -Wl,-rpath=/root/smart-os/work/glibc_install/usr/lib64  
 ```
-
-在当前系统下，我们执行 ./test 程序，通常会报类似于这样的错误 /lib64/libc.so.6: version `GLIBC_2.28' not found 或者直接 crash 了  
-其实这是没有指定动态库加载器/链接器和系统环境的原因，通常我们编译 glibc 的时候，会自动给我们生成一个 testrun.sh，我们在 testrun.sh 所在的目录内执行程序  
-./testrun.sh ./test 通常就成功了。当然我们也可以把下面一句保存到一个脚本中，直接执行就成功了。  
-
+编译成功，我们执行 ./test 程序，通常会报类似于这样的错误 /lib64/libc.so.6: version `GLIBC_2.28' not found 或者程序直接 segment 了  
+其实这是没有指定动态库加载器/链接器和系统环境的原因，通常我们编译 glibc 库的时候，编译目录会自动生成一个 testrun.sh 脚本文件，我们在编译目录内执行程序  
+./testrun.sh ./test  
+通常这样就可以成功执行。我们也可以把下面一句话保存到一个脚本中，执行测试也是可以的。  
 ```shell
 exec env /root/smart-os/work/glibc_install/lib64/ld-linux-x86-64.so.2 --library-path /root/smart-os/work/glibc_install/lib64 ./test
 ```
