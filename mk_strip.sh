@@ -24,18 +24,18 @@ strip_dir() {
 }
 
 # strip glibc
-rm -rf work/glibc_install/share
+rm -rf work/glibc_install/usr/share
 strip_dir work/glibc_install 
 
 # strip busybox
+rm -rf work/busybox_install/linuxrc
 strip work/busybox_install/bin/busybox 
 
 # strip gcc
-rm -rf work/libgcc_install/share
+#rm -rf work/libgcc_install/usr/share
 strip_dir work/libgcc_install
 
 # strip binutils
-rm -rf work/binutils_install/share
-rm -rf work/binutils_install/x86_64-pc-linux-gnu
+#rm -rf work/binutils_install/usr/share
 strip_dir work/binutils_install
 

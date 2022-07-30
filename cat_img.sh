@@ -8,6 +8,8 @@ mkdir -p ./mnt1
 mount -t ext3 ${loop_dev} ./mnt1
 echo "/ ---------------------------------------"
 du ./mnt1 -h
+echo "lib -------------------------------------"
+find ./mnt1 -name "*.a" -exec du -h {} \; 
 umount ./mnt1
 rm -rf mnt1
 losetup -d ${loop_dev}

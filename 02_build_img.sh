@@ -23,7 +23,7 @@ with_gcc=$1
 # 进行目录瘦身
 #
 #----------------------------------------------
-#./mk_strip.sh
+./mk_strip.sh
 
 #----------------------------------------------
 #
@@ -33,9 +33,9 @@ with_gcc=$1
 echo "${CYAN}--- build disk --- ${NC}"
 # 创建磁盘 64M
 if [ ! -n "${with_gcc}" ]; then
-  dd if=/dev/zero of=disk.img bs=1M count=256
+  dd if=/dev/zero of=disk.img bs=1M count=128
 else
-  dd if=/dev/zero of=disk.img bs=1M count=512
+  dd if=/dev/zero of=disk.img bs=1M count=256
 fi
 # 对磁盘进行分区一个主分区
 fdisk disk.img << EOF
@@ -86,16 +86,17 @@ cp work/kernel_install/bzImage ${diskfs}/boot/bzImage
 
 # 拷贝 glibc 到 rootfs
 cp work/glibc_install/* rootfs/ -r
-rm -rf rootfs/lib/*.a
-rm -rf rootfs/share
 rm -rf rootfs/var/db 
+rm -rf rootfs/share
+rm -rf rootfs/usr/share
+find rootfs/ -name "*.a" -exec rm -rf {} \;
 # 编译的镜像带有 gcc 编译器
 if [ ! -n "${with_gcc}" ]; then
   echo "without-gcc tools."
  #rm -rf rootfs/include
 else
   echo "${RED} with-gcc tools --- you can build your world${NC}"
-  #cp work/glibc_install/lib/libc_nonshared.a rootfs/lib 
+  cp work/glibc_install/usr/lib64/libc_nonshared.a rootfs/usr/lib64 
 fi
 
 #----------------------------------------------------------------------
@@ -194,9 +195,9 @@ cp rootfs/* ${diskfs} -r
 if [ "${with_gcc}" ]; then
   echo "${RED} with-gcc tools --- you can build your world${NC}"
   cp work/libgcc_install/* ${diskfs} -r
-  cp work/binutils_install/* ${diskfs} -r
+  cp work/binutils_install/usr/x86_64-pc-linux-gnu/* ${diskfs} -r
 fi
-rm -rf ${diskfs}/init ${diskfs}/linuxrc ${diskfs}/lost+found
+rm -rf ${diskfs}/init ${diskfs}/lost+found
 
 # 我们测试驱动, 制作的镜像启动后，我们进入此目录 insmod hello_world.ko 即可 
 ./mk_drv.sh $(pwd)/${diskfs}/lib/modules 
