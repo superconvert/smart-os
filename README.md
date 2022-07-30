@@ -1,6 +1,9 @@
 # smart-os 一个小巧的 linux 系统
 本项目给大家演示了怎么样快速制作一个小巧的 linux 操作系统
 
+# 项目地址
+https://github.com/superconvert/smart-os
+
 # 功能与特点
 1. 支持挂载多块硬盘
 2. 支持网络功能
