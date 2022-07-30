@@ -10,7 +10,7 @@ losetup -o 1048576 ${loop_dev} disk.img
 mkdir -p ./tmp_docker
 mount -t ext3 ${loop_dev} ./tmp_docker
 cd ./tmp_docker
-tar -cvpf ../${dock_name}.tar --directory=./ --exclude=proc --exclude=sys --exclude=dev --exclude=run --exclude=boot .
+tar -cpf ../${dock_name}.tar --directory=./ --exclude=proc --exclude=sys --exclude=dev --exclude=run --exclude=boot .
 cd ..
 umount ./tmp_docker
 rm -rf ./tmp_docker 

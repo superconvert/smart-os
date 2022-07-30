@@ -23,7 +23,7 @@ with_gcc=$1
 # 进行目录瘦身
 #
 #----------------------------------------------
-./mk_strip.sh
+#./mk_strip.sh
 
 #----------------------------------------------
 #
@@ -33,7 +33,7 @@ with_gcc=$1
 echo "${CYAN}--- build disk --- ${NC}"
 # 创建磁盘 64M
 if [ ! -n "${with_gcc}" ]; then
-  dd if=/dev/zero of=disk.img bs=1M count=64
+  dd if=/dev/zero of=disk.img bs=1M count=256
 else
   dd if=/dev/zero of=disk.img bs=1M count=512
 fi
@@ -67,6 +67,7 @@ grub-install --boot-directory=${diskfs}/boot/ --target=i386-pc --modules=part_ms
 # 制作内核和 rootfs
 #
 #---------------------------------------------
+rm -rf rootfs
 mkdir -pv rootfs
 mkdir -pv rootfs/dev
 mkdir -pv rootfs/etc
@@ -85,18 +86,22 @@ cp work/kernel_install/bzImage ${diskfs}/boot/bzImage
 
 # 拷贝 glibc 到 rootfs
 cp work/glibc_install/* rootfs/ -r
-rm -rf rootfs/lib/*.a 
-rm -rf rootfs/lib/gconv 
-rm -rf rootfs/bin/*
+rm -rf rootfs/lib/*.a
 rm -rf rootfs/share
 rm -rf rootfs/var/db 
 # 编译的镜像带有 gcc 编译器
 if [ ! -n "${with_gcc}" ]; then
-  rm -rf rootfs/include
+  echo "without-gcc tools."
+ #rm -rf rootfs/include
 else
   echo "${RED} with-gcc tools --- you can build your world${NC}"
-  cp work/glibc_install/lib/libc_nonshared.a rootfs/lib 
+  #cp work/glibc_install/lib/libc_nonshared.a rootfs/lib 
 fi
+
+#----------------------------------------------------------------------
+# 这个解释器必须设置对，否则系统会启动时 crash, 导致启动失败 !!!!!!
+#-----------------------------------------------------------------------
+ln -s /lib/ld-2.32.so rootfs/lib64/ld-linux-x86-64.so.2
 
 # 拷贝 busybox 到 rootfs
 cp work/busybox_install/* rootfs/ -r
@@ -191,16 +196,16 @@ if [ "${with_gcc}" ]; then
   cp work/libgcc_install/* ${diskfs} -r
   cp work/binutils_install/* ${diskfs} -r
 fi
-rm -rf ${diskfs}/init ${diskfs}/linuxrc ${diskfs}/lost+found ${diskfs}/share
+rm -rf ${diskfs}/init ${diskfs}/linuxrc ${diskfs}/lost+found
 
 # 我们测试驱动, 制作的镜像启动后，我们进入此目录 insmod hello_world.ko 即可 
-./make_driver.sh $(pwd)/${diskfs}/lib/modules 
+./mk_drv.sh $(pwd)/${diskfs}/lib/modules 
 # 编译网卡驱动 ( 目前版本内核已集成 e1000 )
 # cd work/linux-4.14.9 && make M=drivers/net/ethernet/intel/e1000/ && cd ../..
 
-# 生成 grub.cfg 文件
+# 生成 grub.cfg 文件, 增加 console=ttyS0 就会让 qemu 输出日志到 qemu.log
 cat - > ${diskfs}/boot/grub/grub.cfg << EOF
-set timeout=6
+set timeout=3
 menuentry "smart-os" {
     root=(hd0,msdos1)
     linux /boot/bzImage console=tty0
