@@ -15,8 +15,8 @@ CYAN='\e[1;36m'
 WHITE='\e[1;37m' # 白色
 NC='\e[0m' # 没有颜色
 
-# ./02_build_img.sh gcc 这样就能编译带 gcc 的系统
-with_gcc=$1
+# 导入公共环境
+. ./common.sh
 
 #----------------------------------------------
 #
@@ -32,7 +32,7 @@ with_gcc=$1
 #----------------------------------------------
 echo "${CYAN}--- build disk --- ${NC}"
 # 创建磁盘 64M
-if [ ! -n "${with_gcc}" ]; then
+if [ "${with_gcc}" = false ]; then
   dd if=/dev/zero of=disk.img bs=1M count=128
 else
   dd if=/dev/zero of=disk.img bs=1M count=256
@@ -82,30 +82,30 @@ mkdir -pv rootfs/lib64
 mkdir -pv rootfs/lib/modules
 
 # 拷贝内核镜像
-cp work/kernel_install/bzImage ${diskfs}/boot/bzImage
+cp ${linux_install}/bzImage ${diskfs}/boot/bzImage
 
 # 拷贝 glibc 到 rootfs
-cp work/glibc_install/* rootfs/ -r
+cp ${glibc_install}/* rootfs/ -r
 rm -rf rootfs/var/db 
 rm -rf rootfs/share
 rm -rf rootfs/usr/share
 find rootfs/ -name "*.a" -exec rm -rf {} \;
 # 编译的镜像带有 gcc 编译器
-if [ ! -n "${with_gcc}" ]; then
-  echo "without-gcc tools."
- #rm -rf rootfs/include
+if [ "${with_gcc}" = false ]; then
+  rm -rf rootfs/usr/include
 else
   echo "${RED} with-gcc tools --- you can build your world${NC}"
-  cp work/glibc_install/usr/lib64/libc_nonshared.a rootfs/usr/lib64 
+  cp ${glibc_install}/usr/lib64/libc_nonshared.a rootfs/usr/lib64 
 fi
 
 #----------------------------------------------------------------------
 # 这个解释器必须设置对，否则系统会启动时 crash, 导致启动失败 !!!!!!
+# 这个现在 glibc 编译时，已经自动生成，先注释掉
 #-----------------------------------------------------------------------
-ln -s /lib/ld-2.32.so rootfs/lib64/ld-linux-x86-64.so.2
+# ln -s /lib/ld-2.32.so rootfs/lib64/ld-linux-x86-64.so.2
 
 # 拷贝 busybox 到 rootfs
-cp work/busybox_install/* rootfs/ -r
+cp ${busybox_install}/* rootfs/ -r
 
 #-----------------------------------------------
 #
@@ -122,7 +122,6 @@ make_init() {
 
 cat<<"EOF">init
 #!/bin/sh
-
 # 必须首先挂载，否则 mdev 不能正常工作
 mount -t sysfs none /sys
 mount -t proc none /proc
@@ -131,21 +130,19 @@ mount -t tmpfs none /tmp -o mode=1777
 # 必须挂载一下，否则下面的 mount 不上
 mdev -s
 mount -t ext3 /dev/sda1 /mnt
-
 # 关闭内核烦人的输出信息
 echo 0 > /proc/sys/kernel/printk
+# 热插拔处理都交给 mdev
+echo /sbin/mdev > /proc/sys/kernel/hotplug
 echo -e "\n\e[0;32mBoot took $(cut -d' ' -f1 /proc/uptime) seconds\e[0m"
-
 mkdir -p /dev/pts
 mount -t devpts none /dev/pts
-
 # 切换之前，修改 mount 路径
 mount --move /dev /mnt/dev
 mount --move /sys /mnt/sys
 mount --move /proc /mnt/proc
 mount --move /tmp /mnt/tmp
-
-# 切换到真正的磁盘系统上 rootfs(initramfs) ---> diskfs
+# 切换到真正的磁盘系统上 rootfs ---> diskfs
 exec switch_root /mnt /sbin/init
 EOF
 
@@ -192,17 +189,17 @@ cd ..
 echo "${CYAN}--- build diskfs ---${NC}"
 cp rootfs/* ${diskfs} -r
 # 带有 gcc 编译器
-if [ "${with_gcc}" ]; then
+if [ "${with_gcc}" = true ]; then
   echo "${RED} with-gcc tools --- you can build your world${NC}"
-  cp work/libgcc_install/* ${diskfs} -r
-  cp work/binutils_install/usr/x86_64-pc-linux-gnu/* ${diskfs} -r
+  cp ${gcc_install}/* ${diskfs} -r
+  cp ${binutils_install}/usr/x86_64-pc-linux-gnu/* ${diskfs} -r
 fi
 rm -rf ${diskfs}/init ${diskfs}/lost+found
 
 # 我们测试驱动, 制作的镜像启动后，我们进入此目录 insmod hello_world.ko 即可 
 ./mk_drv.sh $(pwd)/${diskfs}/lib/modules 
 # 编译网卡驱动 ( 目前版本内核已集成 e1000 )
-# cd work/linux-4.14.9 && make M=drivers/net/ethernet/intel/e1000/ && cd ../..
+# cd ${build_dir}/linux-4.14.9 && make M=drivers/net/ethernet/intel/e1000/ && cd ../..
 
 # 生成 grub.cfg 文件, 增加 console=ttyS0 就会让 qemu 输出日志到 qemu.log
 cat - > ${diskfs}/boot/grub/grub.cfg << EOF

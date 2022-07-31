@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# 导入公共环境
+. ./common.sh
+
 strip_dir() {
   for file in `ls $1`
   do
@@ -24,18 +27,18 @@ strip_dir() {
 }
 
 # strip glibc
-rm -rf work/glibc_install/usr/share
-strip_dir work/glibc_install 
+rm -rf ${glibc_install}/usr/share
+strip_dir ${glibc_install}
 
 # strip busybox
-rm -rf work/busybox_install/linuxrc
-strip work/busybox_install/bin/busybox 
+rm -rf ${busybox_install}/linuxrc
+strip ${busybox_install}/bin/busybox 
 
 # strip gcc
 #rm -rf work/libgcc_install/usr/share
-strip_dir work/libgcc_install
+strip_dir ${gcc_install}
 
 # strip binutils
 #rm -rf work/binutils_install/usr/share
-strip_dir work/binutils_install
+strip_dir ${binutils_install}
 
