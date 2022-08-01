@@ -4,6 +4,12 @@ core_num=`nproc`
 # 是否开启 gcc
 with_gcc=false
 
+# 是否挂载第二块硬盘
+with_sdb=false
+
+# 是否登陆模式
+with_login=false
+
 # 编译工程目录
 build_dir=`pwd`"/build"
 

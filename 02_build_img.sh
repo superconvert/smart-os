@@ -163,12 +163,13 @@ make_init
 
 # 指定了利用 /etc/init.d/rcS 启动
 cat<<"EOF">etc/inittab
-::sysinit:echo "sysinit 1++++++++++++++++++++++++++++++++++++++"
-::sysinit:/etc/init.d/rcS
-::sysinit:echo "sysinit 2++++++++++++++++++++++++++++++++++++++"
 ::restart:/sbin/init
 ::ctrlaltdel:/sbin/reboot
 ::shutdown:/bin/umount -a -r
+::shutdown:/sbin/swapoff -a
+::sysinit:echo "sysinit 1++++++++++++++++++++++++++++++++++++++"
+::sysinit:/etc/init.d/rcS
+::sysinit:echo "sysinit 2++++++++++++++++++++++++++++++++++++++"
 tty1::once:echo "hello smart-os tty1"
 tty1::respawn:/bin/sh
 tty2::once:echo "hello smart-os tty2"
@@ -196,6 +197,12 @@ if [ "${with_gcc}" = true ]; then
 fi
 rm -rf ${diskfs}/init ${diskfs}/lost+found
 
+# 测试用户登陆模式: root/123456
+if [ "${with_login}" = true ]; then
+  echo "${RED} with-login --- it's an exciting time ${NC}"
+  ./mk_login.sh ${diskfs}
+fi
+
 # 我们测试驱动, 制作的镜像启动后，我们进入此目录 insmod hello_world.ko 即可 
 ./mk_drv.sh $(pwd)/${diskfs}/lib/modules 
 # 编译网卡驱动 ( 目前版本内核已集成 e1000 )
@@ -209,6 +216,12 @@ menuentry "smart-os" {
     linux /boot/bzImage console=tty0
     initrd /boot/initrd
 }
+EOF
+
+# 生成 /etc/resolv.conf 文件
+cat -> ${diskfs}/etc/resolv.conf << EOF
+nameserver 8.8.8.8
+nameserver 114.114.114.114
 EOF
 
 # 生成 /etc/init.d/rcS 文件
@@ -235,7 +248,6 @@ cd /lib/modules && insmod hello_world.ko
 # dns 测试 busybox 必须动态编译 动态编译 glibc 已经集成 dns 功能
 ifconfig eth0 192.168.100.6 && ifconfig eth0 up
 route add default gw 192.168.100.1
-echo "nameserver 114.114.114.114" >> /etc/resolv.conf
 
 # exec 执行 /etc/init.d/rc.local 脚本
 EOF
