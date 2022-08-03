@@ -98,7 +98,7 @@ fi
 rm -rf ./qemu.log
 disk="-drive format=raw,file=disk.img"
 logfile="-serial file:./qemu.log"
-network="-netdev tap,id=nd0,ifname=tap0 -device e1000,netdev=nd0"
+network="-netdev tap,id=nd0,ifname=tap0,script=no,downscript=no -device e1000,netdev=nd0"
 # 启动镜像 网络对应 run_nat.sh 里面的配置
 qemu-system-x86_64 ${disk} ${sdb_img} ${network} ${logfile}
 
