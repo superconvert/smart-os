@@ -19,6 +19,10 @@ stop_nat() {
   ip tuntap del mode tap tap0
   # 删除网桥
   brctl delbr br0
+  # 删除规则链
+  iptables -D FORWARD -s 192.168.100.0/24 -j ACCEPT
+  iptables -D FORWARD -d 192.168.100.0/24 -j ACCEPT
+  iptables -t nat -D POSTROUTING -s 192.168.100.0/24 ! -d 192.168.100.0/24 -j MASQUERADE
 }
 
 #---------------------
@@ -37,13 +41,14 @@ start_nat() {
   # 启动桥设备和虚拟网卡设备
   ip link set br0 up 
   ip link set tap0 up
+  # 开启物理网卡的转发功能:
+  sysctl -w net.ipv4.ip_forward=1
   # 配置iptables forward转发规则
   # 在基本环境搭建这一节中，设置了一个本地网络，虚机只能访问host，无法访问外网，如果需要访问外网需要设置SNAT
   iptables -t nat -A POSTROUTING -s 192.168.100.0/24 ! -d 192.168.100.0/24 -j MASQUERADE
-  # 开启物理网卡的转发功能:
-  sysctl -w net.ipv4.ip_forward=1
   # 如果有防火墙的，特别是centos系统中，记得放开防火墙
   iptables -A FORWARD -s 192.168.100.0/24 -j ACCEPT
+  iptables -A FORWARD -d 192.168.100.0/24 -j ACCEPT
 }
 
 #----------------------
