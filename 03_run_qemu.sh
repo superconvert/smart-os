@@ -43,10 +43,9 @@ start_nat() {
   ip link set tap0 up
   # 开启物理网卡的转发功能:
   sysctl -w net.ipv4.ip_forward=1
-  # 配置iptables forward转发规则
   # 在基本环境搭建这一节中，设置了一个本地网络，虚机只能访问host，无法访问外网，如果需要访问外网需要设置SNAT
   iptables -t nat -A POSTROUTING -s 192.168.100.0/24 ! -d 192.168.100.0/24 -j MASQUERADE
-  # 如果有防火墙的，特别是centos系统中，记得放开防火墙
+  # 配置iptables forward转发规则
   iptables -A FORWARD -s 192.168.100.0/24 -j ACCEPT
   iptables -A FORWARD -d 192.168.100.0/24 -j ACCEPT
 }
@@ -97,9 +96,11 @@ else
 fi
 
 rm -rf ./qemu.log
+disk="-drive format=raw,file=disk.img"
+logfile="-serial file:./qemu.log"
+network="-netdev tap,id=nd0,ifname=tap0 -device e1000,netdev=nd0"
 # 启动镜像 网络对应 run_nat.sh 里面的配置
-qemu-system-x86_64 -drive format=raw,file=disk.img ${sdb_img} -netdev tap,id=nd0,ifname=tap0 -device e1000,netdev=nd0
-#qemu-system-x86_64 -serial file:./qemu.log -drive format=raw,file=disk.img -netdev tap,id=nd0,ifname=tap0 -device e1000,netdev=nd0
+qemu-system-x86_64 ${disk} ${sdb_img} ${network} ${logfile}
 
 # stop nat
 stop_nat
