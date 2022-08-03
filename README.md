@@ -13,7 +13,8 @@ https://github.com/superconvert/smart-os
 6. 支持 docker 启动
 7. 最精简模式 64 M
 8. 支持驱动相关演示
-9. 支持 smart_rtmpd 流媒体服务器运行
+9. 支持 smart_rtmpd 流媒体服务器运行  
+https://github.com/superconvert/smart_rtmpd
 
 # 用途与场景
 1. 操作系统原理教学
