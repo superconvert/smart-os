@@ -54,7 +54,6 @@ start_nat() {
 # DNS 服务
 #----------------------
 start_dns() {
-
 # 准备dnsmasq配置文件,启动dnsmasq服务，这样就能为虚拟机自动分配IP了
 cat<<EOF>dnsmasq.conf
 strict-order
@@ -70,11 +69,10 @@ dhcp-hostsfile=/var/lib/libvirt/dnsmasq/default.hostsfile
 addn-hosts=/var/lib/libvirt/dnsmasq/default.addnhosts
 EOF
 /usr/sbin/dnsmasq --conf-file=./dnsmasq.conf
-
 }
 
 stop_dns() {
-  # 杀掉 dhcp 服务
+  # 停止 dhcp 服务
   killall dnsmasq
 }
 
@@ -95,10 +93,16 @@ else
   sdb_img="-hdb extra.img"
 fi
 
-rm -rf ./qemu.log
+# 主磁盘
 disk="-drive format=raw,file=disk.img"
+
+# grub 启动参数必须加上 console=ttyS0
+rm -rf ./qemu.log
 logfile="-serial file:./qemu.log"
+
+# 网络参数
 network="-netdev tap,id=nd0,ifname=tap0,script=no,downscript=no -device e1000,netdev=nd0"
+
 # 启动镜像 网络对应 run_nat.sh 里面的配置
 qemu-system-x86_64 ${disk} ${sdb_img} ${network} ${logfile}
 

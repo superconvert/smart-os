@@ -123,10 +123,10 @@ make_init() {
 cat<<"EOF">init
 #!/bin/sh
 # 必须首先挂载，否则 mdev 不能正常工作
-mount -t sysfs none /sys
-mount -t proc none /proc
-mount -t devtmpfs none /dev
-mount -t tmpfs none /tmp -o mode=1777
+mount -t sysfs sysfs /sys
+mount -t proc proc /proc
+mount -t devtmpfs udev /dev
+mount -t tmpfs tmpfs /tmp -o mode=1777
 # 必须挂载一下，否则下面的 mount 不上
 mdev -s
 mount -t ext3 /dev/sda1 /mnt
@@ -136,7 +136,7 @@ echo 0 > /proc/sys/kernel/printk
 echo /sbin/mdev > /proc/sys/kernel/hotplug
 echo -e "\n\e[0;32mBoot took $(cut -d' ' -f1 /proc/uptime) seconds\e[0m"
 mkdir -p /dev/pts
-mount -t devpts none /dev/pts
+mount -t devpts devpts /dev/pts
 # 切换之前，修改 mount 路径
 mount --move /dev /mnt/dev
 mount --move /sys /mnt/sys
@@ -222,6 +222,13 @@ EOF
 cat -> ${diskfs}/etc/resolv.conf << EOF
 nameserver 8.8.8.8
 nameserver 114.114.114.114
+EOF
+
+cat -> ${diskfs}/etc/fstab << EOF
+# <file system>        <dir>         <type>    <options>             <dump> <pass>
+proc                   /proc         proc      defaults              0      0
+tmpfs                  /tmp          tmpfs     defaults              0      0
+sysfs                  /sys          sysfs     defaults              0      0
 EOF
 
 # 生成 /etc/init.d/rcS 文件

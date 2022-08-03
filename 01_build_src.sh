@@ -197,4 +197,9 @@ fi
 
 cd ..
 
+# 编译 xorg-server
+if [ "${with_xorg}" = true ]; then
+  ./mk_xorg.sh
+fi
+
 echo "Run the next script: 02_build_img.sh"

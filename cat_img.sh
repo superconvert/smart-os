@@ -8,6 +8,7 @@ mkdir -p ./mnt1
 mount -t ext3 ${loop_dev} ./mnt1
 echo "/ ---------------------------------------"
 du ./mnt1 -h
+ls ./mnt1/etc
 echo "lib -------------------------------------"
 find ./mnt1 -name "*.a" -exec du -h {} \; 
 umount ./mnt1

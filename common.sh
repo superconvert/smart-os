@@ -4,6 +4,9 @@ core_num=`nproc`
 # 是否开启 gcc
 with_gcc=false
 
+# 是否开启 xorg
+with_org=false
+
 # 是否挂载第二块硬盘
 with_sdb=false
 
@@ -19,6 +22,7 @@ glibc_install=${build_dir}"/glibc_install"
 busybox_install=${build_dir}"/busybox_install"
 gcc_install=${build_dir}"/gcc_install"
 binutils_install=${build_dir}"/binutils_install"
+xorg_install=${build_dir}"/xorg_install"
 
 # 从完整路径获取文件名
 file_name() {
