@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # 预装工具
+apt install git autoconf libtool gcc g++ gettext pkg-config -y
 apt install xutils-dev libtool m4 pkg-config xtrans-dev libpixman-1-dev libdrm-dev libx11-dev libgl-dev libgcrypt-dev libxkbfile-dev libxfont-dev libpciaccess-dev libepoxy-dev libgbm-dev libegl1-mesa-dev -y
 
 #-----------------------------------------------
@@ -51,7 +52,111 @@ cd ${build_dir}
 if [ ! -d "xorg_install" ]; then
   mkdir -pv xorg_install && cd ${XORG_SRC_DIR} && make distclean && ./autogensh 
   ./configure --prefix=/usr
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${xorg_install} && cd ..
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" -j8 DESTDIR=${xorg_install}"/server" && cd ..
 fi
+
+#--------------------------------------------
+#
+# 编译 xclient
+#
+#--------------------------------------------
+export XLOAD_CFLAGS="-I${xorg_install}/xclient/usr"
+export XLOAD_LDFLAGS="-L${xorg_install}/xclient/usr/lib"
+
+echo "${GREEN}build macros begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/util/macros.git
+cd macros
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build macros success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build xcbproto begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/proto/xcbproto.git
+cd xcbproto
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build xcbproto success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build xorgproto begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/proto/xorgproto.git
+cd xorgproto
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build xorgproto success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libxau begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libxau.git
+cd libxau
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxau success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libxcb begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libxcb.git
+cd libxcb
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxcb success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libxtrans begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libxtrans.git
+cd libxtrans
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxtrans success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libx11 begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libx11.git
+cd libx11
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libx11 success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libice begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libice.git
+cd libice
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libice success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libsm begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libsm.git
+cd libsm
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libsm success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libxt begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libxt.git
+cd libxt
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxt success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libxext begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libxext.git
+cd libxext
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxext success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libxmu begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libxmu.git
+cd libxmu
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxmu success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libxpm begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libxpm.git
+cd libxpm
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxpm success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libxaw begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libxaw.git
+cd libxaw
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxaw success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build libxdmcp begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/lib/libxdmcp.git
+cd libxdmcp
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxdmcp success${NC}"
+cd .. && sleep 1
+
+echo "${GREEN}build xload begin${NC}"
+git clone https://gitlab.freedesktop.org/xorg/app/xload.git
+cd xload
+./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build xload success${NC}"
+cd .. && sleep 1
 
 cd ..

@@ -29,27 +29,27 @@ cd source
 
 LINUX_SRC_NAME=$(file_name ${LINUX_SRC_URL})
 if [ ! -f ${LINUX_SRC_NAME} ]; then 
-  wget $LINUX_SRC_URL 
+  wget -c -t 0 $LINUX_SRC_URL
 fi
 
 GLIBC_SRC_NAME=$(file_name ${GLIBC_SRC_URL})
 if [ ! -f ${GLIBC_SRC_NAME} ]; then
-  wget $GLIBC_SRC_URL
+  wget -c -t 0 $GLIBC_SRC_URL
 fi
 
 BUSYBOX_SRC_NAME=$(file_name ${BUSYBOX_SRC_URL})
 if [ ! -f ${BUSYBOX_SRC_NAME} ]; then 
-  wget $BUSYBOX_SRC_URL 
+  wget -c -t 0 $BUSYBOX_SRC_URL
 fi
 
 GCC_SRC_NAME=$(file_name ${GCC_SRC_URL})
 if [ ! -f ${GCC_SRC_NAME} ]; then 
-  wget $GCC_SRC_URL 
+  wget -c -t 0 $GCC_SRC_URL
 fi
 
 BINUTILS_SRC_NAME=$(file_name ${BINUTILS_SRC_URL})
 if [ ! -f ${BINUTILS_SRC_NAME} ]; then
-  wget $BINUTILS_SRC_URL
+  wget -c -t 0 $BINUTILS_SRC_URL
 fi
 
 cd ..
