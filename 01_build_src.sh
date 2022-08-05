@@ -197,7 +197,7 @@ fi
 
 cd ..
 
-# 编译 xorg-server
+# 编译 xorg
 if [ "${with_xorg}" = true ]; then
   ./mk_xorg.sh
 fi
