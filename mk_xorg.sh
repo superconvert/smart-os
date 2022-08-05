@@ -47,12 +47,14 @@ fi
 #
 #---------------------------------------------
 cd ${build_dir}
+xserver_dir=${xorg_install}"/xclient"
+xclient_dir=${xorg_install}"/xclient"
 
 # 编译
 if [ ! -d "xorg_install" ]; then
   mkdir -pv xorg_install && cd ${XORG_SRC_DIR} && make distclean && ./autogensh 
-  ./configure --prefix=/usr
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" -j8 DESTDIR=${xorg_install}"/server" && cd ..
+  ./configure ${CFGOPT}
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${xserver_dir} && cd ..
 fi
 
 #--------------------------------------------
@@ -60,6 +62,7 @@ fi
 # 编译 xclient
 #
 #--------------------------------------------
+export CFGOPT="--prefix=/usr --with-sysroot=${xorg_install}/xclient --with-build-sysroot=${xorg_install}/xclient"
 export CFLAGS="-I${xorg_install}/xclient/usr/include"
 export LDFLAGS="-L${xorg_install}/xclient/usr/lib"
 export ACLOCAL="aclocal -I /usr/share/aclocal:${xorg_install}/xclient/usr/share/aclocal"
@@ -90,92 +93,91 @@ fi
 
 echo "${GREEN}build macros begin${NC}"
 cd macros
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build macros success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build macros success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build xcbproto begin${NC}"
 cd xcbproto
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build xcbproto success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build xcbproto success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build xorgproto begin${NC}"
 cd xorgproto
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build xorgproto success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build xorgproto success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxau begin${NC}"
 cd libxau
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxau success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxau success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxcb begin${NC}"
 cd libxcb
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxcb success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxcb success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxtrans begin${NC}"
 
 cd libxtrans
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxtrans success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxtrans success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libx11 begin${NC}"
 cd libx11
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libx11 success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libx11 success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libice begin${NC}"
-
 cd libice
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libice success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libice success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libsm begin${NC}"
 
 cd libsm
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libsm success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libsm success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxt begin${NC}"
 
 cd libxt
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxt success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxt success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxext begin${NC}"
 
 cd libxext
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxext success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxext success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxmu begin${NC}"
 
 cd libxmu
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxmu success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxmu success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxpm begin${NC}"
 
 cd libxpm
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxpm success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxpm success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxaw begin${NC}"
 
 cd libxaw
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxaw success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxaw success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxdmcp begin${NC}"
 
 cd libxdmcp
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build libxdmcp success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxdmcp success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build xload begin${NC}"
 
 cd xload
-./autogen.sh && ./configure --prefix=/usr && CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" make -j8 && make install -j8 DESTDIR=${xorg_install}"/xclient" && echo "${GREEN}build xload success${NC}"
+./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build xload success${NC}"
 cd .. && sleep 1
 
 cd ..
