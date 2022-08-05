@@ -29,6 +29,7 @@ PS1="[\u@\h \w]\# "
 export PS1 HOSTNAME
 EOF
 
+# 重新生成 inittab 文件
 cat<<EOF>${diskfs}/etc/inittab
 ::sysinit:/bin/hostname -F /etc/hostname
 ::sysinit:/etc/init.d/rcS

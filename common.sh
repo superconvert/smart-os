@@ -22,7 +22,7 @@ core_num=`nproc`
 with_gcc=false
 
 # 是否开启 xorg
-with_xorg=true
+with_xorg=false
 
 # 是否挂载第二块硬盘
 with_sdb=false
