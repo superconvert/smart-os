@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # 预装工具
-apt install git autoconf libtool gcc g++ gettext pkg-config -y
-apt install xutils-dev libtool m4 pkg-config xtrans-dev libpixman-1-dev libdrm-dev libx11-dev libgl-dev libgcrypt-dev libxkbfile-dev libxfont-dev libpciaccess-dev libepoxy-dev libgbm-dev libegl1-mesa-dev -y
+apt install git autoconf libtool gcc g++ gettext pkg-config m4 -y
+apt install xutils-dev xtrans-dev libpixman-1-dev libdrm-dev libx11-dev libgl-dev libgcrypt-dev libxkbfile-dev libxfont-dev libpciaccess-dev libepoxy-dev libgbm-dev libegl1-mesa-dev -y
 
 #-----------------------------------------------
 #
