@@ -1,8 +1,15 @@
 #!/bin/sh
 
 # 预装工具
-apt install git autoconf libtool gcc g++ gettext pkg-config -y
-apt install xutils-dev libtool m4 pkg-config xtrans-dev libpixman-1-dev libdrm-dev libx11-dev libgl-dev libgcrypt-dev libxkbfile-dev libxfont-dev libpciaccess-dev libepoxy-dev libgbm-dev libegl1-mesa-dev -y
+if [ -f "/usr/bin/apt" ]; then
+  apt install git autoconf libtool gcc g++ gettext pkg-config m4 -y
+  apt install xutils-dev xtrans-dev libpixman-1-dev libdrm-dev libx11-dev libgl-dev libgcrypt-dev libxkbfile-dev libxfont-dev libpciaccess-dev libepoxy-dev libgbm-dev libegl1-mesa-dev -y
+fi
+
+if [ -f "/usr/bin/yum" ]; then
+  yum install git autoconf libtool gcc g++ gettext pkg-config m4 -y
+  yum install xutils-dev xtrans-dev libpixman-1-dev libdrm-dev libx11-dev libgl-dev libgcrypt-dev libxkbfile-dev libxfont-dev libpciaccess-dev libepoxy-dev libgbm-dev libegl1-mesa-dev -y
+fi
 
 #-----------------------------------------------
 #
@@ -11,7 +18,9 @@ apt install xutils-dev libtool m4 pkg-config xtrans-dev libpixman-1-dev libdrm-d
 #-----------------------------------------------
 . ./common.sh
 
-XORG_SRC_URL=https://www.x.org/archive/individual/xserver/xorg-server-1.20.11.tar.bz2
+xserver_dir=${xorg_install}"/xclient"
+xclient_dir=${xorg_install}"/xclient"
+XSVR_SRC_URL=https://www.x.org/archive/individual/xserver/xorg-server-1.20.11.tar.bz2
 
 #----------------------------
 #
@@ -21,9 +30,9 @@ XORG_SRC_URL=https://www.x.org/archive/individual/xserver/xorg-server-1.20.11.ta
 mkdir -pv source
 cd source
 
-XORG_SRC_NAME=$(file_name ${XORG_SRC_URL})
-if [ ! -f ${XORG_SRC_NAME} ]; then
-  wget -c -t 0 $XORG_SRC_URL
+XSVR_SRC_NAME=$(file_name ${XSVR_SRC_URL})
+if [ ! -f ${XSVR_SRC_NAME} ]; then
+  wget -c -t 0 $XSVR_SRC_URL
 fi
 
 cd ..
@@ -35,24 +44,22 @@ cd ..
 #---------------------------
 mkdir -pv ${build_dir}
 
-XORG_SRC_DIR=${build_dir}"/"$(file_dirname ${XORG_SRC_NAME} .tar.bz2)
-if [ ! -d ${XORG_SRC_DIR} ]; then
-  echo "unzip ${XORG_SRC_NAME} source code"
-  tar xf source/${XORG_SRC_NAME} -C ${build_dir}
+XSVR_SRC_DIR=${build_dir}"/"$(file_dirname ${XSVR_SRC_NAME} .tar.bz2)
+if [ ! -d ${XSVR_SRC_DIR} ]; then
+  echo "unzip ${XSVR_SRC_NAME} source code"
+  tar xf source/${XSVR_SRC_NAME} -C ${build_dir}
 fi
 
 #---------------------------------------------
 #
-# 编译源码 
+# 编译 xserver 
 #
 #---------------------------------------------
 cd ${build_dir}
-xserver_dir=${xorg_install}"/xclient"
-xclient_dir=${xorg_install}"/xclient"
 
 # 编译
 if [ ! -d "xorg_install" ]; then
-  mkdir -pv xorg_install && cd ${XORG_SRC_DIR} && make distclean && ./autogensh 
+  mkdir -pv xorg_install && cd ${XSVR_SRC_DIR} && make distclean && ./autogensh 
   ./configure ${CFGOPT}
   CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${xserver_dir} && cd ..
 fi
@@ -68,6 +75,7 @@ export LDFLAGS="-L${xorg_install}/xclient/usr/lib"
 export ACLOCAL="aclocal -I /usr/share/aclocal:${xorg_install}/xclient/usr/share/aclocal"
 export PKG_CONFIG_PATH="${xorg_install}/xclient/usr/share/pkgconfig:${xorg_install}/xclient/usr/lib/pkgconfig"
 
+# 采用 cache 机制，禁止每次都重新下载源码
 if [ ! -f xclient.tar.gz ]; then
   git clone https://gitlab.freedesktop.org/xorg/util/macros.git
   git clone https://gitlab.freedesktop.org/xorg/proto/xcbproto.git
@@ -176,6 +184,7 @@ cd .. && sleep 1
 
 echo "${GREEN}build xload begin${NC}"
 
+# 编译 xclient application
 cd xload
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build xload success${NC}"
 cd .. && sleep 1

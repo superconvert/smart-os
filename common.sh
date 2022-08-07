@@ -24,6 +24,9 @@ with_gcc=false
 # 是否开启 xorg
 with_xorg=false
 
+# 是否开启 xfce
+with_xfce=false
+
 # 是否挂载第二块硬盘
 with_sdb=false
 
