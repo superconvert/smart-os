@@ -2,12 +2,12 @@
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install git autoconf libtool gcc g++ gettext pkg-config m4 -y
+  apt install git autoconf libtool gcc g++ gettext pkg-config m4 python-xcbgen -y
   apt install xutils-dev xtrans-dev libpixman-1-dev libdrm-dev libx11-dev libgl-dev libgcrypt-dev libxkbfile-dev libxfont-dev libpciaccess-dev libepoxy-dev libgbm-dev libegl1-mesa-dev -y
 fi
 
 if [ -f "/usr/bin/yum" ]; then
-  yum install git autoconf libtool gcc g++ gettext pkg-config m4 -y
+  yum install git autoconf libtool gcc g++ gettext pkg-config m4 xcb-util -y
   yum install xutils-dev xtrans-dev libpixman-1-dev libdrm-dev libx11-dev libgl-dev libgcrypt-dev libxkbfile-dev libxfont-dev libpciaccess-dev libepoxy-dev libgbm-dev libegl1-mesa-dev -y
 fi
 
@@ -69,11 +69,21 @@ fi
 # 编译 xclient
 #
 #--------------------------------------------
+
+# 解决 libxcb 编译问题
+mkdir -pv ${xorg_install}/xclient/usr/share/aclocal
+mkdir -pv ${xorg_install}/xclient/usr/local/share/aclocal
+
 export CFGOPT="--prefix=/usr --with-sysroot=${xorg_install}/xclient --with-build-sysroot=${xorg_install}/xclient"
 export CFLAGS="-I${xorg_install}/xclient/usr/include"
 export LDFLAGS="-L${xorg_install}/xclient/usr/lib"
-export ACLOCAL="aclocal -I /usr/share/aclocal:${xorg_install}/xclient/usr/share/aclocal"
-export PKG_CONFIG_PATH="${xorg_install}/xclient/usr/share/pkgconfig:${xorg_install}/xclient/usr/lib/pkgconfig"
+export ACLOCAL="aclocal -I /usr/share/aclocal -I ${xorg_install}/xclient/usr/share/aclocal -I ${xorg_install}/xclient/usr/local/share/aclocal"
+
+# 解决 libxcb 编译问题
+export PKG_CONFIG_SYSROOT_DIR="${xclient_dir}"
+export PKG_CONFIG_PATH="${xclient_dir}/usr/share/pkgconfig:${xclient_dir}/usr/lib/pkgconfig:${xclient_dir}/usr/local/lib/pkgconfig"
+export XCBPROTO_XCBINCLUDEDIR="${xclient_dir}/usr/share/xcb"
+export PYTHONPATH="${xclient_dir}/usr/lib/python2.7/dist-packages"
 
 # 采用 cache 机制，禁止每次都重新下载源码
 if [ ! -f xclient.tar.gz ]; then
@@ -95,7 +105,8 @@ if [ ! -f xclient.tar.gz ]; then
   git clone https://gitlab.freedesktop.org/xorg/app/xload.git
   tar zcf xclient.tar.gz macros xcbproto xorgproto libxau libxcb libxtrans libx11 libice libsm libxt libxext libxmu libxpm libxaw libxdmcp xload
 else
-  rm -rf macros xcbproto xorgproto libxau libxcb libxtrans libx11 libice libsm libxt libxext libxmu libxpm libxaw libxdmcp xload
+  #rm -rf macros xcbproto xorgproto libxau libxcb libxtrans libx11 libice libsm libxt libxext libxmu libxpm libxaw libxdmcp xload
+  rm -rf libxcb libxtrans libx11 libice libsm libxt libxext libxmu libxpm libxaw libxdmcp xload
   tar zxf xclient.tar.gz 
 fi
 
@@ -121,11 +132,13 @@ cd .. && sleep 1
 
 echo "${GREEN}build libxcb begin${NC}"
 cd libxcb
+# 解决 libxcb 编译问题
+sed -i "8 i reload(sys)" src/c_client.py
+sed -i "9 i sys.setdefaultencoding('utf8')" src/c_client.py
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxcb success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxtrans begin${NC}"
-
 cd libxtrans
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxtrans success${NC}"
 cd .. && sleep 1
@@ -141,43 +154,36 @@ cd libice
 cd .. && sleep 1
 
 echo "${GREEN}build libsm begin${NC}"
-
 cd libsm
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libsm success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxt begin${NC}"
-
 cd libxt
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxt success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxext begin${NC}"
-
 cd libxext
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxext success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxmu begin${NC}"
-
 cd libxmu
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxmu success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxpm begin${NC}"
-
 cd libxpm
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxpm success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxaw begin${NC}"
-
 cd libxaw
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxaw success${NC}"
 cd .. && sleep 1
 
 echo "${GREEN}build libxdmcp begin${NC}"
-
 cd libxdmcp
 ./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxdmcp success${NC}"
 cd .. && sleep 1
