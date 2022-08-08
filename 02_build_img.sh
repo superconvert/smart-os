@@ -255,6 +255,6 @@ losetup -d ${loop_dev}
 # 查看磁盘内容
 #
 #---------------------------------------------------------------
-./cat_img.sh
+./ls_img.sh
 
 echo "Run the next script: 03_run_qemu.sh or 04_run_docker.sh"
