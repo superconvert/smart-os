@@ -192,7 +192,6 @@ if [ ! -d "binutils_install" ]; then
   mkdir -pv binutils_install && cd ${BINUTILS_SRC_DIR} && make distclean
   ./configure --prefix=/usr
   CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${binutils_install} && cd ..
-  cd ..
 fi
 
 cd ..
