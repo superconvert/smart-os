@@ -115,7 +115,7 @@ https://github.com/superconvert/smart_rtmpd
                 +
      Physical Network  (192.168.0.0/24)
 ```
-# libxcb 的编译
+# libxcb 的编译，具体详情参见 mk_xorg.sh
 1. 需要安装 apt install -y python-xcbgen 这个库，这个库会根据 xcbproto 提供的 xml 文件生成对应的 h 文件和 c 文件
 2. 增加变量 export PKG_CONFIG_SYSROOT_DIR="${xclient_dir}"， 否则，编译过程中找 xml 文件的路径不对
 3. 增加变量 export PKG_CONFIG_PATH="${xclient_dir}/usr/share/pkgconfig:${xclient_dir}/usr/lib/pkgconfig:${xclient_dir}/usr/local/lib/pkgconfig"，
