@@ -115,6 +115,16 @@ https://github.com/superconvert/smart_rtmpd
                 +
      Physical Network  (192.168.0.0/24)
 ```
+# libxcb 的编译
+1. 需要安装 apt install -y python-xcbgen 这个库，这个库会根据 xcbproto 提供的 xml 文件生成对应的 h 文件和 c 文件
+2. 增加变量 export PKG_CONFIG_SYSROOT_DIR="${xclient_dir}"， 否则，编译过程中找 xml 文件的路径不对
+3. 增加变量 export PKG_CONFIG_PATH="${xclient_dir}/usr/share/pkgconfig:${xclient_dir}/usr/lib/pkgconfig:${xclient_dir}/usr/local/lib/pkgconfig"，
+   否则，pkg-config --variable=xcbincludedir xcb-proto 就不能正常工作
+4. 增加变量 export XCBPROTO_XCBINCLUDEDIR="${xclient_dir}/usr/share/xcb" 这是正确的 xml 文件所在的路径
+5. 增加变量 export PYTHONPATH="${xclient_dir}/usr/lib/python2.7/dist-packages"，配置 xcbgen 模块路径
+6. 编辑 libxcb 的文件 src/c_client.py ，解决 UnicodeEncodeError 的问题 ordinal not in range(128)，默认字符集是 ascii 码
+   sed -i "8 i reload(sys)" src/c_client.py
+   sed -i "9 i sys.setdefaultencoding('utf8')" src/c_client.py
 
 # 拓展知识
 
