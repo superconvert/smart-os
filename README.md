@@ -122,7 +122,7 @@ https://github.com/superconvert/smart_rtmpd
    否则，pkg-config --variable=xcbincludedir xcb-proto 就不能正常工作
 4. 增加变量 export XCBPROTO_XCBINCLUDEDIR="${xclient_dir}/usr/share/xcb" 这是正确的 xml 文件所在的路径
 5. 增加变量 export PYTHONPATH="${xclient_dir}/usr/lib/python2.7/dist-packages"，配置 xcbgen 模块路径
-6. 编辑 libxcb 的文件 src/c_client.py ，解决 UnicodeEncodeError 的问题 ordinal not in range(128)，默认字符集是 ascii 码
+6. 编辑 libxcb 的文件 src/c_client.py ，解决 UnicodeEncodeError 的问题 ordinal not in range(128)，Python 默认字符集是 ascii 码
    sed -i "8 i reload(sys)" src/c_client.py
    sed -i "9 i sys.setdefaultencoding('utf8')" src/c_client.py
 
