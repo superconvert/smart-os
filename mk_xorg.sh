@@ -71,13 +71,13 @@ fi
 #--------------------------------------------
 
 # 解决 libxcb 编译问题
-mkdir -pv ${xorg_install}/xclient/usr/share/aclocal
-mkdir -pv ${xorg_install}/xclient/usr/local/share/aclocal
+mkdir -pv ${xclient_dir}/usr/share/aclocal
+mkdir -pv ${xclient_dir}/usr/local/share/aclocal
 
-export CFGOPT="--prefix=/usr --with-sysroot=${xorg_install}/xclient --with-build-sysroot=${xorg_install}/xclient"
-export CFLAGS="-I${xorg_install}/xclient/usr/include"
-export LDFLAGS="-L${xorg_install}/xclient/usr/lib"
-export ACLOCAL="aclocal -I /usr/share/aclocal -I ${xorg_install}/xclient/usr/share/aclocal -I ${xorg_install}/xclient/usr/local/share/aclocal"
+export CFGOPT="--prefix=/usr --with-sysroot=${xclient_dir} --with-build-sysroot=${xclient_dir}"
+export CFLAGS="-I${xclient_dir}/usr/include"
+export LDFLAGS="-L${xclient_dir}/usr/lib"
+export ACLOCAL="aclocal -I /usr/share/aclocal -I ${xclient_dir}/usr/share/aclocal -I ${xclient_dir}/usr/local/share/aclocal"
 
 # 解决 libxcb 编译问题
 export PKG_CONFIG_SYSROOT_DIR="${xclient_dir}"
