@@ -77,6 +77,9 @@ https://github.com/superconvert/smart_rtmpd
 
 4. 我们怎么跟踪一个可执行程序的加载那些库，利用 LD_DEBUG=libs ./test  就可以了, 我们预加载库可以利用 LD_PRELOAD 强制预加载库
 
+5. 我们编译 cairo 通常情况下会遇到很多问题，如果 cairo 编译出现问题，怎么办，有些错误信息网上很难搜到   
+一定看它编译时生成的 config.log 文件，错误信息很详细！可以根据提示信息去解决问题
+
 # TODO 列表
 1. 增加 arm 版本
 2. 增加图形界面演示  
