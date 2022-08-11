@@ -19,7 +19,7 @@ NC='\e[0m' # 没有颜色
 core_num=`nproc`
 
 # 是否开启 gcc
-with_gcc=false
+with_gcc=true
 
 # 是否开启 xorg
 with_xorg=false
