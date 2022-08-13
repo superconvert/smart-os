@@ -1,12 +1,17 @@
 #!/bin/sh
 
 #set -e
+# 所有的编译基于 Ubuntu 18.04.6 LTS 编译通过, 其它系统请自行调整脚本
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install cmake gperf bison flex libtool intltool python3.8-dev python3.8-dbg python3-pip python-docutils libatk1.0-dev libxrender-dev libxext-dev libpng-dev libthai-dev libxkbcommon-dev libpcre2-dev -y
+  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libatk1.0-dev libxrender-dev libsm-dev libxext-dev libpng-dev libthai-dev libxkbcommon-dev libpcre2-dev libgudev-1.0-dev libnotify-dev libupower-glib-dev -y
+  # 安装 OpenGL
+  apt-get install libgl1-mesa-dev libglu1-mesa-dev libglut-dev -y
+  # 安装 gstreamer
+  apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio -y
   # gtk+ 编译
-  apt install libegl1-mesa-dev libxrandr-dev libxi-dev libatk-bridge2.0-dev libxinerama-dev libvulkan-dev -y
+  apt install libcups2-dev libxrandr-dev libxi-dev libatk-bridge2.0-dev libxinerama-dev libvulkan-dev -y
 fi
 
 if [ -f "/usr/bin/yum" ]; then
@@ -17,6 +22,7 @@ fi
 
 pip3 install ninja
 pip3 install meson
+pip3 install gi-docgen
 
 #-----------------------------------------------
 #
@@ -41,7 +47,8 @@ LIBEPOXY_SRC_URL=https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar
 GRAPHENE_SRC_URL=https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar.gz
 GOBJINTROSPE_SRC_URL=https://github.com/GNOME/gobject-introspection/archive/refs/tags/1.72.0.tar.gz
 WAYLANDPROT_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/1.25/wayland-protocols-1.25.tar.gz
-GTKX_SRC_URL=https://download.gnome.org/sources/gtk%2B/3.94/gtk%2B-3.94.0.tar.xz
+LIBWNCK_SRC_URL=https://download.gnome.org/sources/libwnck/3.36/libwnck-3.36.0.tar.xz
+GTKX_SRC_URL=https://download.gnome.org/sources/gtk%2B/3.24/gtk%2B-3.24.9.tar.xz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 
 #----------------------------
@@ -130,6 +137,11 @@ fi
 GOBJINTROSPE_SRC_NAME="gobject-introspection-"$(file_name ${GOBJINTROSPE_SRC_URL})
 if [ ! -f ${GOBJINTROSPE_SRC_NAME} ]; then
   wget -c -t 0 $GOBJINTROSPE_SRC_URL -O $GOBJINTROSPE_SRC_NAME
+fi
+
+LIBWNCK_SRC_NAME=$(file_name ${LIBWNCK_SRC_URL})
+if [ ! -f ${LIBWNCK_SRC_NAME} ]; then
+  wget -c -t 0 $LIBWNCK_SRC_URL
 fi
 
 GTKX_SRC_NAME=$(echo $(file_name ${GTKX_SRC_URL}) | sed 's/%2B/+/')
@@ -231,6 +243,11 @@ if [ ! -d ${GOBJINTROSPE_SRC_DIR} ]; then
   echo "unzip ${GOBJINTROSPE_SRC_NAME} source code" && tar xf source/${GOBJINTROSPE_SRC_NAME} -C ${build_dir}
 fi
 
+LIBWNCK_SRC_DIR=${build_dir}"/"$(file_dirname ${LIBWNCK_SRC_NAME} .tar.xz)
+if [ ! -d ${LIBWNCK_SRC_DIR} ]; then
+  echo "unzip ${LIBWNCK_SRC_NAME} source code" && tar xf source/${LIBWNCK_SRC_NAME} -C ${build_dir}
+fi
+
 GTKX_SRC_DIR=${build_dir}"/"$(file_dirname ${GTKX_SRC_NAME} .tar.xz)
 if [ ! -d ${GTKX_SRC_DIR} ]; then
   echo "unzip ${GTKX_SRC_NAME} source code" && tar xf source/${GTKX_SRC_NAME} -C ${build_dir}
@@ -268,51 +285,117 @@ cd ${build_dir}
 
 xfce_install=${build_dir}"/xfce_install"
 
+xfce_inc=${xfce_install}/usr/include
+xfce_loc_inc=${xfce_install}/usr/local/include
+xfce_x86_64_inc=${xfce_install}/usr/lib/x86_64-linux-gnu
+
 include_path=" \
-  -I${xfce_install}/usr/include \
-  -I${xfce_install}/usr/include/glib-2.0 \
-  -I${xfce_install}/usr/include/harfbuzz \
-  -I${xfce_install}/usr/include/libmount \
-  -I${xfce_install}/usr/local/include \
-  -I${xfce_install}/usr/local/include/cairo \
-  -I${xfce_install}/usr/local/include/pixman-1 \
-  -I${xfce_install}/usr/local/include/freetype2 \
-  -I${xfce_install}/usr/lib/x86_64-linux-gnu \
+  -I${xfce_inc} \
+  -I${xfce_inc}/glib-2.0 \
+  -I${xfce_inc}/harfbuzz \
+  -I${xfce_inc}/libmount \
+  -I${xfce_inc}/gtk-3.0 \
+  -I${xfce_inc}/pango-1.0 \
+  -I${xfce_inc}/harfbuzz \
+  -I${xfce_inc}/libwnck-3.0 \
+  -I${xfce_inc}/gdk-pixbuf-2.0 \
+  -I${xfce_loc_inc} \
+  -I${xfce_loc_inc}/cairo \
+  -I${xfce_loc_inc}/exo-2 \
+  -I${xfce_loc_inc}/pixman-1 \
+  -I${xfce_loc_inc}/freetype2 \
+  -I${xfce_loc_inc}/thunarx-3 \
+  -I${xfce_loc_inc}/garcon-1 \
+  -I${xfce_loc_inc}/garcon-gtk3-1 \
+  -I${xfce_x86_64_inc} \
   -I/usr/include/dbus-1.0 \
+  -I/usr/include/atk-1.0 \
+  -I/usr/include/at-spi2-atk/2.0 \
+  -I/usr/include/gstreamer-1.0 \
   -I/usr/include/libpng16 \
-  -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include \
-  -I/usr/include/python2.7"
+  -I/usr/include/python3.8 \
+  -I/usr/include/startup-notification-1.0 \
+  -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
+
+xfce_lib=${xfce_install}/usr/lib
+xfce_share=${xfce_install}/usr/share
+xfce_loc_lib=${xfce_install}/usr/local/lib
+xfce_loc_share=${xfce_install}/usr/local/share
 
 library_path=" \
   -L${glibc_install}/lib64 \
-  -L${xfce_install}/usr/lib \
-  -L${xfce_install}/usr/local/lib \
-  -L${xfce_install}/usr/lib/x86_64-linux-gnu \
-  -Wl,-rpath=/usr/lib/x86_64-linux-gnu \
-  -Wl,-rpath=${xfce_install}/usr/local/lib"
+  -L${xfce_lib} \
+  -L${xfce_loc_lib} \
+  -L${xfce_lib}/x86_64-linux-gnu"
 
 CFGOPT="--with-sysroot=${xfce_install}"
-pkgcfg1="${xfce_install}/usr/lib/pkgconfig"
-pkgcfg2="${xfce_install}/usr/share/pkgconfig"
-pkgcfg3="${xfce_install}/usr/local/lib/pkgconfig"
-pkgcfg4="${xfce_install}/usr/lib/x86_64-linux-gnu/pkgconfig"
+pkgcfg1="${xfce_lib}/pkgconfig"
+pkgcfg2="${xfce_share}/pkgconfig"
+pkgcfg3="${xfce_loc_lib}/pkgconfig"
+pkgcfg4="${xfce_lib}/x86_64-linux-gnu/pkgconfig"
 
 export CFLAGS="${include_path}"
 export CXXFLAGS="${include_path}"
 export LDFLAGS="${library_path}"
 
+# xfce 组件的编译需要这个设置
+# export PLATFORM_CFLAGS="${include_path}"
+# export PLATFORM_CPPFLAGS="${include_path}"
+# export PLATFORM_LDFLAGS="${library_path}"
+
 export PKG_CONFIG_SYSROOT_DIR="${xfce_install}"
 export PKG_CONFIG_TOP_BUILD_DIR="${xfce_install}"
 export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
+
+# 编译过程中有工具需要 libffi.so.8 库的，需要加载一下，否则会出现找不到 libffi.so.8
+export LD_LIBRARY_PATH="${xfce_lib}:${xfce_loc_lib}:${xfce_lib}/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+ldconfig
+
+# 编译过程中会寻找 *.gir 的文件，.gir 的目录就是这个
+export XDG_DATA_DIRS="${xfce_share}:${xfce_loc_share}:${xfce_share}/gir-1.0:$XDG_DATA_DIRS"
+export GDK_PIXBUF_PIXDATA="${xfce_install}/usr/bin/gdk-pixbuf-pixdata"
+
+# python 模块的搜寻目录
+# export PYTHONPATH="${xfce_lib}/x86_64-linux-gnu/gobject-introspection:${PYTHONPATH}"
+
+#---------------------------------------------------------------------------------------------------------------
+#
+# xfce 库编译时用到 g-ir-scanner 工具，由于设置了 PKG_CONFIG_SYSROOT_DIR , 导致 xfce 调用 g-ir-scanner
+# 的路径变成了 ${sysroot}/usr/bin/g-ir-scanner，这个路径下肯定没有 g-ir-scanner，它只存在 /usr/bin 下，
+# 所以只能做一个软链过来, PKG_CONFIG_SYSROOT_DIR 不能去掉或设置为空，因为编译 gtk+ 以及依赖库都需要设置这个变量
+#
+#----------------------------------------------------------------------------------------------------------------
+for i in $(find /usr/bin -name "g-ir-*")
+do
+  if [ -f ${xfce_install}${i} ]; then
+    continue
+  fi
+  ln -s ${i} ${xfce_install}${i}
+done
+
+gi_makefile=/usr/share/gobject-introspection-1.0/Makefile.introspection
+mkdir -pv ${xfce_share}/gobject-introspection-1.0
+if [ ! -f ${xfce_install}${gi_makefile} ]; then
+  ln -s ${gi_makefile} ${xfce_install}${gi_makefile}
+fi
+
+#---------------------------------------------------------------------------
+#
+# meson 的配置选项
+# meson 编译参数一览 https://mesonbuild.com/Reference-tables.html
+#
+#---------------------------------------------------------------------------
+ms_flag="--sysroot=${xfce_install}"
+ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
 
 # if [ ! -d "xfce_install" ]; then
   # 编译 glib
   mkdir -pv xfce_install
 
-  # 编译 libffi
+  # 编译 libffi, 替换系统的
   if [ ! -f .libffi ]; then
-    echo "${CYAN}build libffi begin${NC}" && cd ${LIBFFI_SRC_DIR} && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.libffi || exit
+    echo "${CYAN}build libffi begin${NC}" && cd ${LIBFFI_SRC_DIR} && ./configure
+    make -j8 && make install && echo "ok" > ../.libffi || exit
     cd .. && echo "${GREEN}build libffi end${NC}"
   fi
 
@@ -335,7 +418,7 @@ export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
 
   # 编译 pixman
   if [ ! -f .pixman ]; then
-    echo "${CYAN}build pixman begin${NC}" && cd ${PIXMAN_SRC_DIR} && ./configure ${CFGOPT}
+    echo "${CYAN}build pixman begin${NC}" && cd ${PIXMAN_SRC_DIR} && ./configure ${CFGOPT} --enable-gtk=no
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.pixman || exit
     cd .. && echo "${GREEN}build pixman end${NC}"
   fi
@@ -392,6 +475,16 @@ export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
     cd .. && echo "${GREEN}build pango end${NC}"
   fi
 
+  # 编译 gobject-introspection
+  # if [ ! -f .gobject-introspection ]; then
+  #    echo "${CYAN}build gobject-introspection begin${NC}" && cd ${GOBJINTROSPE_SRC_DIR}
+  #    mkdir -pv build
+  #    meson setup build --prefix=/usr -Dc_flags=${ms_flag} -Dc_link_args=${ms_link}
+  #    meson compile -C build
+  #    meson install -C build --destdir=${xfce_install} && echo "ok" > ../.gobject-introspection || exit
+  #    cd .. && echo "${GREEN}build gobject-introspection end${NC}"
+  # fi
+
   # 编译 gdkpixbuf
   if [ ! -f .gdkpixbuf ]; then
     echo "${CYAN}build gdkpixbuf begin${NC}" && cd ${GDKPIXBUF_SRC_DIR}
@@ -431,16 +524,6 @@ export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
     meson install -C build --destdir=${xfce_install} && echo "ok" > ../.wayland-protocols || exit
     cd .. && echo "${GREEN}build wayland-protocols end${NC}"
   fi
-  
-  # 编译 gobject-introspection
-  if [ ! -f .gobject-introspection ]; then
-    echo "${CYAN}build gobject-introspection begin${NC}" && cd ${GOBJINTROSPE_SRC_DIR}
-    mkdir -pv build
-    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH}
-    meson compile -C build
-    meson install -C build --destdir=${xfce_install} && echo "ok" > ../.gobject-introspection || exit
-    cd .. && echo "${GREEN}build gobject-introspection end${NC}"
-  fi
 
   # 编译 gettext 解决 libintl 的问题 gtk+
   if [ ! -f .gettext ]; then
@@ -460,10 +543,46 @@ export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
     cd .. && echo "${GREEN}build gtk+ end${NC}"
   fi
 
-  exit
+  # 编译 libwnck
+  if [ ! -f .libwnck ]; then
+    echo "${CYAN}build libwnck begin${NC}" && cd ${LIBWNCK_SRC_DIR}
+    mkdir -pv build
+    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH}
+    meson compile -C build
+    meson install -C build --destdir=${xfce_install} && echo "ok" > ../.libwnck || exit
+    cd .. && echo "${GREEN}build libwnck end${NC}"
+  fi
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
+
+  # 必须去掉这个，否则 xfce 编译不过，做的还是有点差，和 gtk+ 的编译还是差一个档次
+  unset PKG_CONFIG_SYSROOT_DIR
+  unset PKG_CONFIG_TOP_BUILD_DIR
+  base_inc="${xfce_inc}/gtk-3.0:${xfce_inc}/pango-1.0:${xfce_inc}/harfbuzz:${xfce_inc}/gdk-pixbuf-2.0"
+  garcon_inc="${xfce_loc_inc}/garcon-1:${xfce_loc_inc}/garcon-gtk3-1:${xfce_loc_inc}/xfce4/libxfce4panel-2.0"
+  xfce_mod_inc="${xfce_loc_inc}/xfce4:${xfce_loc_inc}/xfce4/xfconf-0:${xfce_loc_inc}/xfce4/libxfce4kbd-private-3:${xfce_loc_inc}/xfce4/libxfce4ui-2"
+  other_mod_inc="${xfce_inc}/libwnck-3.0:${xfce_loc_inc}/cairo:${xfce_loc_inc}/exo-2:${xfce_loc_inc}/thunarx-3"
+  export C_INCLUDE_PATH="${base_inc}:${garcon_inc}:${xfce_mod_inc}:${other_mod_inc}"
+  #export XDG_DATA_DIRS="${xfce_share}:${xfce_loc_share}"
+
+  if [ ! -f .xlibxfce4util ]; then
+    echo "${CYAN}build libxfce4util begin${NC}" && cd libxfce4util-4.16.0 && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xlibxfce4util || exit
+    cd .. && echo "${GREEN}build libxfce4util end${NC}"
+  fi
+
+  if [ ! -f .xfconf ]; then
+    echo "${CYAN}build xfconf begin${NC}" && cd xfconf-4.16.0 && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfconf || exit
+    cd .. && echo "${GREEN}build xfconf end${NC}"
+  fi
+
+  if [ ! -f .libxfce4ui ]; then
+    echo "${CYAN}build libxfce4ui begin${NC}" && cd libxfce4ui-4.16.0 && ./configure ${CFGOPT}
+    printenv && make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.libxfce4ui || exit
+    cd .. && echo "${GREEN}build libxfce4ui end${NC}"
+  fi
 
   if [ ! -f .exo ]; then
     echo "${CYAN}build exo begin${NC}" && cd exo-4.16.0 && ./configure ${CFGOPT}
@@ -483,16 +602,16 @@ export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
     cd .. && echo "${GREEN}build xfce4-dev-tools end${NC}"
   fi
 
-  if [ ! -f .xfce4-settings ]; then
-    echo "${CYAN}build xfce4-settings begin${NC}" && cd xfce4-settings-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce-settings || exit
-    cd .. && echo "${GREEN}build xfce4-settings end${NC}"
-  fi
-
   if [ ! -f .garcon ]; then
     echo "${CYAN}build garcon begin${NC}" && cd garcon-0.8.0 && ./configure ${CFGOPT}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.garcon || exit
     cd .. && echo "${GREEN}build garcon end${NC}"
+  fi
+
+  if [ ! -f .xfce4-settings ]; then
+    echo "${CYAN}build xfce4-settings begin${NC}" && cd xfce4-settings-4.16.0 && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-settings || exit
+    cd .. && echo "${GREEN}build xfce4-settings end${NC}"
   fi
   
   if [ ! -f .thunar-volman ]; then
@@ -505,18 +624,6 @@ export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
     echo "${CYAN}build xfce4-panel begin${NC}" && cd xfce4-panel-4.16.0 && ./configure ${CFGOPT}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-panel || exit
     cd .. && echo "${GREEN}build xfce4-panel end${NC}"
-  fi
-  
-  if [ ! -f .xfconf ]; then
-    echo "${CYAN}build xfconf begin${NC}" && cd xfconf-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfconf || exit
-    cd .. && echo "${GREEN}build xfconf end${NC}"
-  fi
-  
-  if [ ! -f .libxfce4ui ]; then
-    echo "${CYAN}build libxfce4ui begin${NC}" && cd libxfce4ui-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.libxfce4ui || exit
-    cd .. && echo "${GREEN}build libxfce4ui end${NC}"
   fi
   
   if [ ! -f .tumbler ]; then
@@ -537,12 +644,6 @@ export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
     cd .. && echo "${GREEN}build xfdesktop end${NC}"
   fi
 
-  if [ ! -f .xlibxfce4util ]; then
-    echo "${CYAN}build libxfce4util begin${NC}" && cd libxfce4util-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xlibxfce4util || exit
-    cd .. && echo "${GREEN}build libxfce4util end${NC}"
-  fi
-
   if [ ! -f .xfce4-appfinder ]; then
     echo "${CYAN}build xfce4-appfinder begin${NC}" && cd xfce4-appfinder-4.16.0 && ./configure ${CFGOPT}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-appfinder || exit
@@ -551,7 +652,7 @@ export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
   
   if [ ! -f .xfce4-session ]; then
     echo "${CYAN}build xfce4-session begin${NC}" && cd xfce4-session-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > .xfce4-session || exit
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-session || exit
     cd .. && echo "${GREEN}build xfce4-session end${NC}"
   fi
   
@@ -563,3 +664,4 @@ export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
 # fi
 
 cd ..
+echo "${CYAN}build all success - [${GREEN} ok ${CYAN}]${NC}"
