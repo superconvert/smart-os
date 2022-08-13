@@ -125,7 +125,7 @@
    sed -i "8 i reload(sys)" src/c_client.py
    sed -i "9 i sys.setdefaultencoding('utf8')" src/c_client.py
    
-# xfce 的编译
+# xfce 的编译 cairo, pango, gtk+ 等等
 1. xfce 的编译相当于对 xfce 做一个整体的 cross compile，工作量相当庞大，有各个组件之间有顺序关系，有依赖关系
 2. 会依赖很多开发包，系统工具，开发包理论上全需要源码编译，工作量巨大，开发包和系统工具有版本要求
 3. 环境变量要求，比如找不到头文件，找不工具路径，undefined reference to XXX 这些都需要更改环境变量和编译参数进行不同的尝试
