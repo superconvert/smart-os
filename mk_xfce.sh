@@ -425,16 +425,9 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
 
   # 编译 freetype
   if [ ! -f .freetype ]; then
-    echo "${CYAN}build freetype begin${NC}" && cd ${FREETYPE_SRC_DIR} && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.freetype || exit
+    echo "${CYAN}build freetype begin${NC}" && cd ${FREETYPE_SRC_DIR} && ./configure ${CFGOPT} --with-harfbuzz=no
+    make -j8 && make install DESTDIR=${xfce_install} || exit
     cd .. && echo "${GREEN}build freetype end${NC}"
-  fi
-
-  # 编译 fontconfig
-  if [ ! -f .fontconfig ]; then
-    echo "${CYAN}build fontconfig begin${NC}" && cd ${FONTCFG_SRC_DIR} && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.fontconfig || exit
-    cd .. && echo "${GREEN}build fontconfig end${NC}"
   fi
 
   # 编译 cairo
@@ -454,7 +447,21 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
     meson install -C build --destdir=${xfce_install} && echo "ok" > ../.harfbuzz || exit
     cd .. && echo "${GREEN}build harfbuzz end${NC}"
   fi
-  
+
+  # 编译 freetype
+  if [ ! -f .freetype ]; then
+    echo "${CYAN}build freetype begin${NC}" && cd ${FREETYPE_SRC_DIR} && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.freetype || exit
+    cd .. && echo "${GREEN}build freetype end${NC}"
+  fi
+
+  # 编译 fontconfig
+  if [ ! -f .fontconfig ]; then
+    echo "${CYAN}build fontconfig begin${NC}" && cd ${FONTCFG_SRC_DIR} && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.fontconfig || exit
+    cd .. && echo "${GREEN}build fontconfig end${NC}"
+  fi
+
   # 编译 fribidi
   if [ ! -f .fribidi ]; then
     echo "${CYAN}build fribidi begin${NC}" && cd ${FRIBIDI_SRC_DIR}
@@ -566,6 +573,12 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
   export C_INCLUDE_PATH="${base_inc}:${garcon_inc}:${xfce_mod_inc}:${other_mod_inc}"
   #export XDG_DATA_DIRS="${xfce_share}:${xfce_loc_share}"
 
+  if [ ! -f .xfce4-dev-tools ]; then
+    echo "${CYAN}build xfce4-dev-tools begin${NC}" && cd xfce4-dev-tools-4.16.0 && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-dev-tools || exit
+    cd .. && echo "${GREEN}build xfce4-dev-tools end${NC}"
+  fi
+
   if [ ! -f .xlibxfce4util ]; then
     echo "${CYAN}build libxfce4util begin${NC}" && cd libxfce4util-4.16.0 && ./configure ${CFGOPT}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xlibxfce4util || exit
@@ -584,10 +597,22 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
     cd .. && echo "${GREEN}build libxfce4ui end${NC}"
   fi
 
+  if [ ! -f .garcon ]; then
+    echo "${CYAN}build garcon begin${NC}" && cd garcon-0.8.0 && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.garcon || exit
+    cd .. && echo "${GREEN}build garcon end${NC}"
+  fi
+
   if [ ! -f .exo ]; then
     echo "${CYAN}build exo begin${NC}" && cd exo-4.16.0 && ./configure ${CFGOPT}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.exo || exit
     cd .. && echo "${GREEN}build exo end${NC}"
+  fi
+
+  if [ ! -f .xfce4-panel ]; then
+    echo "${CYAN}build xfce4-panel begin${NC}" && cd xfce4-panel-4.16.0 && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-panel || exit
+    cd .. && echo "${GREEN}build xfce4-panel end${NC}"
   fi
 
   if [ ! -f .thunar ]; then
@@ -596,34 +621,34 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
     cd .. && echo "${GREEN}build thunar end${NC}"
   fi
 
-  if [ ! -f .xfce4-dev-tools ]; then
-    echo "${CYAN}build xfce4-dev-tools begin${NC}" && cd xfce4-dev-tools-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-dev-tools || exit
-    cd .. && echo "${GREEN}build xfce4-dev-tools end${NC}"
-  fi
-
-  if [ ! -f .garcon ]; then
-    echo "${CYAN}build garcon begin${NC}" && cd garcon-0.8.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.garcon || exit
-    cd .. && echo "${GREEN}build garcon end${NC}"
-  fi
-
   if [ ! -f .xfce4-settings ]; then
     echo "${CYAN}build xfce4-settings begin${NC}" && cd xfce4-settings-4.16.0 && ./configure ${CFGOPT}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-settings || exit
     cd .. && echo "${GREEN}build xfce4-settings end${NC}"
   fi
   
+  if [ ! -f .xfce4-session ]; then
+    echo "${CYAN}build xfce4-session begin${NC}" && cd xfce4-session-4.16.0 && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-session || exit
+    cd .. && echo "${GREEN}build xfce4-session end${NC}"
+  fi
+
+  if [ ! -f .xfwm4 ]; then
+    echo "${CYAN}build xfwm4 begin${NC}" && cd xfwm4-4.16.0 && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfwm4 || exit
+    cd .. && echo "${GREEN}build xfwm4 end${NC}"
+  fi
+
+  if [ ! -f .xfdesktop ]; then
+    echo "${CYAN}build xfdesktop begin${NC}" && cd xfdesktop-4.16.0 && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfdesktop || exit
+    cd .. && echo "${GREEN}build xfdesktop end${NC}"
+  fi
+
   if [ ! -f .thunar-volman ]; then
     echo "${CYAN}build thunar-volman begin${NC}" && cd thunar-volman-4.16.0 && ./configure ${CFGOPT}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.thunar-volman || exit
     cd .. && echo "${GREEN}build thunar-volman end${NC}"
-  fi
-  
-  if [ ! -f .xfce4-panel ]; then
-    echo "${CYAN}build xfce4-panel begin${NC}" && cd xfce4-panel-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-panel || exit
-    cd .. && echo "${GREEN}build xfce4-panel end${NC}"
   fi
   
   if [ ! -f .tumbler ]; then
@@ -637,30 +662,13 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-power-manager || exit
     cd .. && echo "${GREEN}build xfce4-power-manager end${NC}"
   fi
-  
-  if [ ! -f .xfdesktop ]; then
-    echo "${CYAN}build xfdesktop begin${NC}" && cd xfdesktop-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfdesktop || exit
-    cd .. && echo "${GREEN}build xfdesktop end${NC}"
-  fi
 
   if [ ! -f .xfce4-appfinder ]; then
     echo "${CYAN}build xfce4-appfinder begin${NC}" && cd xfce4-appfinder-4.16.0 && ./configure ${CFGOPT}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-appfinder || exit
     cd .. && echo "${GREEN}build xfce4-appfinder end${NC}"
   fi
-  
-  if [ ! -f .xfce4-session ]; then
-    echo "${CYAN}build xfce4-session begin${NC}" && cd xfce4-session-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfce4-session || exit
-    cd .. && echo "${GREEN}build xfce4-session end${NC}"
-  fi
-  
-  if [ ! -f .xfwm4 ]; then
-    echo "${CYAN}build xfwm4 begin${NC}" && cd xfwm4-4.16.0 && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.xfwm4 || exit
-    cd .. && echo "${GREEN}build xfwm4 end${NC}"
-  fi
+
 # fi
 
 cd ..
