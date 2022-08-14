@@ -5,7 +5,7 @@
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libatk1.0-dev libxrender-dev libsm-dev libxext-dev libpng-dev libthai-dev libxkbcommon-dev libpcre2-dev libgudev-1.0-dev libnotify-dev libupower-glib-dev -y
+  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libatk1.0-dev libxrender-dev libsm-dev libxext-dev libpng-dev libthai-dev libxkbcommon-dev libpcre2-dev libgudev-1.0-dev libnotify-dev libupower-glib-dev libstartup-notification0-dev -y
   # 安装 OpenGL
   apt-get install libgl1-mesa-dev libglu1-mesa-dev libglut-dev -y
   # 安装 gstreamer
@@ -430,6 +430,30 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
     cd .. && echo "${GREEN}build freetype end${NC}"
   fi
 
+  # 编译 harfbuzz
+  if [ ! -f .harfbuzz ]; then
+    echo "${CYAN}build harfbuzz begin${NC}" && cd ${HARFBUZZ_SRC_DIR}
+    rm -rf build && mkdir -pv build
+    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH} -Dcairo=disabled
+    meson compile -C build
+    meson install -C build --destdir=${xfce_install} || exit
+    cd .. && echo "${GREEN}build harfbuzz end${NC}"
+  fi
+
+  # 编译 freetype
+  if [ ! -f .freetype ]; then
+    echo "${CYAN}build freetype begin${NC}" && cd ${FREETYPE_SRC_DIR} && ./configure ${CFGOPT} --with-harfbuzz=yes
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.freetype || exit
+    cd .. && echo "${GREEN}build freetype end${NC}"
+  fi
+
+  # 编译 fontconfig
+  if [ ! -f .fontconfig ]; then
+    echo "${CYAN}build fontconfig begin${NC}" && cd ${FONTCFG_SRC_DIR} && ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.fontconfig || exit
+    cd .. && echo "${GREEN}build fontconfig end${NC}"
+  fi
+
   # 编译 cairo
   if [ ! -f .cairo ]; then
     echo "${CYAN}build cairo begin${NC}" && cd ${CAIRO_SRC_DIR}
@@ -442,24 +466,10 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
   if [ ! -f .harfbuzz ]; then
     echo "${CYAN}build harfbuzz begin${NC}" && cd ${HARFBUZZ_SRC_DIR}
     rm -rf build && mkdir -pv build
-    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH}
+    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH} -Dcairo=enabled
     meson compile -C build
     meson install -C build --destdir=${xfce_install} && echo "ok" > ../.harfbuzz || exit
     cd .. && echo "${GREEN}build harfbuzz end${NC}"
-  fi
-
-  # 编译 freetype
-  if [ ! -f .freetype ]; then
-    echo "${CYAN}build freetype begin${NC}" && cd ${FREETYPE_SRC_DIR} && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.freetype || exit
-    cd .. && echo "${GREEN}build freetype end${NC}"
-  fi
-
-  # 编译 fontconfig
-  if [ ! -f .fontconfig ]; then
-    echo "${CYAN}build fontconfig begin${NC}" && cd ${FONTCFG_SRC_DIR} && ./configure ${CFGOPT}
-    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.fontconfig || exit
-    cd .. && echo "${GREEN}build fontconfig end${NC}"
   fi
 
   # 编译 fribidi
