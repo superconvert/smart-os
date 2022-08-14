@@ -131,8 +131,13 @@
 3. 环境变量要求，比如找不到头文件，找不工具路径，undefined reference to XXX 这些都需要更改环境变量和编译参数进行不同的尝试
 4. 编译过程中，引用的库存在多版本的问题，这个一定要理清楚用哪个版本，编译时，把 search path 的优先次序要理清
 5. 有很多新工具需要熟悉，比如：meson, g-ir-scanner, g-ir-compile 等，这些是工具，不是开发包，刚接触不了解，结果编译 gobject-introspection 搞了很长时间
+6. 编译有循环依赖的比如：freetype && harfbuzz && cairo 具体解决方式，参见 mk_xfce.sh 脚本的处理
 
 # 拓展知识
+
+* usr 目录详解
+   usr = unix system resource 的缩写， /lib 库是内核级别的库，/usr/lib 是系统级别的库，/usr/local/lib 是应用级别的库；/lib 包含许多 /bin && /sbin 中可
+   执行程序使用的库。/usr/lib 几乎所有的系统可执行程序引用的库都会安装在这里，/usr/local/bin 很多应用层可执行性程序引用的库都放到这里
 
 * ramfs :   
    ramfs是一种非常简单的文件系统，它直接利用linux内核已有的高速缓存机制(所以其实现代码很小, 也由于这个原因, ramfs特性不能通过内核配置参数屏蔽，
