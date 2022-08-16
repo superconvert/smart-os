@@ -27,6 +27,9 @@ with_xorg=false
 # 是否开启 xfce
 with_xfce=false
 
+# 开启编译后 xfce 本地测试
+with_xfce_test=true
+
 # 是否挂载第二块硬盘
 with_sdb=false
 
@@ -57,4 +60,17 @@ file_dirname() {
   echo $filedir
 }
 
+# 获取一个目录下所有的文件，包括子目录
+ls_dir() {
+  for file in `ls $1`
+  do
+    if [ -d $1"/"$file ]
+    then
+        ls_dir $1"/"$file $2
+    else
+	file=$1"/"$file
+	echo ${file#$2} >> tmpfile.txt
+    fi
+  done
+}
 

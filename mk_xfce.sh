@@ -459,7 +459,8 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
   # 编译 cairo
   if [ ! -f .cairo ]; then
     echo "${CYAN}build cairo begin${NC}" && cd ${CAIRO_SRC_DIR}
-    ./autogen.sh && ./configure ${CFGOPT} --with-x --enable-png=yes --enable-xlib=yes --enable-xlib-xrender=yes --enable-ft=yes --enable-fc=yes
+    cairo_opt="--with-x --enable-png=yes --enable-xlib=yes --enable-xlib-xrender=yes --enable-ft=yes --enable-fc=yes"
+    ./autogen.sh && ./configure ${CFGOPT} ${cairo_opt}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.cairo || exit
     cd .. && echo "${GREEN}build cairo end${NC}"
   fi
@@ -560,6 +561,11 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
     meson compile -C build
     meson install -C build --destdir=${xfce_install} && echo "ok" > ../.gtk+ || exit
     cd .. && echo "${GREEN}build gtk+ end${NC}"
+  fi
+
+  # 在编译机上测试 xfce4 是否能正常工作
+  if [ "${with_xfce_test}" = true ]; then
+    tar zcf tmp.tar.gz ${xfce_install}
   fi
 
   # 编译 libwnck
@@ -684,4 +690,65 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
 # fi
 
 cd ..
+
+# 此开关选项可以在编译机器上，体验桌面系统了 ( Ubuntu Server 18.04 )
+if [ "${with_xfce_test}" = true ]; then
+
+  # gtk+ 之前 compile 的库不能覆盖系统目录，否则可能导致系统启动失败，或者 xfce4 不能正常运行，只能通过 ld.so.conf.d 加载
+  mkdir -pv test/a test/b
+  tar zxf tmp.tar.gz -C test/a
+  mv test/a/${xfce_install}/* test/a
+  rm test/a/root -rf
+  cp ${xfce_install}/* test/b -rf
+
+  # 删除 to 目录中，与 from 目录中路径一模一样的文件
+  from_dir=test/a
+  to_dir=test/b
+
+  # 删除缓存文件
+  if [ -f tmpfile.txt ]; then
+    rm tmpfile.txt -rf
+  fi
+
+  # 从目录中删除重复文件，只保持 xfce4 的文件
+  ls_dir $from_dir $from_dir
+  for line in $(cat tmpfile.txt)
+  do
+    file=$to_dir$line
+    if [ -f $file ]; then
+      rm $file -rf
+      echo "delete repeat file : $file"
+    fi
+  done
+
+  # 删除空目录，去掉冗余目录
+  find $to_dir -type d -empty -delete
+
+  # 拷贝 xfce4 到系统目录
+  cd $to_dir
+  cp ./ / -r -n
+  cd ..
+
+  # 预装运行环境
+  apt install dbus-x11 x11-session-utils -y
+  apt install xrdp -y
+
+  apt install libstartup-notification0 -y
+  apt install libupower-glib3 -y
+  apt install xfconf -y
+
+  # 配置文件更新
+  echo "exec startxfce4" >> /etc/xrdp/xrdp.ini
+  echo "xfce4-session" > ~/.xsession
+
+  # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
+  echo "/root/test/a/usr/lib" > /etc/ld.so.conf.d/xfce4.conf
+  echo "/root/test/a/usr/local/lib" >> /etc/ld.so.conf.d/xfce4.conf
+  echo "/root/test/a/usr/lib/x86_64-linux-gnu" >> /etc/ld.so.conf.d/xfce4.conf
+
+  # 重启系统，然后可以利用 windows 下 remote desktop 体验最新版本的 xfce4 了, 最新版本的 xfce4 还是很漂亮的
+  # reboot
+
+fi
+
 echo "${CYAN}build all success - [${GREEN} ok ${CYAN}]${NC}"
