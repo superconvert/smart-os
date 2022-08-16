@@ -125,13 +125,16 @@
    sed -i "8 i reload(sys)" src/c_client.py
    sed -i "9 i sys.setdefaultencoding('utf8')" src/c_client.py
    
-# xfce 的编译 cairo, pango, gtk+ 等等
+# xfce4 的编译 cairo, pango, gtk+ 等等
 1. xfce 的编译相当于对 xfce 做一个整体的 cross compile，工作量相当庞大，有各个组件之间有顺序关系，有依赖关系
 2. 会依赖很多开发包，系统工具，开发包理论上全需要源码编译，工作量巨大，开发包和系统工具有版本要求
 3. 环境变量要求，比如找不到头文件，找不工具路径，undefined reference to XXX 这些都需要更改环境变量和编译参数进行不同的尝试
 4. 编译过程中，引用的库存在多版本的问题，这个一定要理清楚用哪个版本，编译时，把 search path 的优先次序要理清
 5. 有很多新工具需要熟悉，比如：meson, g-ir-scanner, g-ir-compile 等，这些是工具，不是开发包，刚接触不了解，结果编译 gobject-introspection 搞了很长时间
 6. 编译有循环依赖的比如：freetype && harfbuzz && cairo 具体解决方式，参见 mk_xfce.sh 脚本的处理
+
+# 有关 xfce4 的编译，配置，安装与运行
+这块知识牵涉的知识相对比较庞大，国内包括国外专门介绍 xfce4 的编译及使用文章相对较少，我也是摸着石头过河，尽量把这块知识演示清楚，我会专门开一个章节专门讲解这个，对于 xfce4 移植到 smart-os 内，我没有十分的把握，但我会尽力做到这一点，给国人揭示图形系统的奥秘
 
 # 拓展知识
 
