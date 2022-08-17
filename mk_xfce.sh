@@ -420,7 +420,7 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
 
   # 编译 pixman
   if [ ! -f .pixman ]; then
-    echo "${CYAN}build pixman begin${NC}" && cd ${PIXMAN_SRC_DIR} && ./configure ${CFGOPT} --enable-gtk=no
+    echo "${CYAN}build pixman begin${NC}" && cd ${PIXMAN_SRC_DIR} && ./configure ${CFGOPT} --enable-libpng=yes
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.pixman || exit
     cd .. && echo "${GREEN}build pixman end${NC}"
   fi
@@ -742,9 +742,12 @@ if [ "${with_xfce_test}" = true ]; then
   echo "xfce4-session" > ~/.xsession
 
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
-  echo "/root/test/a/usr/lib" > /etc/ld.so.conf.d/xfce4.conf
-  echo "/root/test/a/usr/local/lib" >> /etc/ld.so.conf.d/xfce4.conf
-  echo "/root/test/a/usr/lib/x86_64-linux-gnu" >> /etc/ld.so.conf.d/xfce4.conf
+  # echo "/root/test/a/usr/lib" > /etc/ld.so.conf.d/xfce4.conf
+  # echo "/root/test/a/usr/local/lib" >> /etc/ld.so.conf.d/xfce4.conf
+  # echo "/root/test/a/usr/lib/x86_64-linux-gnu" >> /etc/ld.so.conf.d/xfce4.conf
+  libdir=`pwd`"/a/usr"
+  echo "XDG_CONFIG_HOME=\"/usr/local/etc/xdg\"" >> /etc/environment
+  echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu\"" >> /etc/environment
 
   # 重启系统，然后可以利用 windows 下 remote desktop 体验最新版本的 xfce4 了, 最新版本的 xfce4 还是很漂亮的
   # reboot

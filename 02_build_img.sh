@@ -16,21 +16,12 @@
 #
 #----------------------------------------------
 echo "${CYAN}--- build disk --- ${NC}"
-# 创建磁盘 64M
+# 创建磁盘 128M 或 256M
 if [ "${with_gcc}" = false ]; then
-  dd if=/dev/zero of=disk.img bs=1M count=128
+  create_disk disk.img 128
 else
-  dd if=/dev/zero of=disk.img bs=1M count=256
+  create_disk disk.img 256
 fi
-# 对磁盘进行分区一个主分区
-fdisk disk.img << EOF
-n
-p
-
-
-
-w
-EOF
 echo "${GREEN}+++ build disk ok +++${NC}"
 
 # 磁盘镜像挂载到具体设备

@@ -74,3 +74,21 @@ ls_dir() {
   done
 }
 
+# 创建一个磁盘文件并分区
+create_disk() {
+# 输入参数磁盘文件和大小
+disk=$1
+size=$2
+# 创建一个磁盘文件
+dd if=/dev/zero of=${disk} bs=1M count=${size}
+
+# 对磁盘进行分区一个主分区
+fdisk ${disk} << EOF
+n
+p
+
+
+
+w
+EOF
+}

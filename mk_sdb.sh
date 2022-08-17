@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# 导入公共环境
+. ./common.sh
+
 #----------------------------------------------
 #
 # 制作磁盘
@@ -13,18 +16,7 @@ fi
 echo "${CYAN}开始制作磁盘...${NC}"
 
 # 创建磁盘 64M
-dd if=/dev/zero of=extra.img bs=1M count=64
-
-# 对磁盘进行分区一个主分区
-fdisk extra.img << EOF
-n
-p
-
-
-
-w
-EOF
-
+create_disk extra.img 64
 echo "${GREEN}磁盘制作成功!!!${NC}"
 echo ".........................................................."
 
