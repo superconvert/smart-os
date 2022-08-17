@@ -1,8 +1,39 @@
 # xfce4 组件介绍
-* cairo
-* harfbuzz
-* freetype2
-* pixman
+[Gtk+]  
+  libffi  
+  libmount  
+  glib  
+  pixman  
+  freetype  
+  harfbuzz  
+  fontconfig  
+  cairo  
+  fribidi  
+  pango  
+  gdkpixbuf  
+  libeproxy  
+  graphene  
+  wayland-protocols  
+  gettext( libintl )  
+  gtk+  
+[xfce]  
+  libwnck  
+  xfce4-dev-tools  
+  xlibxfce4util  
+  xfconf  
+  libxfce4ui  
+  garcon  
+  exo  
+  xfce4-panel  
+  thunar 
+  xfce4-settings  
+  xfce4-session  
+  xfwm4  
+  xfdesktop  
+  thunar-volman  
+  tumbler  
+  xfce4-power-manager  
+  xfce4-appfinder  
 
 # Cairo 
 cairo is a vector graphics library with cross-device output support  
@@ -10,3 +41,13 @@ cairo能够做各种复杂的点线图案绘制、填充、文字渲染、图像
 
 # harfbuzz
 HarfBuzz 是一个文本整形引擎。它主要支持OpenType，但也 支持Apple Advanced Typography。HarfBuzz 用于 Android、Chrome、ChromeOS、Firefox、GNOME、GTK+、KDE、LibreOffice、OpenJDK、PlayStation、Qt、XeTeX 等地方。
+
+
+# xfce 运行黑屏怎么办
+比如黑屏，我们由屏幕想到可能是 xfdesktop 这个应用负责渲屏，黑屏可能是 xfdesktop 未能正确运行，这个就需要我们手工调试跟踪了，通常情况下我们会这么做：
+```shell
+# 设置屏幕，这个是 xfce 默认的值 10
+export DISPLAY=:10
+# 执行这个，正常执行理论上就不会黑屏，不能执行，可能是依赖库路径不对，版本不对，配置不对，逐步根据提示解决问题
+xfdesktop
+```
