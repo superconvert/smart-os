@@ -52,5 +52,5 @@ export DISPLAY=:10
 xfdesktop
 ```
 # xfce4-session 每个客户建立一个屏幕，具体动作的执行在下面配置文件
-/usr/local/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml 其实就是执行的 xfdesktop
+/usr/local/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml 其实就是执行的 xfdesktop  
 startxfce4 ---> xinitrc ---> xfce4-session ---> xfdesktop
