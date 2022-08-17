@@ -51,3 +51,5 @@ export DISPLAY=:10
 # 执行这个，正常执行理论上就不会黑屏，不能执行，可能是依赖库路径不对，版本不对，配置不对，逐步根据提示解决问题
 xfdesktop
 ```
+# xfce4-session 每个客户建立一个屏幕，具体动作的执行在下面配置文件
+/usr/local/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml 其实就是执行的 xfdesktop
