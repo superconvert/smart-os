@@ -1,5 +1,5 @@
 # xfce4 组件介绍
-[Gtk+]  
+* [Gtk+]  
   libffi  
   libmount  
   glib  
@@ -16,7 +16,7 @@
   wayland-protocols  
   gettext( libintl )  
   gtk+  
-[xfce]  
+* [xfce]  
   libwnck  
   xfce4-dev-tools  
   xlibxfce4util  
