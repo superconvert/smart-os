@@ -203,10 +203,10 @@ xfwm4-Message: 02:00:03.303: To replace the current window manager, try "--repla
 对用户的授权，我们通过日志可以观察到是通过文件 ~/.Xauthority
 
 5. xrdp-sesman 会根据 sesman.ini 调用 /etc/xrdp/startwm.sh，这个脚本最终会调用 /etc/X11/Xsession 这个脚本, Xsession 这个脚本大有文章
-
 ```shell
 SYSSESSIONDIR=/etc/X11/Xsession.d
-USERXSESSION=$HOME/.xsession  ---> 看到没有这就是我们经常看到的 echo "xfce4-session" > ~/.xsession 的原因，设置 Xsession 的环境变量
+USERXSESSION=$HOME/.xsession  ---> 看到没有这就是我们经常看到的
+echo "xfce4-session" > ~/.xsession 的原因，设置 Xsession 的环境变量
 ...
 SESSIONFILES=$(run-parts --list $SYSSESSIONDIR)  ---> 最终会执行 /etc/X11/Xsession.d 下的脚本，我们所有的窗口会话实现，应该放到这个里面
 
@@ -218,7 +218,6 @@ if [ -n "$SESSIONFILES" ]; then
   done
   set -e
 fi
-
 ```
 
 /etc/X11/Xsession.d/20dbus_xdg-runtime
