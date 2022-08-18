@@ -52,18 +52,16 @@ export DISPLAY=:10
 xfdesktop
 ```
 
-# xrdp 远程访问 linux 桌面流程分析
+# xrdp 远程访问 linux 桌面流程分析（ 重要 ）
 
 1. xrdp 服务依赖 xrdp-sesman 服务
 我们可以通过 grep 全局查找 xrdp-sesman，发现下面这句
-
 ```shell
 ./lib/systemd/system/xrdp.service:4:Requires=xrdp-sesman.service
 ```
 因此 xrdp 启动时，肯定 xrdp-sesman 也相应启动，具体机制待研究(TODO)
 
 2. 配置文件 /etc/xrdp/sesman.ini
-
 ```shell
 [Globals]
 ListenAddress=127.0.0.1
@@ -71,7 +69,6 @@ ListenPort=3350
 ```
 
 3. 确认 xrdp 和 xrdp-sesman 服务
-
 ```shell
 root@freeabc:/# netstat -anpt | grep xrdp
 tcp6       0      0 :::3389                 :::*                    LISTEN      6288/xrdp           
@@ -255,7 +252,6 @@ into $XDG_CACHE_HOME/sessions/.
 具体配置文件就是 /usr/local/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-
 <channel name="xfce4-session" version="1.0">
   <property name="general" type="empty">
     <property name="FailsafeSessionName" type="string" value="Failsafe"/>
@@ -304,11 +300,17 @@ into $XDG_CACHE_HOME/sessions/.
 cp /root/test/a/usr/local/etc/* /usr/local/etc/ -rf
 
 2. 解决 Cannot read private key file /etc/xrdp/key.pem: Permission denied
+```shell
 adduser xrdp ssl-cert
 reboot
+```
 
 3. 解决 libpango 库多版本的环境下，系统的低版本优先加载，导致 xfdesktop 不能正常启动的问题我们可以这么做
 ```shell
 echo "LD_LIBRARY_PATH="/root/test/a/usr/lib:/root/test/a/usr/local/lib:/root/test/a/usr/lib/x86_64-linux-gnu" xfce4-session" > ~/.xsession
 ```
 这样就可以优先加载我们编译的动态库了
+
+4. xfce4-session 其实相应的配置也可以通过命令行工具查看
+xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
+我们可以逐行查看每个属性，然后通过 ps -aef | grep xf* 查看相应的进程是否正确启动，如果没有启动，就会导致出现问题，然后单独手工启动那个进程，查看是什么原因导致不能正常启动的，解决问题就非常简单了。
