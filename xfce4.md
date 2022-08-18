@@ -1,5 +1,5 @@
 # xfce4 组件介绍
-* [Gtk+]  
+* [ Gtk+ ] 这些组件 gtk 最庞大  
   libffi  
   libmount  
   glib  
@@ -16,7 +16,7 @@
   wayland-protocols  
   gettext( libintl )  
   gtk+  
-* [xfce]  
+* [ xfce ] 这些组件编译顺序也有要求  
   libwnck  
   xfce4-dev-tools  
   xlibxfce4util  
