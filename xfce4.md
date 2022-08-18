@@ -243,11 +243,8 @@ fi
 我们跟踪执行 /etc/X11/Xsession.d/99x11-common_start/99x11-common_start 时，exec $STARTUP 这个其实就是执行 xfce4-session 了，至此 xfce4-session 启动完成
 
 xfce4-session 会读取 下面的文件，并执行里面的命令
-```shell
-https://manpages.ubuntu.com/manpages/xenial/man1/xfce4-session.1.html
-xfce4-session  reads its configuration from Xfconf.  xfce4-session stores its session data
-into $XDG_CACHE_HOME/sessions/.
-```
+https://manpages.ubuntu.com/manpages/xenial/man1/xfce4-session.1.html  
+xfce4-session  reads its configuration from Xfconf.  xfce4-session stores its session data into $XDG_CACHE_HOME/sessions/.
 
 具体配置文件就是 /usr/local/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml
 ```xml
@@ -307,7 +304,8 @@ reboot
 
 3. 解决 libpango 库多版本的环境下，系统的低版本优先加载，导致 xfdesktop 不能正常启动的问题我们可以这么做
 ```shell
-echo "LD_LIBRARY_PATH="/root/test/a/usr/lib:/root/test/a/usr/local/lib:/root/test/a/usr/lib/x86_64-linux-gnu" xfce4-session" > ~/.xsession
+libdir=`pwd`"/a/usr"
+echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu\" xfce4-session" > ~/.xsession
 ```
 这样就可以优先加载我们编译的动态库了
 
