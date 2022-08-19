@@ -295,16 +295,16 @@ systemd--
         |-xrdp---xrdp
         |-xrdp-sesman---xrdp-sesman---Xorg---9*[{Xorg}]
                                     |-bash---ssh-agent
-                                    |          |-xfce4-session---Thunar---2*[{Thunar}]
-                                    |                          |-xfce4-panel---panel-14-action---2*[{panel-14-action}]
-                                    |                          |             |-panel-6-systray---2*[{panel-6-systray}]
-                                    |                          |             |-panel-9-power-m---2*[{panel-9-power-m}]
-                                    |                          |             |-2*[{xfce4-panel}]
-                                    |                          |-xfce4-power-man---2*[{xfce4-power-man}]
-                                    |                          |-xfdesktop---2*[{xfdesktop}]
-                                    |                          |-xfsettingsd---2*[{xfsettingsd}]
-                                    |                          |-xfwm4---2*[{xfwm4}]
-                                    |                          |-10*[{xfce4-session}]
+                                    |      |-xfce4-session---Thunar---2*[{Thunar}]
+                                    |                      |-xfce4-panel---panel-14-action---2*[{panel-14-action}]
+                                    |                      |             |-panel-6-systray---2*[{panel-6-systray}]
+                                    |                      |             |-panel-9-power-m---2*[{panel-9-power-m}]
+                                    |                      |             |-2*[{xfce4-panel}]
+                                    |                      |-xfce4-power-man---2*[{xfce4-power-man}]
+                                    |                      |-xfdesktop---2*[{xfdesktop}]
+                                    |                      |-xfsettingsd---2*[{xfsettingsd}]
+                                    |                      |-xfwm4---2*[{xfwm4}]
+                                    |                      |-10*[{xfce4-session}]
                                     |-xrdp-chansrv---{xrdp-chansrv}
 ```
 
