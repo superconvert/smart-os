@@ -13,7 +13,7 @@ if [ -f "/usr/bin/apt" ]; then
   # gtk+ 编译
   apt install libcups2-dev libxrandr-dev libxi-dev libatk-bridge2.0-dev libxinerama-dev libvulkan-dev -y
   # xfce 编译
-  apt install x11-xserver-utils -y
+  apt install x11-xserver-utils libxcb-util-dev libudev-dev -y
 fi
 
 if [ -f "/usr/bin/yum" ]; then
@@ -48,7 +48,10 @@ GDKPIXBUF_SRC_URL=https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/2.42.8/gdk
 LIBEPOXY_SRC_URL=https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar.gz
 GRAPHENE_SRC_URL=https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar.gz
 GOBJINTROSPE_SRC_URL=https://github.com/GNOME/gobject-introspection/archive/refs/tags/1.72.0.tar.gz
+STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
 WAYLANDPROT_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/1.25/wayland-protocols-1.25.tar.gz
+LIBGUDEV_SRC_URL=https://gitlab.gnome.org/GNOME/libgudev/-/archive/236/libgudev-236.tar.gz
+UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
 LIBWNCK_SRC_URL=https://download.gnome.org/sources/libwnck/3.36/libwnck-3.36.0.tar.xz
 GTKX_SRC_URL=https://download.gnome.org/sources/gtk%2B/3.24/gtk%2B-3.24.9.tar.xz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
@@ -134,6 +137,21 @@ fi
 WAYLANDPROT_SRC_NAME=$(file_name ${WAYLANDPROT_SRC_URL})
 if [ ! -f ${WAYLANDPROT_SRC_NAME} ]; then
   wget -c -t 0 $WAYLANDPROT_SRC_URL
+fi
+
+STARTUPNOTI_SRC_NAME=$(file_name ${STARTUPNOTI_SRC_URL})
+if [ ! -f ${STARTUPNOTI_SRC_NAME} ]; then
+  wget -c -t 0 $STARTUPNOTI_SRC_URL
+fi
+
+LIBGUDEV_SRC_NAME=$(file_name ${LIBGUDEV_SRC_URL})
+if [ ! -f ${LIBGUDEV_SRC_NAME} ]; then
+  wget -c -t 0 $LIBGUDEV_SRC_URL
+fi
+
+UPOWER_SRC_NAME=$(file_name ${UPOWER_SRC_URL})
+if [ ! -f ${UPOWER_SRC_NAME} ]; then
+  wget -c -t 0 $UPOWER_SRC_URL
 fi
 
 GOBJINTROSPE_SRC_NAME="gobject-introspection-"$(file_name ${GOBJINTROSPE_SRC_URL})
@@ -238,6 +256,21 @@ fi
 WAYLANDPROT_SRC_DIR=${build_dir}"/"$(file_dirname ${WAYLANDPROT_SRC_NAME} .tar.gz)
 if [ ! -d ${WAYLANDPROT_SRC_DIR} ]; then
   echo "unzip ${WAYLANDPROT_SRC_NAME} source code" && tar xf source/${WAYLANDPROT_SRC_NAME} -C ${build_dir}
+fi
+
+STARTUPNOTI_SRC_DIR=${build_dir}"/"$(file_dirname ${STARTUPNOTI_SRC_NAME} .tar.gz)
+if [ ! -d ${STARTUPNOTI_SRC_DIR} ]; then
+  echo "unzip ${STARTUPNOTI_SRC_NAME} source code" && tar xf source/${STARTUPNOTI_SRC_NAME} -C ${build_dir}
+fi
+
+LIBGUDEV_SRC_DIR=${build_dir}"/"$(file_dirname ${LIBGUDEV_SRC_NAME} .tar.gz)
+if [ ! -d ${LIBGUDEV_SRC_DIR} ]; then
+  echo "unzip ${LIBGUDEV_SRC_NAME} source code" && tar xf source/${LIBGUDEV_SRC_NAME} -C ${build_dir}
+fi
+
+UPOWER_SRC_DIR=${build_dir}"/"$(file_dirname ${UPOWER_SRC_NAME} .tar.gz)
+if [ ! -d ${UPOWER_SRC_DIR} ]; then
+  echo "unzip ${UPOWER_SRC_NAME} source code" && tar xf source/${UPOWER_SRC_NAME} -C ${build_dir}
 fi
 
 GOBJINTROSPE_SRC_DIR=${build_dir}"/"$(file_dirname ${GOBJINTROSPE_SRC_NAME} .tar.gz)
@@ -545,6 +578,35 @@ ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
     cd .. && echo "${GREEN}build wayland-protocols end${NC}"
   fi
 
+  # 编译 libstartup-notification0 ( 很多 xfce4 应用依赖此库, 依赖: libxcb-util-dev )
+  if [ ! -f .startupnoti ]; then
+    echo "${CYAN}build libstartup-notification0 begin${NC}" && cd ${STARTUPNOTI_SRC_DIR}
+    ./configure ${CFGOPT}
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.startupnoti || exit
+    cd .. && echo "${GREEN}build libstartup-notification0 end${NC}"
+  fi
+
+  # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
+  if [ ! -f .libgudev ]; then
+    echo "${CYAN}build libgudev begin${NC}" && cd ${LIBGUDEV_SRC_DIR}
+    mkdir -pv build
+    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH}
+    meson compile -C build
+    meson install -C build --destdir=${xfce_install} && echo "ok" > ../.libgudev || exit
+    cd .. && echo "${GREEN}build libgudev end${NC}"
+  fi
+
+  # 编译 upower ( xfce4-power-manager 依赖此库， 依赖: libgudev )
+  if [ ! -f .upower ]; then
+    echo "${CYAN}build upower begin${NC}" && cd ${UPOWER_SRC_DIR}
+    up_flags="-DENOTSUP=95"
+    mkdir -pv build
+    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH} -Dc_args=${up_flags}
+    meson compile -C build
+    meson install -C build --destdir=${xfce_install} && echo "ok" > ../.upower || exit
+    cd .. && echo "${GREEN}build upower end${NC}"
+  fi
+
   # 编译 gettext 解决 libintl 的问题 gtk+
   if [ ! -f .gettext ]; then
     echo "${CYAN}build gettext begin${NC}" && cd ${GETTEXT_SRC_DIR}/gettext-runtime
@@ -730,12 +792,11 @@ if [ "${with_xfce_test}" = true ]; then
   cd ..
 
   # 预装运行环境
-  apt install dbus-x11 x11-session-utils -y
+  apt install dbus-x11 -y
   apt install xrdp -y
 
-  apt install libstartup-notification0 -y
-  apt install libupower-glib3 -y
-  # apt install xfconf -y
+  #apt install libstartup-notification0 -y
+  #apt install libupower-glib3 -y
 
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
