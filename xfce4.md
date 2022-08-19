@@ -288,7 +288,25 @@ xfce4-session  reads its configuration from Xfconf.  xfce4-session stores its se
 ```
 
 我们看到一个会话启动五个最基本的服务 xfwm4, xfsettingsd, xfce4-panel, Thunar, xfdesktop，如果启动失败，请依次排查这几个服务是否正常
-如果只出状态栏和 Dock ，桌面出现黑屏，基本上是 xfdesktop 启动失败，可能依赖的库不满足，缺少什么库，这个需要具体问题具体分析了
+如果只出状态栏和 Dock ，桌面出现黑屏，基本上是 xfdesktop 启动失败，可能依赖的库不满足，缺少什么库，这个需要具体问题具体分析了。
+进程关系如下图
+```shell
+systemd--
+              |-xrdp---xrdp
+              |-xrdp-sesman---xrdp-sesman---Xorg---9*[{Xorg}]
+                                                            |-bash---ssh-agent
+                                                            |          |-xfce4-session---Thunar---2*[{Thunar}]
+                                                            |                                  |-xfce4-panel---panel-14-action---2*[{panel-14-action}]
+                                                            |                                  |                    |-panel-6-systray---2*[{panel-6-systray}]
+                                                            |                                  |                    |-panel-9-power-m---2*[{panel-9-power-m}]
+                                                            |                                  |                    |-2*[{xfce4-panel}]
+                                                            |                                  |-xfce4-power-man---2*[{xfce4-power-man}]
+                                                            |                                  |-xfdesktop---2*[{xfdesktop}]
+                                                            |                                  |-xfsettingsd---2*[{xfsettingsd}]
+                                                            |                                  |-xfwm4---2*[{xfwm4}]
+                                                            |                                  |-10*[{xfce4-session}]
+                                                            |-xrdp-chansrv---{xrdp-chansrv}
+```
 
 # 常见问题解决方法
 1. 解决 Fontconfig error: Cannot load default config file: No such file
