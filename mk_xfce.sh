@@ -1,17 +1,17 @@
 #!/bin/sh
 
-#set -e
+# set +e
 # 所有的编译基于 Ubuntu 18.04.6 LTS 编译通过, 其它系统请自行调整脚本
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libatk1.0-dev libxrender-dev libsm-dev libxext-dev libpng-dev libthai-dev libxkbcommon-dev libpcre2-dev libnotify-dev -y
+  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libxrender-dev libsm-dev libxext-dev libthai-dev libxkbcommon-dev libpcre2-dev libnotify-dev -y
   # 安装 OpenGL
   apt-get install libgl1-mesa-dev libglu1-mesa-dev libglut-dev -y
   # 安装 gstreamer
   apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio -y
   # gtk+ 编译
-  apt install libcups2-dev libxrandr-dev libxi-dev libatk-bridge2.0-dev libxinerama-dev libvulkan-dev -y
+  apt install libcups2-dev libxrandr-dev libxi-dev libxinerama-dev libvulkan-dev -y
   # xfce 编译
   apt install x11-xserver-utils libxcb-util-dev libudev-dev -y
 fi
@@ -21,7 +21,6 @@ if [ -f "/usr/bin/yum" ]; then
 fi
 
 # undefined symbol: Py_InitModule4_64 需要安装高版本的 python3.8-dbg
-
 pip3 install ninja
 pip3 install meson
 pip3 install gi-docgen
@@ -36,6 +35,7 @@ pip3 install gi-docgen
 GETTEXT_SRC_URL=https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 LIBMNT_SRC_URL=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.tar.xz
+LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
 GLIB_SRC_URL=https://download.gnome.org/sources/glib/2.62/glib-2.62.0.tar.xz
 PIXMAN_SRC_URL=https://www.cairographics.org/releases/pixman-0.40.0.tar.gz
 CAIRO_SRC_URL=https://www.cairographics.org/releases/cairo-1.16.0.tar.xz
@@ -47,6 +47,9 @@ PANGO_SRC_URL=https://download.gnome.org/sources/pango/1.48/pango-1.48.9.tar.xz
 GDKPIXBUF_SRC_URL=https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/2.42.8/gdk-pixbuf-2.42.8.tar.gz
 LIBATK_SRC_URL=https://gitlab.gnome.org/GNOME/atk/-/archive/2.38.0/atk-2.38.0.tar.gz
 LIBEPOXY_SRC_URL=https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar.gz
+LIBXML_SRC_URL=https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.8.tar.xz
+LIBATK_CORE_SRC_URL=https://download.gnome.org/sources/at-spi2-core/2.38/at-spi2-core-2.38.0.tar.xz
+LIBATK_BRIDGE_SRC_URL=https://download.gnome.org/sources/at-spi2-atk/2.38/at-spi2-atk-2.38.0.tar.xz
 GRAPHENE_SRC_URL=https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar.gz
 GOBJINTROSPE_SRC_URL=https://github.com/GNOME/gobject-introspection/archive/refs/tags/1.72.0.tar.gz
 STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
@@ -65,119 +68,45 @@ XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 mkdir -pv source
 cd source
 
-LIBFFI_SRC_NAME=$(file_name ${LIBFFI_SRC_URL})
-if [ ! -f ${LIBFFI_SRC_NAME} ]; then
-  wget -c -t 0 $LIBFFI_SRC_URL
-fi
+download_src() {
+  SRC_NAME=$2$(file_name $1)
+  if [ ! -f ${SRC_NAME} ]; then
+    wget -c -t 0 $1 -O $SRC_NAME || (echo "download $1 failed" && exit)
+  fi
+  echo $SRC_NAME
+}
 
-LIBMNT_SRC_NAME=$(file_name ${LIBMNT_SRC_URL})
-if [ ! -f ${LIBMNT_SRC_NAME} ]; then
-  wget -c -t 0 $LIBMNT_SRC_URL
-fi
+LIBFFI_SRC_NAME=$(download_src ${LIBFFI_SRC_URL})
+LIBMNT_SRC_NAME=$(download_src ${LIBMNT_SRC_URL})
+LIBPNG_SRC_NAME=$(download_src ${LIBPNG_SRC_URL})
+GLIB_SRC_NAME=$(download_src ${GLIB_SRC_URL})
+PIXMAN_SRC_NAME=$(download_src ${PIXMAN_SRC_URL})
+FREETYPE_SRC_NAME=$(download_src ${FREETYPE_SRC_URL})
+CAIRO_SRC_NAME=$(download_src ${CAIRO_SRC_URL})
+FONTCFG_SRC_NAME=$(download_src ${FONTCFG_SRC_URL})
+HARFBUZZ_SRC_NAME=$(download_src ${HARFBUZZ_SRC_URL})
+FRIBIDI_SRC_NAME=$(download_src ${FRIBIDI_SRC_URL})
+PANGO_SRC_NAME=$(download_src ${PANGO_SRC_URL})
+GDKPIXBUF_SRC_NAME=$(download_src ${GDKPIXBUF_SRC_URL})
+LIBATK_SRC_NAME=$(download_src ${LIBATK_SRC_URL})
+GETTEXT_SRC_NAME=$(download_src ${GETTEXT_SRC_URL})
+WAYLANDPROT_SRC_NAME=$(download_src ${WAYLANDPROT_SRC_URL})
+STARTUPNOTI_SRC_NAME=$(download_src ${STARTUPNOTI_SRC_URL})
+LIBGUDEV_SRC_NAME=$(download_src ${LIBGUDEV_SRC_URL})
+UPOWER_SRC_NAME=$(download_src ${UPOWER_SRC_URL})
+LIBWNCK_SRC_NAME=$(download_src ${LIBWNCK_SRC_URL})
+LIBXML_SRC_NAME=$(download_src ${LIBXML_SRC_URL})
+LIBATK_CORE_SRC_NAME=$(download_src ${LIBATK_CORE_SRC_URL})
+LIBATK_BRIDGE_SRC_NAME=$(download_src ${LIBATK_BRIDGE_SRC_URL})
+XFCE_SRC_NAME=$(download_src ${XFCE_SRC_URL})
+LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
+GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
+GOBJINTROSPE_SRC_NAME=$(download_src ${GOBJINTROSPE_SRC_URL} "gobject-introspection-")
 
-GLIB_SRC_NAME=$(file_name ${GLIB_SRC_URL})
-if [ ! -f ${GLIB_SRC_NAME} ]; then
-  wget -c -t 0 $GLIB_SRC_URL
-fi
-
-PIXMAN_SRC_NAME=$(file_name ${PIXMAN_SRC_URL})
-if [ ! -f ${PIXMAN_SRC_NAME} ]; then
-  wget -c -t 0 $PIXMAN_SRC_URL
-fi
-
-FREETYPE_SRC_NAME=$(file_name ${FREETYPE_SRC_URL})
-if [ ! -f ${FREETYPE_SRC_NAME} ]; then
-  wget -c -t 0 $FREETYPE_SRC_URL
-fi
-
-CAIRO_SRC_NAME=$(file_name ${CAIRO_SRC_URL})
-if [ ! -f ${CAIRO_SRC_NAME} ]; then
-  wget -c -t 0 $CAIRO_SRC_URL
-fi
-
-FONTCFG_SRC_NAME=$(file_name ${FONTCFG_SRC_URL})
-if [ ! -f ${FONTCFG_SRC_NAME} ]; then
-  wget -c -t 0 $FONTCFG_SRC_URL
-fi
-
-HARFBUZZ_SRC_NAME=$(file_name ${HARFBUZZ_SRC_URL})
-if [ ! -f ${HARFBUZZ_SRC_NAME} ]; then
-  wget -c -t 0 $HARFBUZZ_SRC_URL
-fi
-
-FRIBIDI_SRC_NAME=$(file_name ${FRIBIDI_SRC_URL})
-if [ ! -f ${FRIBIDI_SRC_NAME} ]; then
-  wget -c -t 0 $FRIBIDI_SRC_URL
-fi
-
-PANGO_SRC_NAME=$(file_name ${PANGO_SRC_URL})
-if [ ! -f ${PANGO_SRC_NAME} ]; then
-  wget -c -t 0 $PANGO_SRC_URL
-fi
-
-GDKPIXBUF_SRC_NAME=$(file_name ${GDKPIXBUF_SRC_URL})
-if [ ! -f ${GDKPIXBUF_SRC_NAME} ]; then
-  wget -c -t 0 $GDKPIXBUF_SRC_URL
-fi
-
-LIBATK_SRC_NAME=$(file_name ${LIBATK_SRC_URL})
-if [ ! -f ${LIBATK_SRC_NAME} ]; then
-  wget -c -t 0 $LIBATK_SRC_URL
-fi
-
-LIBEPOXY_SRC_NAME="libepoxy-"$(file_name ${LIBEPOXY_SRC_URL})
-if [ ! -f ${LIBEPOXY_SRC_NAME} ]; then
-  wget -c -t 0 $LIBEPOXY_SRC_URL -O $LIBEPOXY_SRC_NAME
-fi
-
-GRAPHENE_SRC_NAME="graphene-"$(file_name ${GRAPHENE_SRC_URL})
-if [ ! -f ${GRAPHENE_SRC_NAME} ]; then
-  wget -c -t 0 $GRAPHENE_SRC_URL -O $GRAPHENE_SRC_NAME
-fi
-
-GETTEXT_SRC_NAME=$(file_name ${GETTEXT_SRC_URL})
-if [ ! -f ${GETTEXT_SRC_NAME} ]; then
-  wget -c -t 0 $GETTEXT_SRC_URL
-fi
-
-WAYLANDPROT_SRC_NAME=$(file_name ${WAYLANDPROT_SRC_URL})
-if [ ! -f ${WAYLANDPROT_SRC_NAME} ]; then
-  wget -c -t 0 $WAYLANDPROT_SRC_URL
-fi
-
-STARTUPNOTI_SRC_NAME=$(file_name ${STARTUPNOTI_SRC_URL})
-if [ ! -f ${STARTUPNOTI_SRC_NAME} ]; then
-  wget -c -t 0 $STARTUPNOTI_SRC_URL
-fi
-
-LIBGUDEV_SRC_NAME=$(file_name ${LIBGUDEV_SRC_URL})
-if [ ! -f ${LIBGUDEV_SRC_NAME} ]; then
-  wget -c -t 0 $LIBGUDEV_SRC_URL
-fi
-
-UPOWER_SRC_NAME=$(file_name ${UPOWER_SRC_URL})
-if [ ! -f ${UPOWER_SRC_NAME} ]; then
-  wget -c -t 0 $UPOWER_SRC_URL
-fi
-
-GOBJINTROSPE_SRC_NAME="gobject-introspection-"$(file_name ${GOBJINTROSPE_SRC_URL})
-if [ ! -f ${GOBJINTROSPE_SRC_NAME} ]; then
-  wget -c -t 0 $GOBJINTROSPE_SRC_URL -O $GOBJINTROSPE_SRC_NAME
-fi
-
-LIBWNCK_SRC_NAME=$(file_name ${LIBWNCK_SRC_URL})
-if [ ! -f ${LIBWNCK_SRC_NAME} ]; then
-  wget -c -t 0 $LIBWNCK_SRC_URL
-fi
-
+# gtk 因为 + 号，需要特殊处理
 GTKX_SRC_NAME=$(echo $(file_name ${GTKX_SRC_URL}) | sed 's/%2B/+/')
 if [ ! -f ${GTKX_SRC_NAME} ]; then
   wget -c -t 0 $GTKX_SRC_URL
-fi
-
-XFCE_SRC_NAME=$(file_name ${XFCE_SRC_URL})
-if [ ! -f ${XFCE_SRC_NAME} ]; then
-  wget -c -t 0 $XFCE_SRC_URL
 fi
 
 cd ..
@@ -189,115 +118,41 @@ cd ..
 #---------------------------
 mkdir -pv ${build_dir}
 
-LIBFFI_SRC_DIR=${build_dir}"/"$(file_dirname ${LIBFFI_SRC_NAME} .tar.gz)
-if [ ! -d ${LIBFFI_SRC_DIR} ]; then
-  echo "unzip ${LIBFFI_SRC_NAME} source code" && tar xf source/${LIBFFI_SRC_NAME} -C ${build_dir}
-fi
+unzip_src() {
+  SRC_NAME=$2
+  SRC_DIR=${build_dir}"/"$(file_dirname ${SRC_NAME} $1)
+  if [ ! -d ${SRC_DIR} ]; then
+    tar xf source/${SRC_NAME} -C ${build_dir}
+  fi
+  echo $SRC_DIR
+}
 
-LIBMNT_SRC_DIR=${build_dir}"/"$(file_dirname ${LIBMNT_SRC_NAME} .tar.xz)
-if [ ! -d ${LIBMNT_SRC_DIR} ]; then
-  echo "unzip ${LIBMNT_SRC_NAME} source code" && tar xf source/${LIBMNT_SRC_NAME} -C ${build_dir}
-fi
-
-GLIB_SRC_DIR=${build_dir}"/"$(file_dirname ${GLIB_SRC_NAME} .tar.xz)
-if [ ! -d ${GLIB_SRC_DIR} ]; then
-  echo "unzip ${GLIB_SRC_NAME} source code" && tar xf source/${GLIB_SRC_NAME} -C ${build_dir}
-fi
-
-PIXMAN_SRC_DIR=${build_dir}"/"$(file_dirname ${PIXMAN_SRC_NAME} .tar.gz)
-if [ ! -d ${PIXMAN_SRC_DIR} ]; then
-  echo "unzip ${PIXMAN_SRC_NAME} source code" && tar xf source/${PIXMAN_SRC_NAME} -C ${build_dir}
-fi
-
-FREETYPE_SRC_DIR=${build_dir}"/"$(file_dirname ${FREETYPE_SRC_NAME} .tar.xz)
-if [ ! -d ${FREETYPE_SRC_DIR} ]; then
-  echo "unzip ${FREETYPE_SRC_NAME} source code" && tar xf source/${FREETYPE_SRC_NAME} -C ${build_dir}
-fi
-
-CAIRO_SRC_DIR=${build_dir}"/"$(file_dirname ${CAIRO_SRC_NAME} .tar.xz)
-if [ ! -d ${CAIRO_SRC_DIR} ]; then
-  echo "unzip ${CAIRO_SRC_NAME} source code" && tar xf source/${CAIRO_SRC_NAME} -C ${build_dir}
-fi
-
-FONTCFG_SRC_DIR=${build_dir}"/"$(file_dirname ${FONTCFG_SRC_NAME} .tar.xz)
-if [ ! -d ${FONTCFG_SRC_DIR} ]; then
-  echo "unzip ${FONTCFG_SRC_NAME} source code" && tar xf source/${FONTCFG_SRC_NAME} -C ${build_dir}
-fi
-
-HARFBUZZ_SRC_DIR=${build_dir}"/"$(file_dirname ${HARFBUZZ_SRC_NAME} .tar.xz)
-if [ ! -d ${HARFBUZZ_SRC_DIR} ]; then
-  echo "unzip ${HARFBUZZ_SRC_NAME} source code" && tar xf source/${HARFBUZZ_SRC_NAME} -C ${build_dir}
-fi
-
-FRIBIDI_SRC_DIR=${build_dir}"/"$(file_dirname ${FRIBIDI_SRC_NAME} .tar.xz)
-if [ ! -d ${FRIBIDI_SRC_DIR} ]; then
-  echo "unzip ${FRIBIDI_SRC_NAME} source code" && tar xf source/${FRIBIDI_SRC_NAME} -C ${build_dir}
-fi
-
-PANGO_SRC_DIR=${build_dir}"/"$(file_dirname ${PANGO_SRC_NAME} .tar.xz)
-if [ ! -d ${PANGO_SRC_DIR} ]; then
-  echo "unzip ${PANGO_SRC_NAME} source code" && tar xf source/${PANGO_SRC_NAME} -C ${build_dir}
-fi
-
-GDKPIXBUF_SRC_DIR=${build_dir}"/"$(file_dirname ${GDKPIXBUF_SRC_NAME} .tar.gz)
-if [ ! -d ${GDKPIXBUF_SRC_DIR} ]; then
-  echo "unzip ${GDKPIXBUF_SRC_NAME} source code" && tar xf source/${GDKPIXBUF_SRC_NAME} -C ${build_dir}
-fi
-
-LIBATK_SRC_DIR=${build_dir}"/"$(file_dirname ${LIBATK_SRC_NAME} .tar.gz)
-if [ ! -d ${LIBATK_SRC_DIR} ]; then
-  echo "unzip ${LIBATK_SRC_NAME} source code" && tar xf source/${LIBATK_SRC_NAME} -C ${build_dir}
-fi
-
-LIBEPOXY_SRC_DIR=${build_dir}"/"$(file_dirname ${LIBEPOXY_SRC_NAME} .tar.gz)
-if [ ! -d ${LIBEPOXY_SRC_DIR} ]; then
-  echo "unzip ${LIBEPOXY_SRC_NAME} source code" && tar xf source/${LIBEPOXY_SRC_NAME} -C ${build_dir}
-fi
-
-GRAPHENE_SRC_DIR=${build_dir}"/"$(file_dirname ${GRAPHENE_SRC_NAME} .tar.gz)
-if [ ! -d ${GRAPHENE_SRC_DIR} ]; then
-  echo "unzip ${GRAPHENE_SRC_NAME} source code" && tar xf source/${GRAPHENE_SRC_NAME} -C ${build_dir}
-fi
-
-GETTEXT_SRC_DIR=${build_dir}"/"$(file_dirname ${GETTEXT_SRC_NAME} .tar.gz)
-if [ ! -d ${GETTEXT_SRC_DIR} ]; then
-  echo "unzip ${GETTEXT_SRC_NAME} source code" && tar xf source/${GETTEXT_SRC_NAME} -C ${build_dir}
-fi
-
-WAYLANDPROT_SRC_DIR=${build_dir}"/"$(file_dirname ${WAYLANDPROT_SRC_NAME} .tar.gz)
-if [ ! -d ${WAYLANDPROT_SRC_DIR} ]; then
-  echo "unzip ${WAYLANDPROT_SRC_NAME} source code" && tar xf source/${WAYLANDPROT_SRC_NAME} -C ${build_dir}
-fi
-
-STARTUPNOTI_SRC_DIR=${build_dir}"/"$(file_dirname ${STARTUPNOTI_SRC_NAME} .tar.gz)
-if [ ! -d ${STARTUPNOTI_SRC_DIR} ]; then
-  echo "unzip ${STARTUPNOTI_SRC_NAME} source code" && tar xf source/${STARTUPNOTI_SRC_NAME} -C ${build_dir}
-fi
-
-LIBGUDEV_SRC_DIR=${build_dir}"/"$(file_dirname ${LIBGUDEV_SRC_NAME} .tar.gz)
-if [ ! -d ${LIBGUDEV_SRC_DIR} ]; then
-  echo "unzip ${LIBGUDEV_SRC_NAME} source code" && tar xf source/${LIBGUDEV_SRC_NAME} -C ${build_dir}
-fi
-
-UPOWER_SRC_DIR=${build_dir}"/"$(file_dirname ${UPOWER_SRC_NAME} .tar.gz)
-if [ ! -d ${UPOWER_SRC_DIR} ]; then
-  echo "unzip ${UPOWER_SRC_NAME} source code" && tar xf source/${UPOWER_SRC_NAME} -C ${build_dir}
-fi
-
-GOBJINTROSPE_SRC_DIR=${build_dir}"/"$(file_dirname ${GOBJINTROSPE_SRC_NAME} .tar.gz)
-if [ ! -d ${GOBJINTROSPE_SRC_DIR} ]; then
-  echo "unzip ${GOBJINTROSPE_SRC_NAME} source code" && tar xf source/${GOBJINTROSPE_SRC_NAME} -C ${build_dir}
-fi
-
-LIBWNCK_SRC_DIR=${build_dir}"/"$(file_dirname ${LIBWNCK_SRC_NAME} .tar.xz)
-if [ ! -d ${LIBWNCK_SRC_DIR} ]; then
-  echo "unzip ${LIBWNCK_SRC_NAME} source code" && tar xf source/${LIBWNCK_SRC_NAME} -C ${build_dir}
-fi
-
-GTKX_SRC_DIR=${build_dir}"/"$(file_dirname ${GTKX_SRC_NAME} .tar.xz)
-if [ ! -d ${GTKX_SRC_DIR} ]; then
-  echo "unzip ${GTKX_SRC_NAME} source code" && tar xf source/${GTKX_SRC_NAME} -C ${build_dir}
-fi
+LIBFFI_SRC_DIR=$(unzip_src ".tar.gz" ${LIBFFI_SRC_NAME}); echo "unzip ${LIBFFI_SRC_NAME} source code"
+LIBMNT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBMNT_SRC_NAME}); echo "unzip ${LIBMNT_SRC_NAME} source code"
+LIBPNG_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPNG_SRC_NAME}); echo "unzip ${LIBPNG_SRC_NAME} source code"
+GLIB_SRC_DIR=$(unzip_src ".tar.xz" ${GLIB_SRC_NAME}); echo "unzip ${GLIB_SRC_NAME} source code"
+PIXMAN_SRC_DIR=$(unzip_src ".tar.gz" ${PIXMAN_SRC_NAME}); echo "unzip ${PIXMAN_SRC_NAME} source code"
+FREETYPE_SRC_DIR=$(unzip_src ".tar.xz" ${FREETYPE_SRC_NAME}); echo "unzip ${FREETYPE_SRC_NAME} source code"
+CAIRO_SRC_DIR=$(unzip_src ".tar.xz" ${CAIRO_SRC_NAME}); echo "unzip ${CAIRO_SRC_NAME} source code"
+FONTCFG_SRC_DIR=$(unzip_src ".tar.xz" ${FONTCFG_SRC_NAME}); echo "unzip ${FONTCFG_SRC_NAME} source code"
+HARFBUZZ_SRC_DIR=$(unzip_src ".tar.xz" ${HARFBUZZ_SRC_NAME}); echo "unzip ${HARFBUZZ_SRC_NAME} source code"
+FRIBIDI_SRC_DIR=$(unzip_src ".tar.xz" ${FRIBIDI_SRC_NAME}); echo "unzip ${FRIBIDI_SRC_NAME} source code"
+PANGO_SRC_DIR=$(unzip_src ".tar.xz" ${PANGO_SRC_NAME}); echo "unzip ${PANGO_SRC_NAME} source code"
+GDKPIXBUF_SRC_DIR=$(unzip_src ".tar.gz" ${GDKPIXBUF_SRC_NAME}); echo "unzip ${GDKPIXBUF_SRC_NAME} source code"
+LIBATK_SRC_DIR=$(unzip_src ".tar.gz" ${LIBATK_SRC_NAME}); echo "unzip ${LIBATK_SRC_NAME} source code"
+LIBEPOXY_SRC_DIR=$(unzip_src ".tar.gz" ${LIBEPOXY_SRC_NAME}); echo "unzip ${LIBEPOXY_SRC_NAME} source code"
+LIBXML_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXML_SRC_NAME}); echo "unzip ${LIBXML_SRC_NAME} source code"
+LIBATK_CORE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_CORE_SRC_NAME}); echo "unzip ${LIBATK_CORE_SRC_NAME} source code"
+LIBATK_BRIDGE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_BRIDGE_SRC_NAME}); echo "unzip ${LIBATK_BRIDGE_SRC_NAME} source code"
+GRAPHENE_SRC_DIR=$(unzip_src ".tar.gz" ${GRAPHENE_SRC_NAME}); echo "unzip ${GRAPHENE_SRC_NAME} source code"
+GETTEXT_SRC_DIR=$(unzip_src ".tar.gz" ${GETTEXT_SRC_NAME}); echo "unzip ${GETTEXT_SRC_NAME} source code"
+WAYLANDPROT_SRC_DIR=$(unzip_src ".tar.gz" ${WAYLANDPROT_SRC_NAME}); echo "unzip ${WAYLANDPROT_SRC_NAME} source code"
+STARTUPNOTI_SRC_DIR=$(unzip_src ".tar.gz" ${STARTUPNOTI_SRC_NAME}); echo "unzip ${STARTUPNOTI_SRC_NAME} source code"
+LIBGUDEV_SRC_DIR=$(unzip_src ".tar.gz" ${LIBGUDEV_SRC_NAME}); echo "unzip ${LIBGUDEV_SRC_NAME} source code"
+UPOWER_SRC_DIR=$(unzip_src ".tar.gz" ${UPOWER_SRC_NAME}); echo "unzip ${UPOWER_SRC_NAME} source code"
+GOBJINTROSPE_SRC_DIR=$(unzip_src ".tar.gz" ${GOBJINTROSPE_SRC_NAME}); echo "unzip ${GOBJINTROSPE_SRC_NAME} source code"
+LIBWNCK_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWNCK_SRC_NAME}); echo "unzip ${LIBWNCK_SRC_NAME} source code"
+GTKX_SRC_DIR=$(unzip_src ".tar.xz" ${GTKX_SRC_NAME}); echo "unzip ${GTKX_SRC_NAME} source code"
 
 XFCE_SRC_DIR=${build_dir}"/"$(file_dirname ${XFCE_SRC_NAME} .tar.bz2)
 if [ ! -d ${XFCE_SRC_DIR} ]; then
@@ -330,24 +185,26 @@ fi
 cd ${build_dir}
 
 xfce_install=${build_dir}"/xfce_install"
-
 xfce_inc=${xfce_install}/usr/include
 xfce_loc_inc=${xfce_install}/usr/local/include
 xfce_x86_64_inc=${xfce_install}/usr/lib/x86_64-linux-gnu
-
 include_path=" \
   -I${xfce_inc} \
   -I${xfce_inc}/glib-2.0 \
   -I${xfce_inc}/harfbuzz \
   -I${xfce_inc}/libmount \
+  -I${xfce_inc}/atk-1.0 \
   -I${xfce_inc}/gtk-3.0 \
+  -I${xfce_inc}/gudev-1.0 \
   -I${xfce_inc}/pango-1.0 \
   -I${xfce_inc}/harfbuzz \
   -I${xfce_inc}/libwnck-3.0 \
   -I${xfce_inc}/gdk-pixbuf-2.0 \
+  -I${xfce_inc}/libupower-glib \
   -I${xfce_loc_inc} \
   -I${xfce_loc_inc}/cairo \
   -I${xfce_loc_inc}/exo-2 \
+  -I${xfce_loc_inc}/libxml2 \
   -I${xfce_loc_inc}/pixman-1 \
   -I${xfce_loc_inc}/freetype2 \
   -I${xfce_loc_inc}/thunarx-3 \
@@ -355,43 +212,34 @@ include_path=" \
   -I${xfce_loc_inc}/garcon-gtk3-1 \
   -I${xfce_x86_64_inc} \
   -I/usr/include/dbus-1.0 \
-  -I/usr/include/atk-1.0 \
-  -I/usr/include/at-spi2-atk/2.0 \
   -I/usr/include/gstreamer-1.0 \
   -I/usr/include/libpng16 \
   -I/usr/include/python3.8 \
-  -I/usr/include/startup-notification-1.0 \
   -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
 
 xfce_lib=${xfce_install}/usr/lib
 xfce_share=${xfce_install}/usr/share
 xfce_loc_lib=${xfce_install}/usr/local/lib
 xfce_loc_share=${xfce_install}/usr/local/share
-
 library_path=" \
   -L${glibc_install}/lib64 \
   -L${xfce_lib} \
   -L${xfce_loc_lib} \
   -L${xfce_lib}/x86_64-linux-gnu"
 
-CFGOPT="--with-sysroot=${xfce_install}"
-pkgcfg1="${xfce_lib}/pkgconfig"
-pkgcfg2="${xfce_share}/pkgconfig"
-pkgcfg3="${xfce_loc_lib}/pkgconfig"
-pkgcfg4="${xfce_lib}/x86_64-linux-gnu/pkgconfig"
+cfg_opt="--with-sysroot=${xfce_install}"
+pkg_cfg1="${xfce_lib}/pkgconfig"
+pkg_cfg2="${xfce_share}/pkgconfig"
+pkg_cfg3="${xfce_loc_lib}/pkgconfig"
+pkg_cfg4="${xfce_lib}/x86_64-linux-gnu/pkgconfig"
 
 export CFLAGS="${include_path}"
 export CXXFLAGS="${include_path}"
 export LDFLAGS="${library_path}"
 
-# xfce 组件的编译需要这个设置
-# export PLATFORM_CFLAGS="${include_path}"
-# export PLATFORM_CPPFLAGS="${include_path}"
-# export PLATFORM_LDFLAGS="${library_path}"
-
 export PKG_CONFIG_SYSROOT_DIR="${xfce_install}"
 export PKG_CONFIG_TOP_BUILD_DIR="${xfce_install}"
-export PKG_CONFIG_PATH="${pkgcfg1}:${pkgcfg2}:${pkgcfg3}:${pkgcfg4}"
+export PKG_CONFIG_PATH="${pkg_cfg1}:${pkg_cfg2}:${pkg_cfg3}:${pkg_cfg4}"
 
 # 编译过程中有工具需要 libffi.so.8 库的，需要加载一下，否则会出现找不到 libffi.so.8
 export LD_LIBRARY_PATH="${xfce_lib}:${xfce_loc_lib}:${xfce_lib}/x86_64-linux-gnu:$LD_LIBRARY_PATH"
@@ -425,49 +273,46 @@ if [ ! -f ${xfce_install}${gi_makefile} ]; then
   ln -s ${gi_makefile} ${xfce_install}${gi_makefile}
 fi
 
-#---------------------
-#
-# 公共编译函数
-# meson 的配置选项
-# meson 编译参数一览 https://mesonbuild.com/Reference-tables.html
-#
-#---------------------
-ms_flag="--sysroot=${xfce_install}"
-ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
-
+#---------------------------
+# meson 编译 编译参数一览 https://mesonbuild.com/Reference-tables.html
+#---------------------------
 meson_build() {
   name=$1
   srcdir=$2
-  param=$3
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && mkdir -pv build
-    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH} ${param}
+    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH} $3
     meson compile -C build
     meson install -C build --destdir=${xfce_install} && echo "ok" > ../.${name} || exit
     cd .. && echo "${GREEN}build ${name} end${NC}"
   fi
 }
 
+#--------------------------
+# xfce4 编译定义
+#--------------------------
 xfce4_build() {
   name=$1
   srcdir=$2
   if [ ! -f .${name} ]; then
-    echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && ./configure ${CFGOPT}
+    echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && ./configure ${cfg_opt}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.${name} || exit
     cd .. && echo "${GREEN}build ${name} end${NC}"
   fi
 }
 
+#--------------------------
+# 公共模块编译
+#--------------------------
 common_build() {
   name=$1
   srcdir=$2
-  param=$3
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} 
     if [ -f autogen.sh ]; then
       ./autogen.sh
     fi
-    ./configure ${CFGOPT} ${param}
+    ./configure ${cfg_opt} $3
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.${name} || exit
     cd .. && echo "${GREEN}build ${name} end${NC}"
   fi
@@ -478,88 +323,68 @@ common_build() {
   mkdir -pv xfce_install
 
   # 编译 libffi, 替换系统的
-  if [ ! -f .libffi ]; then
-    echo "${CYAN}build libffi begin${NC}" && cd ${LIBFFI_SRC_DIR} && ./configure
-    make -j8 && make install && echo "ok" > ../.libffi || exit
-    cd .. && echo "${GREEN}build libffi end${NC}"
-  fi
-
+  common_build libffi ${LIBFFI_SRC_DIR}
   # 编译 util-linux ( libmount )
   common_build libmnt ${LIBMNT_SRC_DIR}
-  
+  # 编译 libpng
+  common_build libpng ${LIBPNG_SRC_DIR}
   # 编译 glib
   meson_build glib ${GLIB_SRC_DIR}
-
   # 编译 pixman
   common_build pixman ${PIXMAN_SRC_DIR} --enable-libpng=yes
-
   # 编译 freetype
-  common_build freetype ${FREETYPE_SRC_DIR} --with-harfbuzz=no
-  rm ../.freetype
-
+  common_build freetype_pre ${FREETYPE_SRC_DIR} --with-harfbuzz=no
   # 编译 harfbuzz
-  meson_build harfbuzz ${HARFBUZZ_SRC_DIR} -Dcairo=disabled
-  rm ../.harfbuzz
-
+  meson_build harfbuzz_pre ${HARFBUZZ_SRC_DIR} -Dcairo=disabled
   # 编译 freetype
   common_build freetype ${FREETYPE_SRC_DIR} --with-harfbuzz=yes
-
   # 编译 fontconfig
   common_build fontconfig ${FONTCFG_SRC_DIR}
-
   # 编译 cairo
   cairo_opt="--with-x --enable-png=yes --enable-xlib=yes --enable-xlib-xrender=yes --enable-ft=yes --enable-fc=yes"
   common_build cairo ${CAIRO_SRC_DIR} ${cairo_opt}
-
   # 编译 harfbuzz
   meson_build harfbuzz ${HARFBUZZ_SRC_DIR} -Dcairo=enabled
-
   # 编译 fribidi
   meson_build fribidi ${FRIBIDI_SRC_DIR}
-
   # 编译 pango
   meson_build pango ${PANGO_SRC_DIR}
-
   # 编译 gobject-introspection
+  # ms_flag="--sysroot=${xfce_install}"
+  # ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
   # gobject_inttro="-Dc_flags=${ms_flag} -Dc_link_args=${ms_link}"
   # meson_build gobject-introspection ${GOBJINTROSPE_SRC_DIR} ${gobject_intro}
-
   # 编译 gdkpixbuf
   meson_build gdkpixbuf ${GDKPIXBUF_SRC_DIR}
-
   # 编译 libatk
   meson_build libatk ${LIBATK_SRC_DIR}
-
+  # 编译 libxml
+  common_build libxml ${LIBXML_SRC_DIR}
+  # 编译 libatk-core
+  meson_build libatk-core ${LIBATK_CORE_SRC_DIR}
+  # 编译 libatk-bridge
+  meson_build libatk-bridge ${LIBATK_BRIDGE_SRC_DIR}
   # 编译 libepoxy
   meson_build libepoxy ${LIBEPOXY_SRC_DIR}
-
   # 编译 graphene
   meson_build graphene ${GRAPHENE_SRC_DIR}
-
   # 编译 wayland-protocols
   meson_build wayland-protocols ${WAYLANDPROT_SRC_DIR}
-
   # 编译 libstartup-notification0 ( 很多 xfce4 应用依赖此库, 依赖: libxcb-util-dev )
   common_build startupnoti ${STARTUPNOTI_SRC_DIR}
-
   # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
   meson_build libgudev ${LIBGUDEV_SRC_DIR}
-
   # 编译 upower ( xfce4-power-manager 依赖此库， 依赖: libgudev )
   upower_flags="-DENOTSUP=95"
   meson_build upower ${UPOWER_SRC_DIR} -Dc_args=${upower_flags}
-
   # 编译 gettext 解决 libintl 的问题 gtk+
-  common_build gettext ${GETTEXT_SRC_DIR}/gettext-runtime --with-PACKAGE=gettext-runtime
-
+  common_build gettext ${GETTEXT_SRC_DIR}
   # 编译 gtk+
   meson_build gtk+ ${GTKX_SRC_DIR}
-
   # 在编译机上测试 xfce4 是否能正常工作
   if [ "${with_xfce_test}" = true ]; then
     tar zcf tmp.tar.gz ${xfce_install}
   fi
-
   # 编译 libwnck
   meson_build libwnck ${LIBWNCK_SRC_DIR}
 
@@ -569,13 +394,13 @@ common_build() {
   # 必须去掉这个，否则 xfce 编译不过，做的还是有点差，和 gtk+ 的编译还是差一个档次
   unset PKG_CONFIG_SYSROOT_DIR
   unset PKG_CONFIG_TOP_BUILD_DIR
-  base_inc="${xfce_inc}/gtk-3.0:${xfce_inc}/pango-1.0:${xfce_inc}/harfbuzz:${xfce_inc}/gdk-pixbuf-2.0"
+  xfce4_inc="${xfce_loc_inc}/xfce4"
+  base_inc="${xfce_inc}/gtk-3.0:${xfce_inc}/pango-1.0:${xfce_inc}/harfbuzz:${xfce_inc}/atk-1.0:${xfce_inc}/gdk-pixbuf-2.0"
   garcon_inc="${xfce_loc_inc}/garcon-1:${xfce_loc_inc}/garcon-gtk3-1:${xfce_loc_inc}/xfce4/libxfce4panel-2.0"
   startup_inc="${xfce_loc_inc}/startup-notification-1.0"
-  xfce_mod_inc="${xfce_loc_inc}/xfce4:${xfce_loc_inc}/xfce4/xfconf-0:${xfce_loc_inc}/xfce4/libxfce4kbd-private-3:${xfce_loc_inc}/xfce4/libxfce4ui-2"
+  xfce_mod_inc="${xfce4_inc}:${xfce4_inc}/xfconf-0:${xfce4_inc}/libxfce4kbd-private-3:${xfce4_inc}/libxfce4ui-2"
   other_mod_inc="${xfce_inc}/libwnck-3.0:${xfce_loc_inc}/cairo:${xfce_loc_inc}/exo-2:${xfce_loc_inc}/thunarx-3"
   export C_INCLUDE_PATH="${base_inc}:${garcon_inc}:${startup_inc}:${xfce_mod_inc}:${other_mod_inc}"
-  #export XDG_DATA_DIRS="${xfce_share}:${xfce_loc_share}"
 
   xfce4_build xfce4-dev-tools xfce4-dev-tools-4.16.0
   xfce4_build libxfce4util libxfce4util-4.16.0 
@@ -594,18 +419,17 @@ common_build() {
   xfce4_build xfce4-power-manager xfce4-power-manager-4.16.0 
   xfce4_build xfce4-appfinder xfce4-appfinder-4.16.0 
 
-# fi
+  cd ..
 
-cd ..
+# fi
 
 # 此开关选项可以在编译机器上，体验桌面系统了 ( Ubuntu Server 18.04 )
 if [ "${with_xfce_test}" = true ]; then
 
   # gtk+ 之前 compile 的库不能覆盖系统目录，否则可能导致系统启动失败，或者 xfce4 不能正常运行，只能通过 ld.so.conf.d 加载
+  rm test/a test/b -rf
   mkdir -pv test/a test/b
-  tar zxf tmp.tar.gz -C test/a
-  mv test/a/${xfce_install}/* test/a
-  rm test/a/root -rf
+  tar zxf tmp.tar.gz -C test/a && (mv test/a${xfce_install}/* test/a) && (rm test/a/root -rf)
   cp ${xfce_install}/* test/b -rf
 
   # 删除 to 目录中，与 from 目录中路径一模一样的文件
@@ -623,25 +447,17 @@ if [ "${with_xfce_test}" = true ]; then
   do
     file=$to_dir$line
     if [ -f $file ]; then
-      rm $file -rf
-      echo "delete repeat file : $file"
+      rm $file -rf && echo "delete repeat file : $file"
     fi
   done
 
   # 删除空目录，去掉冗余目录
   find $to_dir -type d -empty -delete
-
-  # 拷贝 xfce4 到系统目录
-  cd $to_dir
-  cp ./ / -r -n
-  cd ..
+  # 拷贝编译后的 xfce4 到系统目录
+  cd $to_dir && (cp ./ / -r -n) && cd ..
 
   # 预装运行环境
-  apt install dbus-x11 -y
-  apt install xrdp -y
-
-  #apt install libstartup-notification0 -y
-  #apt install libupower-glib3 -y
+  apt install dbus-x11 xrdp -y
 
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
@@ -652,4 +468,5 @@ if [ "${with_xfce_test}" = true ]; then
 
 fi
 
+cd ..
 echo "${CYAN}build all success - [${GREEN} ok ${CYAN}]${NC}"
