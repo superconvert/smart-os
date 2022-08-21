@@ -5,7 +5,7 @@
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libxrender-dev libsm-dev libxext-dev libthai-dev libxkbcommon-dev libpcre2-dev libnotify-dev -y
+  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libxrender-dev libsm-dev libxext-dev libthai-dev libxkbcommon-dev libdbus-1-dev libxtst-dev docbook-xsl -y
   # 安装 OpenGL
   apt-get install libgl1-mesa-dev libglu1-mesa-dev libglut-dev -y
   # 安装 gstreamer
@@ -13,7 +13,7 @@ if [ -f "/usr/bin/apt" ]; then
   # gtk+ 编译
   apt install libcups2-dev libxrandr-dev libxi-dev libxinerama-dev libvulkan-dev -y
   # xfce 编译
-  apt install x11-xserver-utils libxcb-util-dev libudev-dev -y
+  apt install x11-xserver-utils libxcb-util-dev libudev-dev docbook-xsl-ns libwayland-client0 libwayland-egl-backend-dev libelf-dev-y
 fi
 
 if [ -f "/usr/bin/yum" ]; then
@@ -36,7 +36,9 @@ GETTEXT_SRC_URL=https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 LIBMNT_SRC_URL=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.tar.xz
 LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
+LIBZIP_SRC_URL=https://libzip.org/download/libzip-1.9.2.tar.xz
 LIBPCRE2_SRC_URL=https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz
+LIBNOTIFY_SRC_URL=https://download.gnome.org/sources/libnotify/0.8/libnotify-0.8.0.tar.xz
 GLIB_SRC_URL=https://download.gnome.org/sources/glib/2.62/glib-2.62.0.tar.xz
 PIXMAN_SRC_URL=https://www.cairographics.org/releases/pixman-0.40.0.tar.gz
 CAIRO_SRC_URL=https://www.cairographics.org/releases/cairo-1.16.0.tar.xz
@@ -51,6 +53,9 @@ LIBEPOXY_SRC_URL=https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar
 LIBXML_SRC_URL=https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.8.tar.xz
 LIBATK_CORE_SRC_URL=https://download.gnome.org/sources/at-spi2-core/2.38/at-spi2-core-2.38.0.tar.xz
 LIBATK_BRIDGE_SRC_URL=https://download.gnome.org/sources/at-spi2-atk/2.38/at-spi2-atk-2.38.0.tar.xz
+PCIACCESS_SRC_URL=https://github.com/freedesktop/xorg-libpciaccess/archive/refs/tags/libpciaccess-0.16.tar.gz
+LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
+MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/mesa-mesa-20.0.0-rc3.tar.gz
 GRAPHENE_SRC_URL=https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar.gz
 GOBJINTROSPE_SRC_URL=https://github.com/GNOME/gobject-introspection/archive/refs/tags/1.72.0.tar.gz
 STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
@@ -58,6 +63,7 @@ WAYLANDPROT_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland-protocols/-/a
 LIBGUDEV_SRC_URL=https://gitlab.gnome.org/GNOME/libgudev/-/archive/236/libgudev-236.tar.gz
 UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
 LIBWNCK_SRC_URL=https://download.gnome.org/sources/libwnck/3.36/libwnck-3.36.0.tar.xz
+GSTREAMER_SRC_URL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.2.tar.xz
 GTKX_SRC_URL=https://download.gnome.org/sources/gtk%2B/3.24/gtk%2B-3.24.9.tar.xz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 
@@ -73,7 +79,9 @@ LIBFFI_SRC_NAME=$(download_src ${LIBFFI_SRC_URL})
 LIBXML_SRC_NAME=$(download_src ${LIBXML_SRC_URL})
 LIBMNT_SRC_NAME=$(download_src ${LIBMNT_SRC_URL})
 LIBPNG_SRC_NAME=$(download_src ${LIBPNG_SRC_URL})
+LIBZIP_SRC_NAME=$(download_src ${LIBZIP_SRC_URL})
 LIBPCRE2_SRC_NAME=$(download_src ${LIBPCRE2_SRC_URL})
+LIBNOTIFY_SRC_NAME=$(download_src ${LIBNOTIFY_SRC_URL})
 GLIB_SRC_NAME=$(download_src ${GLIB_SRC_URL})
 PIXMAN_SRC_NAME=$(download_src ${PIXMAN_SRC_URL})
 FREETYPE_SRC_NAME=$(download_src ${FREETYPE_SRC_URL})
@@ -93,8 +101,12 @@ LIBWNCK_SRC_NAME=$(download_src ${LIBWNCK_SRC_URL})
 LIBATK_CORE_SRC_NAME=$(download_src ${LIBATK_CORE_SRC_URL})
 LIBATK_BRIDGE_SRC_NAME=$(download_src ${LIBATK_BRIDGE_SRC_URL})
 XFCE_SRC_NAME=$(download_src ${XFCE_SRC_URL})
+MESA_SRC_NAME=$(download_src ${MESA_SRC_URL})
+LIBDRM_SRC_NAME=$(download_src ${LIBDRM_SRC_URL})
+GSTREAMER_SRC_NAME=$(download_src ${GSTREAMER_SRC_URL})
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
+PCIACCESS_SRC_NAME=$(download_src ${PCIACCESS_SRC_URL} "xorg-libpciaccess-")
 GOBJINTROSPE_SRC_NAME=$(download_src ${GOBJINTROSPE_SRC_URL} "gobject-introspection-")
 # gtk 因为 + 号，需要特殊处理
 GTKX_SRC_NAME=$(echo $(file_name ${GTKX_SRC_URL}) | sed 's/%2B/+/')
@@ -115,7 +127,9 @@ LIBFFI_SRC_DIR=$(unzip_src ".tar.gz" ${LIBFFI_SRC_NAME}); echo "unzip ${LIBFFI_S
 LIBXML_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXML_SRC_NAME}); echo "unzip ${LIBXML_SRC_NAME} source code"
 LIBMNT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBMNT_SRC_NAME}); echo "unzip ${LIBMNT_SRC_NAME} source code"
 LIBPNG_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPNG_SRC_NAME}); echo "unzip ${LIBPNG_SRC_NAME} source code"
+LIBZIP_SRC_DIR=$(unzip_src ".tar.xz" ${LIBZIP_SRC_NAME}); echo "unzip ${LIBZIP_SRC_NAME} source code"
 LIBPCRE2_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCRE2_SRC_NAME}); echo "unzip ${LIBPCRE2_SRC_NAME} source code"
+LIBNOTIFY_SRC_DIR=$(unzip_src ".tar.xz" ${LIBNOTIFY_SRC_NAME}); echo "unzip ${LIBNOTIFY_SRC_NAME} source code"
 GLIB_SRC_DIR=$(unzip_src ".tar.xz" ${GLIB_SRC_NAME}); echo "unzip ${GLIB_SRC_NAME} source code"
 PIXMAN_SRC_DIR=$(unzip_src ".tar.gz" ${PIXMAN_SRC_NAME}); echo "unzip ${PIXMAN_SRC_NAME} source code"
 FREETYPE_SRC_DIR=$(unzip_src ".tar.xz" ${FREETYPE_SRC_NAME}); echo "unzip ${FREETYPE_SRC_NAME} source code"
@@ -137,6 +151,10 @@ LIBGUDEV_SRC_DIR=$(unzip_src ".tar.gz" ${LIBGUDEV_SRC_NAME}); echo "unzip ${LIBG
 UPOWER_SRC_DIR=$(unzip_src ".tar.gz" ${UPOWER_SRC_NAME}); echo "unzip ${UPOWER_SRC_NAME} source code"
 GOBJINTROSPE_SRC_DIR=$(unzip_src ".tar.gz" ${GOBJINTROSPE_SRC_NAME}); echo "unzip ${GOBJINTROSPE_SRC_NAME} source code"
 LIBWNCK_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWNCK_SRC_NAME}); echo "unzip ${LIBWNCK_SRC_NAME} source code"
+GSTREAMER_SRC_DIR=$(unzip_src ".tar.xz" ${GSTREAMER_SRC_NAME}); echo "unzip ${GSTREAMER_SRC_NAME} source code"
+LIBDRM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBDRM_SRC_NAME}); echo "unzip ${LIBDRM_SRC_NAME} source code"
+PCIACCESS_SRC_DIR=$(unzip_src ".tar.gz" ${PCIACCESS_SRC_NAME}); echo "unzip ${PCIACCESS_SRC_NAME} source code"
+MESA_SRC_DIR=$(unzip_src ".tar.gz" ${MESA_SRC_NAME}); echo "unzip ${MESA_SRC_NAME} source code"
 GTKX_SRC_DIR=$(unzip_src ".tar.xz" ${GTKX_SRC_NAME}); echo "unzip ${GTKX_SRC_NAME} source code"
 XFCE_SRC_DIR=${build_dir}"/"$(file_dirname ${XFCE_SRC_NAME} .tar.bz2)
 if [ ! -d ${XFCE_SRC_DIR} ]; then
@@ -195,8 +213,8 @@ include_path=" \
   -I${xfce_loc_inc}/garcon-gtk3-1 \
   -I${xfce_x86_64_inc} \
   -I/usr/include/dbus-1.0 \
-  -I/usr/include/gstreamer-1.0 \
   -I/usr/include/python3.8 \
+  -I/usr/include/gstreamer-1.0 \
   -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
 
 xfce_lib=${xfce_install}/usr/lib
@@ -294,11 +312,25 @@ common_build() {
     if [ -f autogen.sh ]; then
       ./autogen.sh
     fi
-    ./configure ${cfg_opt} $3
+    if [ -f CMakeLists.txt ]; then
+      cmake .
+    fi
+    if [ -f ./configure ]; then
+      ./configure ${cfg_opt} $3
+    fi
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.${name} || exit
     cd .. && echo "${GREEN}build ${name} end${NC}"
   fi
 }
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+# 编译 harfbuzz 遇到问题: linking of temporary binary failed，关闭 glibc 的链接，问题就解决了，原因推测如下：
+# 目前还不支持和 glibc 同时编译，因为如果编译链接 glibc ，可能需要全部依赖都做到源码编译，否则，可能编译过程中有问题
+# 因为 apt install 安装的软件可能依赖系统自带的 glibc，这边指定编译的 glibc ，就会导致链接器工作混乱。导致链接失败
+# 因此编译 xfce 时，一定保证 glibc_install/lib64 目录为空，否则就会出现上面的错误 died with <Signals.SIGSEGV: 11>
+#
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # if [ ! -d "xfce_install" ]; then
   mkdir -pv xfce_install
@@ -311,6 +343,8 @@ common_build() {
   common_build libmnt ${LIBMNT_SRC_DIR}
   # 编译 libpng
   common_build libpng ${LIBPNG_SRC_DIR}
+  # 编译 libzip
+  common_build libzip ${LIBZIP_SRC_DIR}
   # 编译 libpcre2
   common_build libpcre2 ${LIBPCRE2_SRC_DIR}
   # 编译 glib
@@ -347,12 +381,18 @@ common_build() {
   meson_build libatk-core ${LIBATK_CORE_SRC_DIR}
   # 编译 libatk-bridge ( 依赖: libatk-core )
   meson_build libatk-bridge ${LIBATK_BRIDGE_SRC_DIR}
+  # 编译 pciaccess
+  common_build pciaccess ${PCIACCESS_SRC_DIR}
+  # 编译 libdrm
+  meson_build libdrm ${LIBDRM_SRC_DIR}
   # 编译 libepoxy
   meson_build libepoxy ${LIBEPOXY_SRC_DIR}
   # 编译 graphene
   meson_build graphene ${GRAPHENE_SRC_DIR}
   # 编译 wayland-protocols
   meson_build wayland-protocols ${WAYLANDPROT_SRC_DIR}
+  # 编译 mesa
+  meson_build mesa ${MESA_SRC_DIR}
   # 编译 libstartup-notification0 ( 很多 xfce4 应用依赖此库, 依赖: libxcb-util-dev )
   common_build startupnoti ${STARTUPNOTI_SRC_DIR}
   # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
@@ -362,6 +402,8 @@ common_build() {
   meson_build upower ${UPOWER_SRC_DIR} -Dc_args=${upower_flags}
   # 编译 gettext 解决 libintl 的问题 gtk+
   common_build gettext ${GETTEXT_SRC_DIR}
+  # 编译 gstreamer
+  meson_build gstreamer ${GSTREAMER_SRC_DIR}
   # 编译 gtk+
   meson_build gtk+ ${GTKX_SRC_DIR}
   # 在编译机上测试 xfce4 是否能正常工作
@@ -370,6 +412,8 @@ common_build() {
   fi
   # 编译 libwnck
   meson_build libwnck ${LIBWNCK_SRC_DIR}
+  # 编译 libnotify
+  meson_build libnotify ${LIBNOTIFY_SRC_DIR}
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
