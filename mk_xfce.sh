@@ -5,7 +5,7 @@
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libxrender-dev libsm-dev libxext-dev libthai-dev libxkbcommon-dev libnotify-dev libdbus-1-dev libxtst-dev -y
+  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libxrender-dev libsm-dev libxext-dev libthai-dev libxkbcommon-dev libdbus-1-dev libxtst-dev docbook-xsl -y
   # 安装 OpenGL
   apt-get install libgl1-mesa-dev libglu1-mesa-dev libglut-dev -y
   # 安装 gstreamer
@@ -36,7 +36,9 @@ GETTEXT_SRC_URL=https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 LIBMNT_SRC_URL=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.tar.xz
 LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
+LIBZIP_SRC_URL=https://libzip.org/download/libzip-1.9.2.tar.xz
 LIBPCRE2_SRC_URL=https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz
+LIBNOTIFY_SRC_URL=https://download.gnome.org/sources/libnotify/0.8/libnotify-0.8.0.tar.xz
 GLIB_SRC_URL=https://download.gnome.org/sources/glib/2.62/glib-2.62.0.tar.xz
 PIXMAN_SRC_URL=https://www.cairographics.org/releases/pixman-0.40.0.tar.gz
 CAIRO_SRC_URL=https://www.cairographics.org/releases/cairo-1.16.0.tar.xz
@@ -73,7 +75,9 @@ LIBFFI_SRC_NAME=$(download_src ${LIBFFI_SRC_URL})
 LIBXML_SRC_NAME=$(download_src ${LIBXML_SRC_URL})
 LIBMNT_SRC_NAME=$(download_src ${LIBMNT_SRC_URL})
 LIBPNG_SRC_NAME=$(download_src ${LIBPNG_SRC_URL})
+LIBZIP_SRC_NAME=$(download_src ${LIBZIP_SRC_URL})
 LIBPCRE2_SRC_NAME=$(download_src ${LIBPCRE2_SRC_URL})
+LIBNOTIFY_SRC_NAME=$(download_src ${LIBNOTIFY_SRC_URL})
 GLIB_SRC_NAME=$(download_src ${GLIB_SRC_URL})
 PIXMAN_SRC_NAME=$(download_src ${PIXMAN_SRC_URL})
 FREETYPE_SRC_NAME=$(download_src ${FREETYPE_SRC_URL})
@@ -115,7 +119,9 @@ LIBFFI_SRC_DIR=$(unzip_src ".tar.gz" ${LIBFFI_SRC_NAME}); echo "unzip ${LIBFFI_S
 LIBXML_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXML_SRC_NAME}); echo "unzip ${LIBXML_SRC_NAME} source code"
 LIBMNT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBMNT_SRC_NAME}); echo "unzip ${LIBMNT_SRC_NAME} source code"
 LIBPNG_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPNG_SRC_NAME}); echo "unzip ${LIBPNG_SRC_NAME} source code"
+LIBZIP_SRC_DIR=$(unzip_src ".tar.xz" ${LIBZIP_SRC_NAME}); echo "unzip ${LIBZIP_SRC_NAME} source code"
 LIBPCRE2_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCRE2_SRC_NAME}); echo "unzip ${LIBPCRE2_SRC_NAME} source code"
+LIBNOTIFY_SRC_DIR=$(unzip_src ".tar.xz" ${LIBNOTIFY_SRC_NAME}); echo "unzip ${LIBNOTIFY_SRC_NAME} source code"
 GLIB_SRC_DIR=$(unzip_src ".tar.xz" ${GLIB_SRC_NAME}); echo "unzip ${GLIB_SRC_NAME} source code"
 PIXMAN_SRC_DIR=$(unzip_src ".tar.gz" ${PIXMAN_SRC_NAME}); echo "unzip ${PIXMAN_SRC_NAME} source code"
 FREETYPE_SRC_DIR=$(unzip_src ".tar.xz" ${FREETYPE_SRC_NAME}); echo "unzip ${FREETYPE_SRC_NAME} source code"
@@ -195,8 +201,8 @@ include_path=" \
   -I${xfce_loc_inc}/garcon-gtk3-1 \
   -I${xfce_x86_64_inc} \
   -I/usr/include/dbus-1.0 \
-  -I/usr/include/gstreamer-1.0 \
   -I/usr/include/python3.8 \
+  -I/usr/include/gstreamer-1.0 \
   -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
 
 xfce_lib=${xfce_install}/usr/lib
@@ -294,11 +300,25 @@ common_build() {
     if [ -f autogen.sh ]; then
       ./autogen.sh
     fi
-    ./configure ${cfg_opt} $3
+    if [ -f CMakeLists.txt ]; then
+      cmake .
+    fi
+    if [ -f ./configure ]; then
+      ./configure ${cfg_opt} $3
+    fi
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.${name} || exit
     cd .. && echo "${GREEN}build ${name} end${NC}"
   fi
 }
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+# 编译 harfbuzz 遇到问题: linking of temporary binary failed，关闭 glibc 的链接，问题就解决了，原因推测如下：
+# 目前还不支持和 glibc 同时编译，因为如果编译链接 glibc ，可能需要全部依赖都做到源码编译，否则，可能编译过程中有问题
+# 因为 apt install 安装的软件可能依赖系统自带的 glibc，这边指定编译的 glibc ，就会导致链接器工作混乱。导致链接失败
+# 因此编译 xfce 时，一定保证 glibc_install/lib64 目录为空，否则就会出现上面的错误 died with <Signals.SIGSEGV: 11>
+#
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # if [ ! -d "xfce_install" ]; then
   mkdir -pv xfce_install
@@ -311,6 +331,8 @@ common_build() {
   common_build libmnt ${LIBMNT_SRC_DIR}
   # 编译 libpng
   common_build libpng ${LIBPNG_SRC_DIR}
+  # 编译 libzip
+  common_build libzip ${LIBZIP_SRC_DIR}
   # 编译 libpcre2
   common_build libpcre2 ${LIBPCRE2_SRC_DIR}
   # 编译 glib
@@ -370,6 +392,8 @@ common_build() {
   fi
   # 编译 libwnck
   meson_build libwnck ${LIBWNCK_SRC_DIR}
+  # 编译 libnotify
+  meson_build libnotify ${LIBNOTIFY_SRC_DIR}
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
