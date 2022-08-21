@@ -36,31 +36,61 @@ with_sdb=false
 # 是否登陆模式
 with_login=false
 
-# 编译工程目录
-build_dir=`pwd`"/build"
-
+#----------------------------------------------
 # 公共目录
+#----------------------------------------------
+build_dir=`pwd`"/build"
 linux_install=${build_dir}"/linux_install"
 glibc_install=${build_dir}"/glibc_install"
 busybox_install=${build_dir}"/busybox_install"
 gcc_install=${build_dir}"/gcc_install"
 binutils_install=${build_dir}"/binutils_install"
 xorg_install=${build_dir}"/xorg_install"
+xfce_install=${build_dir}"/xfce_install"
 
+#----------------------------------------------
 # 从完整路径获取文件名
+#----------------------------------------------
 file_name() {
   filename=$(echo $1 | rev | awk -v FS='/' '{print $1}' | rev)
   echo ${filename}
 }
 
+#----------------------------------------------
 # 获取去掉扩展名的文件名
+#----------------------------------------------
 file_dirname() {
   filename=$(file_name $1)
   filedir=`echo $filename | sed "s/$2//g"`
   echo $filedir
 }
 
+#----------------------------------------------
+# 下载一个指定 URL 的源码包, 并存为指定的名字
+#----------------------------------------------
+download_src() {
+  SRC_NAME=$2$(file_name $1)
+  if [ ! -f ${SRC_NAME} ]; then
+    wget -c -t 0 $1 -O $SRC_NAME || (echo "download $1 failed" && exit)
+  fi
+  echo $SRC_NAME
+}
+
+#----------------------------------------------
+# 解压一个下载的源码包到去掉扩展名的目录内
+#----------------------------------------------
+unzip_src() {
+  SRC_NAME=$2
+  SRC_DIR=${build_dir}"/"$(file_dirname ${SRC_NAME} $1)
+  if [ ! -d ${SRC_DIR} ]; then
+    tar xf source/${SRC_NAME} -C ${build_dir}
+  fi
+  echo $SRC_DIR
+}
+
+#----------------------------------------------
 # 获取一个目录下所有的文件，包括子目录
+#----------------------------------------------
 ls_dir() {
   for file in `ls $1`
   do
@@ -74,7 +104,9 @@ ls_dir() {
   done
 }
 
+#---------------------------------------------
 # 创建一个磁盘文件并分区
+#---------------------------------------------
 create_disk() {
 # 输入参数磁盘文件和大小
 disk=$1

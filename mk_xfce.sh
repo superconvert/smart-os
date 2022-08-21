@@ -36,6 +36,7 @@ GETTEXT_SRC_URL=https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 LIBMNT_SRC_URL=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.tar.xz
 LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
+LIBPCRE2_SRC_URL=https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz
 GLIB_SRC_URL=https://download.gnome.org/sources/glib/2.62/glib-2.62.0.tar.xz
 PIXMAN_SRC_URL=https://www.cairographics.org/releases/pixman-0.40.0.tar.gz
 CAIRO_SRC_URL=https://www.cairographics.org/releases/cairo-1.16.0.tar.xz
@@ -68,17 +69,11 @@ XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 mkdir -pv source
 cd source
 
-download_src() {
-  SRC_NAME=$2$(file_name $1)
-  if [ ! -f ${SRC_NAME} ]; then
-    wget -c -t 0 $1 -O $SRC_NAME || (echo "download $1 failed" && exit)
-  fi
-  echo $SRC_NAME
-}
-
 LIBFFI_SRC_NAME=$(download_src ${LIBFFI_SRC_URL})
+LIBXML_SRC_NAME=$(download_src ${LIBXML_SRC_URL})
 LIBMNT_SRC_NAME=$(download_src ${LIBMNT_SRC_URL})
 LIBPNG_SRC_NAME=$(download_src ${LIBPNG_SRC_URL})
+LIBPCRE2_SRC_NAME=$(download_src ${LIBPCRE2_SRC_URL})
 GLIB_SRC_NAME=$(download_src ${GLIB_SRC_URL})
 PIXMAN_SRC_NAME=$(download_src ${PIXMAN_SRC_URL})
 FREETYPE_SRC_NAME=$(download_src ${FREETYPE_SRC_URL})
@@ -95,14 +90,12 @@ STARTUPNOTI_SRC_NAME=$(download_src ${STARTUPNOTI_SRC_URL})
 LIBGUDEV_SRC_NAME=$(download_src ${LIBGUDEV_SRC_URL})
 UPOWER_SRC_NAME=$(download_src ${UPOWER_SRC_URL})
 LIBWNCK_SRC_NAME=$(download_src ${LIBWNCK_SRC_URL})
-LIBXML_SRC_NAME=$(download_src ${LIBXML_SRC_URL})
 LIBATK_CORE_SRC_NAME=$(download_src ${LIBATK_CORE_SRC_URL})
 LIBATK_BRIDGE_SRC_NAME=$(download_src ${LIBATK_BRIDGE_SRC_URL})
 XFCE_SRC_NAME=$(download_src ${XFCE_SRC_URL})
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
 GOBJINTROSPE_SRC_NAME=$(download_src ${GOBJINTROSPE_SRC_URL} "gobject-introspection-")
-
 # gtk 因为 + 号，需要特殊处理
 GTKX_SRC_NAME=$(echo $(file_name ${GTKX_SRC_URL}) | sed 's/%2B/+/')
 if [ ! -f ${GTKX_SRC_NAME} ]; then
@@ -118,18 +111,11 @@ cd ..
 #---------------------------
 mkdir -pv ${build_dir}
 
-unzip_src() {
-  SRC_NAME=$2
-  SRC_DIR=${build_dir}"/"$(file_dirname ${SRC_NAME} $1)
-  if [ ! -d ${SRC_DIR} ]; then
-    tar xf source/${SRC_NAME} -C ${build_dir}
-  fi
-  echo $SRC_DIR
-}
-
 LIBFFI_SRC_DIR=$(unzip_src ".tar.gz" ${LIBFFI_SRC_NAME}); echo "unzip ${LIBFFI_SRC_NAME} source code"
+LIBXML_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXML_SRC_NAME}); echo "unzip ${LIBXML_SRC_NAME} source code"
 LIBMNT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBMNT_SRC_NAME}); echo "unzip ${LIBMNT_SRC_NAME} source code"
 LIBPNG_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPNG_SRC_NAME}); echo "unzip ${LIBPNG_SRC_NAME} source code"
+LIBPCRE2_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCRE2_SRC_NAME}); echo "unzip ${LIBPCRE2_SRC_NAME} source code"
 GLIB_SRC_DIR=$(unzip_src ".tar.xz" ${GLIB_SRC_NAME}); echo "unzip ${GLIB_SRC_NAME} source code"
 PIXMAN_SRC_DIR=$(unzip_src ".tar.gz" ${PIXMAN_SRC_NAME}); echo "unzip ${PIXMAN_SRC_NAME} source code"
 FREETYPE_SRC_DIR=$(unzip_src ".tar.xz" ${FREETYPE_SRC_NAME}); echo "unzip ${FREETYPE_SRC_NAME} source code"
@@ -141,7 +127,6 @@ PANGO_SRC_DIR=$(unzip_src ".tar.xz" ${PANGO_SRC_NAME}); echo "unzip ${PANGO_SRC_
 GDKPIXBUF_SRC_DIR=$(unzip_src ".tar.gz" ${GDKPIXBUF_SRC_NAME}); echo "unzip ${GDKPIXBUF_SRC_NAME} source code"
 LIBATK_SRC_DIR=$(unzip_src ".tar.gz" ${LIBATK_SRC_NAME}); echo "unzip ${LIBATK_SRC_NAME} source code"
 LIBEPOXY_SRC_DIR=$(unzip_src ".tar.gz" ${LIBEPOXY_SRC_NAME}); echo "unzip ${LIBEPOXY_SRC_NAME} source code"
-LIBXML_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXML_SRC_NAME}); echo "unzip ${LIBXML_SRC_NAME} source code"
 LIBATK_CORE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_CORE_SRC_NAME}); echo "unzip ${LIBATK_CORE_SRC_NAME} source code"
 LIBATK_BRIDGE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_BRIDGE_SRC_NAME}); echo "unzip ${LIBATK_BRIDGE_SRC_NAME} source code"
 GRAPHENE_SRC_DIR=$(unzip_src ".tar.gz" ${GRAPHENE_SRC_NAME}); echo "unzip ${GRAPHENE_SRC_NAME} source code"
@@ -153,7 +138,6 @@ UPOWER_SRC_DIR=$(unzip_src ".tar.gz" ${UPOWER_SRC_NAME}); echo "unzip ${UPOWER_S
 GOBJINTROSPE_SRC_DIR=$(unzip_src ".tar.gz" ${GOBJINTROSPE_SRC_NAME}); echo "unzip ${GOBJINTROSPE_SRC_NAME} source code"
 LIBWNCK_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWNCK_SRC_NAME}); echo "unzip ${LIBWNCK_SRC_NAME} source code"
 GTKX_SRC_DIR=$(unzip_src ".tar.xz" ${GTKX_SRC_NAME}); echo "unzip ${GTKX_SRC_NAME} source code"
-
 XFCE_SRC_DIR=${build_dir}"/"$(file_dirname ${XFCE_SRC_NAME} .tar.bz2)
 if [ ! -d ${XFCE_SRC_DIR} ]; then
   echo "unzip ${XFCE_SRC_NAME} source code" && tar xf source/${XFCE_SRC_NAME} -C ${build_dir}
@@ -184,7 +168,6 @@ fi
 #---------------------------------------------
 cd ${build_dir}
 
-xfce_install=${build_dir}"/xfce_install"
 xfce_inc=${xfce_install}/usr/include
 xfce_loc_inc=${xfce_install}/usr/local/include
 xfce_x86_64_inc=${xfce_install}/usr/lib/x86_64-linux-gnu
@@ -213,7 +196,6 @@ include_path=" \
   -I${xfce_x86_64_inc} \
   -I/usr/include/dbus-1.0 \
   -I/usr/include/gstreamer-1.0 \
-  -I/usr/include/libpng16 \
   -I/usr/include/python3.8 \
   -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
 
@@ -241,13 +223,13 @@ export PKG_CONFIG_SYSROOT_DIR="${xfce_install}"
 export PKG_CONFIG_TOP_BUILD_DIR="${xfce_install}"
 export PKG_CONFIG_PATH="${pkg_cfg1}:${pkg_cfg2}:${pkg_cfg3}:${pkg_cfg4}"
 
-# 编译过程中有工具需要 libffi.so.8 库的，需要加载一下，否则会出现找不到 libffi.so.8
-export LD_LIBRARY_PATH="${xfce_lib}:${xfce_loc_lib}:${xfce_lib}/x86_64-linux-gnu:$LD_LIBRARY_PATH"
-ldconfig
-
 # 编译过程中会寻找 *.gir 的文件，.gir 的目录就是这个
 export XDG_DATA_DIRS="${xfce_share}:${xfce_loc_share}:${xfce_share}/gir-1.0:$XDG_DATA_DIRS"
 export GDK_PIXBUF_PIXDATA="${xfce_install}/usr/bin/gdk-pixbuf-pixdata"
+
+# 编译过程中有工具需要 libffi.so.8 库的，需要加载一下，否则会出现找不到 libffi.so.8
+export LD_LIBRARY_PATH="${xfce_lib}:${xfce_loc_lib}:${xfce_lib}/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+ldconfig
 
 # python 模块的搜寻目录
 # export PYTHONPATH="${xfce_lib}/x86_64-linux-gnu/gobject-introspection:${PYTHONPATH}"
@@ -277,8 +259,8 @@ fi
 # meson 编译 编译参数一览 https://mesonbuild.com/Reference-tables.html
 #---------------------------
 meson_build() {
-  name=$1
-  srcdir=$2
+  local name=$1
+  local srcdir=$2
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && mkdir -pv build
     meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH} $3
@@ -292,8 +274,8 @@ meson_build() {
 # xfce4 编译定义
 #--------------------------
 xfce4_build() {
-  name=$1
-  srcdir=$2
+  local name=$1
+  local srcdir=$2
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && ./configure ${cfg_opt}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.${name} || exit
@@ -305,8 +287,8 @@ xfce4_build() {
 # 公共模块编译
 #--------------------------
 common_build() {
-  name=$1
-  srcdir=$2
+  local name=$1
+  local srcdir=$2
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} 
     if [ -f autogen.sh ]; then
@@ -319,15 +301,18 @@ common_build() {
 }
 
 # if [ ! -d "xfce_install" ]; then
-  # 编译 glib
   mkdir -pv xfce_install
 
   # 编译 libffi, 替换系统的
   common_build libffi ${LIBFFI_SRC_DIR}
+  # 编译 libxml
+  common_build libxml ${LIBXML_SRC_DIR}
   # 编译 util-linux ( libmount )
   common_build libmnt ${LIBMNT_SRC_DIR}
   # 编译 libpng
   common_build libpng ${LIBPNG_SRC_DIR}
+  # 编译 libpcre2
+  common_build libpcre2 ${LIBPCRE2_SRC_DIR}
   # 编译 glib
   meson_build glib ${GLIB_SRC_DIR}
   # 编译 pixman
@@ -358,11 +343,9 @@ common_build() {
   meson_build gdkpixbuf ${GDKPIXBUF_SRC_DIR}
   # 编译 libatk
   meson_build libatk ${LIBATK_SRC_DIR}
-  # 编译 libxml
-  common_build libxml ${LIBXML_SRC_DIR}
-  # 编译 libatk-core
+  # 编译 libatk-core ( 依赖: libxml )
   meson_build libatk-core ${LIBATK_CORE_SRC_DIR}
-  # 编译 libatk-bridge
+  # 编译 libatk-bridge ( 依赖: libatk-core )
   meson_build libatk-bridge ${LIBATK_BRIDGE_SRC_DIR}
   # 编译 libepoxy
   meson_build libepoxy ${LIBEPOXY_SRC_DIR}
@@ -464,7 +447,6 @@ if [ "${with_xfce_test}" = true ]; then
   echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu\" xfce4-session" > ~/.xsession
 
   # 重启系统，然后可以利用 windows 下 remote desktop 体验最新版本的 xfce4 了, 最新版本的 xfce4 还是很漂亮的
-  # reboot
 
 fi
 

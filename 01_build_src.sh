@@ -26,32 +26,11 @@ export CFLAGS="-Os -s -fno-stack-protector -fomit-frame-pointer -U_FORTIFY_SOURC
 #----------------------------------------------
 mkdir -pv source
 cd source
-
-LINUX_SRC_NAME=$(file_name ${LINUX_SRC_URL})
-if [ ! -f ${LINUX_SRC_NAME} ]; then 
-  wget -c -t 0 $LINUX_SRC_URL
-fi
-
-GLIBC_SRC_NAME=$(file_name ${GLIBC_SRC_URL})
-if [ ! -f ${GLIBC_SRC_NAME} ]; then
-  wget -c -t 0 $GLIBC_SRC_URL
-fi
-
-BUSYBOX_SRC_NAME=$(file_name ${BUSYBOX_SRC_URL})
-if [ ! -f ${BUSYBOX_SRC_NAME} ]; then 
-  wget -c -t 0 $BUSYBOX_SRC_URL
-fi
-
-GCC_SRC_NAME=$(file_name ${GCC_SRC_URL})
-if [ ! -f ${GCC_SRC_NAME} ]; then 
-  wget -c -t 0 $GCC_SRC_URL
-fi
-
-BINUTILS_SRC_NAME=$(file_name ${BINUTILS_SRC_URL})
-if [ ! -f ${BINUTILS_SRC_NAME} ]; then
-  wget -c -t 0 $BINUTILS_SRC_URL
-fi
-
+LINUX_SRC_NAME=$(download_src ${LINUX_SRC_URL})
+GLIBC_SRC_NAME=$(download_src ${GLIBC_SRC_URL})
+BUSYBOX_SRC_NAME=$(download_src ${BUSYBOX_SRC_URL})
+GCC_SRC_NAME=$(download_src ${GCC_SRC_URL})
+BINUTILS_SRC_NAME=$(download_src ${BINUTILS_SRC_URL})
 cd ..
 
 #---------------------------------------------
@@ -61,35 +40,11 @@ cd ..
 #---------------------------------------------
 mkdir -pv ${build_dir} 
 
-LINUX_SRC_DIR=${build_dir}"/"$(file_dirname ${LINUX_SRC_NAME} .tar.xz)
-if [ ! -d ${LINUX_SRC_DIR} ]; then
-  echo "unzip ${LINUX_SRC_NAME} source code"
-  tar xf source/${LINUX_SRC_NAME} -C ${build_dir}
-fi
-
-GLIBC_SRC_DIR=${build_dir}"/"$(file_dirname ${GLIBC_SRC_NAME} .tar.bz2)
-if [ ! -d ${GLIBC_SRC_DIR} ]; then
-  echo "unzip ${GLIBC_SRC_NAME} source code"
-  tar xf source/${GLIBC_SRC_NAME} -C ${build_dir}
-fi
-
-BUSYBOX_SRC_DIR=${build_dir}"/"$(file_dirname ${BUSYBOX_SRC_NAME} .tar.bz2)
-if [ ! -d ${BUSYBOX_SRC_DIR} ]; then
-  echo "unzip ${BUSYBOX_SRC_NAME} source code"
-  tar xf source/${BUSYBOX_SRC_NAME} -C ${build_dir}
-fi
-
-GCC_SRC_DIR=${build_dir}"/"$(file_dirname ${GCC_SRC_NAME} .tar.xz)
-if [ ! -d ${GCC_SRC_DIR} ]; then
-  echo "unzip ${GCC_SRC_NAME} source code"
-  tar xf source/${GCC_SRC_NAME} -C ${build_dir}
-fi
-
-BINUTILS_SRC_DIR=${build_dir}"/"$(file_dirname ${BINUTILS_SRC_NAME} .tar.xz)
-if [ ! -d ${BINUTILS_SRC_DIR} ]; then
-  echo "unzip ${BINUTILS_SRC_NAME} source code"
-  tar xf source/${BINUTILS_SRC_NAME} -C ${build_dir}
-fi
+LINUX_SRC_DIR=$(unzip_src ".tar.xz" ${LINUX_SRC_NAME}); echo "unzip ${LINUX_SRC_NAME} source code"
+GLIBC_SRC_DIR=$(unzip_src ".tar.bz2" ${GLIBC_SRC_NAME}); echo "unzip ${GLIBC_SRC_NAME} source code"
+BUSYBOX_SRC_DIR=$(unzip_src ".tar.bz2" ${BUSYBOX_SRC_NAME}); echo "unzip ${BUSYBOX_SRC_NAME} source code"
+GCC_SRC_DIR=$(unzip_src ".tar.xz" ${GCC_SRC_NAME}); echo "unzip ${GCC_SRC_NAME} source code"
+BINUTILS_SRC_DIR=$(unzip_src ".tar.xz" ${BINUTILS_SRC_NAME}); echo "unzip ${BINUTILS_SRC_NAME} source code"
 
 #-----------------------------------------------
 #

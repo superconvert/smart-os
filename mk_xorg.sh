@@ -29,12 +29,7 @@ XSVR_SRC_URL=https://www.x.org/archive/individual/xserver/xorg-server-1.20.11.ta
 #----------------------------
 mkdir -pv source
 cd source
-
-XSVR_SRC_NAME=$(file_name ${XSVR_SRC_URL})
-if [ ! -f ${XSVR_SRC_NAME} ]; then
-  wget -c -t 0 $XSVR_SRC_URL
-fi
-
+XSVR_SRC_NAME=$(download_src ${XSVR_SRC_URL})
 cd ..
 
 #---------------------------
@@ -43,12 +38,7 @@ cd ..
 #
 #---------------------------
 mkdir -pv ${build_dir}
-
-XSVR_SRC_DIR=${build_dir}"/"$(file_dirname ${XSVR_SRC_NAME} .tar.bz2)
-if [ ! -d ${XSVR_SRC_DIR} ]; then
-  echo "unzip ${XSVR_SRC_NAME} source code"
-  tar xf source/${XSVR_SRC_NAME} -C ${build_dir}
-fi
+XSVR_SRC_DIR=$(unzip_src ".tar.bz2" ${XSVR_SRC_NAME}); echo "unzip ${XSVR_SRC_NAME} source code"
 
 #---------------------------------------------
 #
@@ -110,89 +100,37 @@ else
   tar zxf xclient.tar.gz 
 fi
 
-echo "${GREEN}build macros begin${NC}"
-cd macros
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build macros success${NC}"
-cd .. && sleep 1
+#---------------------------
+# 公共编译函数定义
+#---------------------------
+xorg_build() {
+  local name=$1
+  echo "${GREEN}build ${name} begin${NC}" && cd ${name}
+  if [ "${name}" = "libxcb" ]; then
+    # 解决 libxcb 编译问题
+    sed -i "8 i reload(sys)" src/c_client.py
+    sed -i "9 i sys.setdefaultencoding('utf8')" src/c_client.py
+  fi
+  ./autogen.sh && ./configure ${CFGOPT}
+  make -j8 && make install DESTDIR=${xclient_dir} && echo "${GREEN}build ${name} success${NC}"
+  cd .. && sleep 1
+}
 
-echo "${GREEN}build xcbproto begin${NC}"
-cd xcbproto
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build xcbproto success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build xorgproto begin${NC}"
-cd xorgproto
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build xorgproto success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libxau begin${NC}"
-cd libxau
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxau success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libxcb begin${NC}"
-cd libxcb
-# 解决 libxcb 编译问题
-sed -i "8 i reload(sys)" src/c_client.py
-sed -i "9 i sys.setdefaultencoding('utf8')" src/c_client.py
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxcb success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libxtrans begin${NC}"
-cd libxtrans
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxtrans success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libx11 begin${NC}"
-cd libx11
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libx11 success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libice begin${NC}"
-cd libice
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libice success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libsm begin${NC}"
-cd libsm
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libsm success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libxt begin${NC}"
-cd libxt
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxt success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libxext begin${NC}"
-cd libxext
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxext success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libxmu begin${NC}"
-cd libxmu
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxmu success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libxpm begin${NC}"
-cd libxpm
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxpm success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libxaw begin${NC}"
-cd libxaw
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxaw success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build libxdmcp begin${NC}"
-cd libxdmcp
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build libxdmcp success${NC}"
-cd .. && sleep 1
-
-echo "${GREEN}build xload begin${NC}"
-
-# 编译 xclient application
-cd xload
-./autogen.sh && ./configure ${CFGOPT} && make -j8 && make install -j8 DESTDIR=${xclient_dir} && echo "${GREEN}build xload success${NC}"
-cd .. && sleep 1
+xorg_build macros
+xorg_build xcbproto
+xorg_build xorgproto
+xorg_build libxau
+xorg_build libxcb
+xorg_build libxtrans
+xorg_build libx11
+xorg_build libice
+xorg_build libsm
+xorg_build libxt
+xorg_build libxext
+xorg_build libxmu
+xorg_build libxpm
+xorg_build libxaw
+xorg_build libxdmcp
+xorg_build xload
 
 cd ..
