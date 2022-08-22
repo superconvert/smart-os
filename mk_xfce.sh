@@ -5,15 +5,15 @@
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install cmake gperf bison flex intltool libtool libxml2-utils gobject-introspection gtk-doc-tools libgirepository1.0-dev python3.8-dev python3.8-dbg python3-pip python-docutils libxrender-dev libsm-dev libxext-dev libthai-dev libxkbcommon-dev libdbus-1-dev libxtst-dev docbook-xsl -y
+  apt install cmake make gperf bison flex intltool libtool llvm-10 clang-10 graphviz xmlto doxygen docbook-xsl docbook-xsl-ns gobject-introspection gtk-doc-tools -y
+  apt install python3.8-dev python3.8-dbg python3-pip python-docutils -y
+  apt install libxrender-dev libsm-dev libxext-dev libxkbcommon-dev libdbus-1-dev libxtst-dev libgirepository1.0-dev -y
   # 安装 OpenGL
   apt-get install libgl1-mesa-dev libglu1-mesa-dev libglut-dev -y
-  # 安装 gstreamer
-  apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio -y
   # gtk+ 编译
-  apt install libcups2-dev libxrandr-dev libxi-dev libxinerama-dev libvulkan-dev -y
+  apt install libcups2-dev libxrandr-dev libxi-dev libxinerama-dev libvulkan-dev libxdamage-dev -y
   # xfce 编译
-  apt install x11-xserver-utils libxcb-util-dev libudev-dev docbook-xsl-ns libwayland-client0 libwayland-egl-backend-dev libelf-dev-y
+  apt install xutils-dev x11-xserver-utils libx11-xcb-dev libxxf86vm-dev libxcb-util-dev libxcb-glx0-dev libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libudev-dev libelf-dev libxshmfence-dev -y
 fi
 
 if [ -f "/usr/bin/yum" ]; then
@@ -37,6 +37,8 @@ LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-
 LIBMNT_SRC_URL=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.tar.xz
 LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
 LIBZIP_SRC_URL=https://libzip.org/download/libzip-1.9.2.tar.xz
+LIBTHAI_SRC_URL=https://github.com/tlwg/libthai/releases/download/v0.1.29/libthai-0.1.29.tar.xz
+LIBDATRIE_SRC_URL=https://github.com/tlwg/libdatrie/releases/download/v0.2.13/libdatrie-0.2.13.tar.xz
 LIBPCRE2_SRC_URL=https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz
 LIBNOTIFY_SRC_URL=https://download.gnome.org/sources/libnotify/0.8/libnotify-0.8.0.tar.xz
 GLIB_SRC_URL=https://download.gnome.org/sources/glib/2.62/glib-2.62.0.tar.xz
@@ -59,6 +61,7 @@ MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/
 GRAPHENE_SRC_URL=https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar.gz
 GOBJINTROSPE_SRC_URL=https://github.com/GNOME/gobject-introspection/archive/refs/tags/1.72.0.tar.gz
 STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
+WAYLANDCORE_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland/-/archive/1.20.93/wayland-1.20.93.tar.gz
 WAYLANDPROT_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/1.25/wayland-protocols-1.25.tar.gz
 LIBGUDEV_SRC_URL=https://gitlab.gnome.org/GNOME/libgudev/-/archive/236/libgudev-236.tar.gz
 UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
@@ -80,6 +83,8 @@ LIBXML_SRC_NAME=$(download_src ${LIBXML_SRC_URL})
 LIBMNT_SRC_NAME=$(download_src ${LIBMNT_SRC_URL})
 LIBPNG_SRC_NAME=$(download_src ${LIBPNG_SRC_URL})
 LIBZIP_SRC_NAME=$(download_src ${LIBZIP_SRC_URL})
+LIBTHAI_SRC_NAME=$(download_src ${LIBTHAI_SRC_URL})
+LIBDATRIE_SRC_NAME=$(download_src ${LIBDATRIE_SRC_URL})
 LIBPCRE2_SRC_NAME=$(download_src ${LIBPCRE2_SRC_URL})
 LIBNOTIFY_SRC_NAME=$(download_src ${LIBNOTIFY_SRC_URL})
 GLIB_SRC_NAME=$(download_src ${GLIB_SRC_URL})
@@ -93,6 +98,7 @@ PANGO_SRC_NAME=$(download_src ${PANGO_SRC_URL})
 GDKPIXBUF_SRC_NAME=$(download_src ${GDKPIXBUF_SRC_URL})
 LIBATK_SRC_NAME=$(download_src ${LIBATK_SRC_URL})
 GETTEXT_SRC_NAME=$(download_src ${GETTEXT_SRC_URL})
+WAYLANDCORE_SRC_NAME=$(download_src ${WAYLANDCORE_SRC_URL})
 WAYLANDPROT_SRC_NAME=$(download_src ${WAYLANDPROT_SRC_URL})
 STARTUPNOTI_SRC_NAME=$(download_src ${STARTUPNOTI_SRC_URL})
 LIBGUDEV_SRC_NAME=$(download_src ${LIBGUDEV_SRC_URL})
@@ -128,6 +134,8 @@ LIBXML_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXML_SRC_NAME}); echo "unzip ${LIBXML_S
 LIBMNT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBMNT_SRC_NAME}); echo "unzip ${LIBMNT_SRC_NAME} source code"
 LIBPNG_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPNG_SRC_NAME}); echo "unzip ${LIBPNG_SRC_NAME} source code"
 LIBZIP_SRC_DIR=$(unzip_src ".tar.xz" ${LIBZIP_SRC_NAME}); echo "unzip ${LIBZIP_SRC_NAME} source code"
+LIBTHAI_SRC_DIR=$(unzip_src ".tar.xz" ${LIBTHAI_SRC_NAME}); echo "unzip ${LIBTHAI_SRC_NAME} source code"
+LIBDATRIE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBDATRIE_SRC_NAME}); echo "unzip ${LIBDATRIE_SRC_NAME} source code"
 LIBPCRE2_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCRE2_SRC_NAME}); echo "unzip ${LIBPCRE2_SRC_NAME} source code"
 LIBNOTIFY_SRC_DIR=$(unzip_src ".tar.xz" ${LIBNOTIFY_SRC_NAME}); echo "unzip ${LIBNOTIFY_SRC_NAME} source code"
 GLIB_SRC_DIR=$(unzip_src ".tar.xz" ${GLIB_SRC_NAME}); echo "unzip ${GLIB_SRC_NAME} source code"
@@ -145,6 +153,7 @@ LIBATK_CORE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_CORE_SRC_NAME}); echo "unzip 
 LIBATK_BRIDGE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_BRIDGE_SRC_NAME}); echo "unzip ${LIBATK_BRIDGE_SRC_NAME} source code"
 GRAPHENE_SRC_DIR=$(unzip_src ".tar.gz" ${GRAPHENE_SRC_NAME}); echo "unzip ${GRAPHENE_SRC_NAME} source code"
 GETTEXT_SRC_DIR=$(unzip_src ".tar.gz" ${GETTEXT_SRC_NAME}); echo "unzip ${GETTEXT_SRC_NAME} source code"
+WAYLANDCORE_SRC_DIR=$(unzip_src ".tar.gz" ${WAYLANDCORE_SRC_NAME}); echo "unzip ${WAYLANDCORE_SRC_NAME} source code"
 WAYLANDPROT_SRC_DIR=$(unzip_src ".tar.gz" ${WAYLANDPROT_SRC_NAME}); echo "unzip ${WAYLANDPROT_SRC_NAME} source code"
 STARTUPNOTI_SRC_DIR=$(unzip_src ".tar.gz" ${STARTUPNOTI_SRC_NAME}); echo "unzip ${STARTUPNOTI_SRC_NAME} source code"
 LIBGUDEV_SRC_DIR=$(unzip_src ".tar.gz" ${LIBGUDEV_SRC_NAME}); echo "unzip ${LIBGUDEV_SRC_NAME} source code"
@@ -345,10 +354,16 @@ common_build() {
   common_build libpng ${LIBPNG_SRC_DIR}
   # 编译 libzip
   common_build libzip ${LIBZIP_SRC_DIR}
+  # 编译 libdatrie
+  common_build libdatrie ${LIBDATRIE_SRC_DIR}
+  ln -s ${xfce_install}/usr/local/bin/trietool /usr/local/bin/trietool
+  # 编译 libthai
+  common_build libthai ${LIBTHAI_SRC_DIR}
   # 编译 libpcre2
   common_build libpcre2 ${LIBPCRE2_SRC_DIR}
   # 编译 glib
   meson_build glib ${GLIB_SRC_DIR}
+  ln -s ${xfce_install}/usr/bin/glib-mkenums /usr/bin/glib-mkenums
   # 编译 pixman
   common_build pixman ${PIXMAN_SRC_DIR} --enable-libpng=yes
   # 编译 freetype
@@ -385,14 +400,17 @@ common_build() {
   common_build pciaccess ${PCIACCESS_SRC_DIR}
   # 编译 libdrm
   meson_build libdrm ${LIBDRM_SRC_DIR}
-  # 编译 libepoxy
-  meson_build libepoxy ${LIBEPOXY_SRC_DIR}
   # 编译 graphene
   meson_build graphene ${GRAPHENE_SRC_DIR}
+  # 编译 wayland-core
+  meson_build wayland-core ${WAYLANDCORE_SRC_DIR}
+  ln -s ${xfce_install}/usr/bin/wayland-scanner /usr/bin/wayland-scanner
   # 编译 wayland-protocols
   meson_build wayland-protocols ${WAYLANDPROT_SRC_DIR}
   # 编译 mesa
   meson_build mesa ${MESA_SRC_DIR}
+  # 编译 libepoxy
+  meson_build libepoxy ${LIBEPOXY_SRC_DIR}
   # 编译 libstartup-notification0 ( 很多 xfce4 应用依赖此库, 依赖: libxcb-util-dev )
   common_build startupnoti ${STARTUPNOTI_SRC_DIR}
   # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
