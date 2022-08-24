@@ -328,3 +328,9 @@ echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-l
 4. xfce4-session 其实相应的配置也可以通过命令行工具查看
 xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
 我们可以逐行查看每个属性，然后通过 ps -aef | grep xf* 查看相应的进程是否正确启动，如果没有启动，就会导致出现问题，然后单独手工启动那个进程，查看是什么原因导致不能正常启动的，解决问题就非常简单了。
+
+5. xfdesktop 启动时，提示：Settings schema 'org.gtk.Settings.FileChooser' is not installed  
+方法：apt install libgtk-3-common
+
+6. xfce4 编译后，启动远程桌面，发现面板上相应的 item 都没有图标，进入文件管理器，对应的文件也没有图标，只显示文字，需要安装  
+方法：apt install gnome-icon-theme，当然这两个问题只装 libgtk-3-common 都可以解决
