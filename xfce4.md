@@ -341,3 +341,19 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     Requested 'inputproto >= 2.3.99.1' but version of InputProto is 2.3.2
     ```
     方法：其实现在这些（inputproto）都被合并到项目 xorgproto 里面了，编译这个库就行了，这个问题折腾我好久
+
+8. 编译 libx11 遇到问题
+    ```shell
+    checking keysym definitions... configure: error: /usr/local/include/X11 doesn't exist or isn't a directory
+    ```
+    方法: --with-keysymdefdir="${xfce_install}/usr/local/include/X11"
+    
+9. 编译 pciaccess, libxcb-util 遇到问题
+    ```shell
+    error: must install xorg-macros 1.8 or later before running autoconf/autogen
+    error: must install xorg-macros 1.16.0 or later before running autoconf/autogen
+    ```
+    方法: 原因就是 aclocal 的路径设置的不完全 
+    ```shell
+    export ACLOCAL="aclocal -I /usr/share/aclocal -I ${xfce_share}/aclocal -I ${xfce_loc_share}/aclocal"
+    ```
