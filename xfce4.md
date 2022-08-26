@@ -313,17 +313,17 @@ systemd--
 cp /root/test/a/usr/local/etc/* /usr/local/etc/ -rf
 
 2. 解决 Cannot read private key file /etc/xrdp/key.pem: Permission denied
-```shell
-adduser xrdp ssl-cert
-reboot
-```
+    ```shell
+    adduser xrdp ssl-cert
+    reboot
+    ```
 
 3. 解决 libpango 库多版本的环境下，系统的低版本优先加载，导致 xfdesktop 不能正常启动的问题我们可以这么做
-```shell
-libdir=`pwd`"/a/usr"
-echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu\" xfce4-session" > ~/.xsession
-```
-这样就可以优先加载我们编译的动态库了
+    ```shell
+    libdir=`pwd`"/a/usr"
+    echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu\" xfce4-session" > ~/.xsession
+    ```
+    这样就可以优先加载我们编译的动态库了
 
 4. xfce4-session 其实相应的配置也可以通过命令行工具查看
 xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
