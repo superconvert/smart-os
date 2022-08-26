@@ -336,8 +336,7 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
 方法：apt install gnome-icon-theme，当然这两个问题只装 libgtk-3-common 都可以解决
 
 7. 编译 libxi 库时，会提示下面的错误，我们去官方网站去看 发现 inputproto  项目已经被废弃，怎么办？
-
-
+    
 ```shell
 configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.0.3 xext >= 1.0.99.1 inputproto >= 2.3.99.1) were not met:
 Requested 'inputproto >= 2.3.99.1' but version of InputProto is 2.3.2
