@@ -357,3 +357,28 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     ```shell
     export ACLOCAL="aclocal -I /usr/share/aclocal -I ${xfce_share}/aclocal -I ${xfce_loc_share}/aclocal"
     ```
+10. 我们利用 xrdp 远程访问 xfce 桌面黑屏，查看日志 .xsession-errors，发现提示下述错误
+    ```shell
+    (xfce4-session:1904): xfce4-session-WARNING **: 11:23:52.330: ICE connection 0x55b030d772e0 rejected
+    (xfwm4:1942): xfwm4-WARNING **: 11:23:52.330: Failed to connect to session manager: Failed to connect to the session manager: Authentication Rejected, reason : None of the authentication protocols specified are supported and host-based authentication failed
+    (xfce4-session:1904): xfce4-session-WARNING **: 11:24:00.217: ICE connection 0x55b030ddb520 rejected
+    Failed to connect to session manager: Failed to connect to the session manager: Authentication Rejected, reason : None of the authen
+    tication protocols specified are supported and host-based authentication failed
+    ```
+    我们进一步追踪，journalctl -xf 
+    ```shell
+    Aug 28 11:30:52 freeabc xrdp[2172]: (2172)(139849385854784)[INFO ] Using default X.509 key file: /etc/xrdp/key.pem
+    Aug 28 11:30:52 freeabc xrdp[2172]: (2172)(139849385854784)[ERROR] Cannot read private key file /etc/xrdp/key.pem: Permission denied
+    Aug 28 11:30:52 freeabc xrdp[2172]: (2172)(139849385854784)[DEBUG] TLSv1.2 enabled
+    Aug 28 11:30:52 freeabc xrdp[2172]: (2172)(139849385854784)[DEBUG] TLSv1.1 enabled
+    Aug 28 11:30:52 freeabc xrdp[2172]: (2172)(139849385854784)[DEBUG] TLSv1 enabled
+    Aug 28 11:30:52 freeabc xrdp[2172]: (2172)(139849385854784)[DEBUG] Security layer: requested 11, selected 0
+    Aug 28 11:30:52 freeabc xrdp[2172]: (2172)(139849385854784)[DEBUG] Closed socket 12 (AF_INET6 ::ffff:192.168.1.101 port 3389)
+    Aug 28 11:30:52 freeabc xrdp[1289]: (1289)(139849385854784)[INFO ] Socket 12: AF_INET6 connection received from ::ffff:192.168.1.105 port 11281
+    Aug 28 11:30:52 freeabc xrdp[1289]: (1289)(139849385854784)[DEBUG] Closed socket 12 (AF_INET6 ::ffff:192.168.1.101 port 3389)
+    Aug 28 11:30:52 freeabc xrdp[2173]: (2173)(139849385854784)[DEBUG] Closed socket 11 (AF_INET6 :: port 3389)
+    Aug 28 11:30:52 freeabc xrdp[2173]: (2173)(139849385854784)[INFO ] Using default X.509 certificate: /etc/xrdp/cert.pem
+    Aug 28 11:30:52 freeabc xrdp[2173]: (2173)(139849385854784)[INFO ] Using default X.509 key file: /etc/xrdp/key.pem
+    Aug 28 11:30:52 freeabc xrdp[2173]: (2173)(139849385854784)[ERROR] Cannot read private key file /etc/xrdp/key.pem: Permission denied
+    ```
+    我们看到是 key.pem 的权限不允许导致的,  sudo adduser xrdp ssl-cert  重启系统，这个问题解决
