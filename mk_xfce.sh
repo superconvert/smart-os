@@ -5,15 +5,20 @@
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install cmake make gperf bison flex intltool libtool llvm-10 clang-10 graphviz xmlto doxygen docbook-xsl docbook-xsl-ns gobject-introspection gtk-doc-tools -y
-  apt install python3.8-dev python3.8-dbg python3-pip python-docutils -y
-  apt install libxrender-dev libsm-dev libxext-dev libxkbcommon-dev libdbus-1-dev libxtst-dev libgirepository1.0-dev -y
+  apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config llvm-10 clang-10 intltool gobject-introspection -y || exit
+  apt install bison flex python3-pip python3.8-dev libpython-dev gperf doxygen gtk-doc-tools xsltproc docbook-xsl-ns -y || exit
+  apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev libudev-dev -y || exit
+  #apt install cmake make gperf bison flex intltool libtool llvm-10 clang-10 graphviz xmlto doxygen docbook-xsl docbook-xsl-ns gobject-introspection gtk-doc-tools -y
+  #apt install python3.8-dev python3.8-dbg python3-pip python-docutils -y
+  #apt install libxrender-dev libsm-dev libxext-dev libxkbcommon-dev libdbus-1-dev libxtst-dev libgirepository1.0-dev -y
   # 安装 OpenGL
-  apt-get install libgl1-mesa-dev libglu1-mesa-dev libglut-dev -y
+  #apt-get install libgl1-mesa-dev libglu1-mesa-dev libglut-dev -y
   # gtk+ 编译
-  apt install libcups2-dev libxrandr-dev libxi-dev libxinerama-dev libvulkan-dev libxdamage-dev -y
+  #apt install libcups2-dev libxrandr-dev libxi-dev libxinerama-dev libvulkan-dev libxdamage-dev -y
+  # elf 编译
+  #apt install libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev -y
   # xfce 编译
-  apt install xutils-dev x11-xserver-utils libx11-xcb-dev libxxf86vm-dev libxcb-util-dev libxcb-glx0-dev libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libudev-dev libelf-dev libxshmfence-dev -y
+  #apt install xutils-dev x11-xserver-utils libx11-xcb-dev libxxf86vm-dev libxcb-util-dev libxcb-glx0-dev libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libudev-dev libxshmfence-dev -y
 fi
 
 if [ -f "/usr/bin/yum" ]; then
@@ -21,9 +26,9 @@ if [ -f "/usr/bin/yum" ]; then
 fi
 
 # undefined symbol: Py_InitModule4_64 需要安装高版本的 python3.8-dbg
-pip3 install ninja
-pip3 install meson
-pip3 install gi-docgen
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple ninja
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple meson
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple gi-docgen
 
 #-----------------------------------------------
 #
@@ -33,42 +38,84 @@ pip3 install gi-docgen
 . ./common.sh
 
 GETTEXT_SRC_URL=https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz
-LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 LIBMNT_SRC_URL=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.tar.xz
-LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
 LIBZIP_SRC_URL=https://libzip.org/download/libzip-1.9.2.tar.xz
+LIBELF_SRC_URL=https://sourceware.org/elfutils/ftp/0.186/elfutils-0.186.tar.bz2
+CAIRO_SRC_URL=https://www.cairographics.org/releases/cairo-1.16.0.tar.xz
+PIXMAN_SRC_URL=https://www.cairographics.org/releases/pixman-0.40.0.tar.gz
+LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
+ZLIB_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.xz
+FREETYPE_SRC_URL=https://nchc.dl.sourceforge.net/project/freetype/freetype2/2.12.0/freetype-2.12.0.tar.xz
+LIBJPEGTURBO_SRC_URL=https://sourceforge.net/projects/libjpeg-turbo/files/2.1.0/libjpeg-turbo-2.1.0.tar.gz
+XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
+XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
+
+# download from https://github.com
+LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 LIBTHAI_SRC_URL=https://github.com/tlwg/libthai/releases/download/v0.1.29/libthai-0.1.29.tar.xz
 LIBDATRIE_SRC_URL=https://github.com/tlwg/libdatrie/releases/download/v0.2.13/libdatrie-0.2.13.tar.xz
 LIBPCRE2_SRC_URL=https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz
-LIBNOTIFY_SRC_URL=https://download.gnome.org/sources/libnotify/0.8/libnotify-0.8.0.tar.xz
-GLIB_SRC_URL=https://download.gnome.org/sources/glib/2.62/glib-2.62.0.tar.xz
-PIXMAN_SRC_URL=https://www.cairographics.org/releases/pixman-0.40.0.tar.gz
-CAIRO_SRC_URL=https://www.cairographics.org/releases/cairo-1.16.0.tar.xz
-FREETYPE_SRC_URL=https://nchc.dl.sourceforge.net/project/freetype/freetype2/2.12.0/freetype-2.12.0.tar.xz
-FONTCFG_SRC_URL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.96.tar.xz
 HARFBUZZ_SRC_URL=https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz
 FRIBIDI_SRC_URL=https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz
-PANGO_SRC_URL=https://download.gnome.org/sources/pango/1.48/pango-1.48.9.tar.xz
-GDKPIXBUF_SRC_URL=https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/2.42.8/gdk-pixbuf-2.42.8.tar.gz
-LIBATK_SRC_URL=https://gitlab.gnome.org/GNOME/atk/-/archive/2.38.0/atk-2.38.0.tar.gz
+DBUS1_SRC_URL=https://github.com/freedesktop/dbus/archive/refs/tags/dbus-1.12.22.tar.gz
 LIBEPOXY_SRC_URL=https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar.gz
-LIBXML_SRC_URL=https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.8.tar.xz
-LIBATK_CORE_SRC_URL=https://download.gnome.org/sources/at-spi2-core/2.38/at-spi2-core-2.38.0.tar.xz
-LIBATK_BRIDGE_SRC_URL=https://download.gnome.org/sources/at-spi2-atk/2.38/at-spi2-atk-2.38.0.tar.xz
-PCIACCESS_SRC_URL=https://github.com/freedesktop/xorg-libpciaccess/archive/refs/tags/libpciaccess-0.16.tar.gz
-LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
-MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/mesa-mesa-20.0.0-rc3.tar.gz
 GRAPHENE_SRC_URL=https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar.gz
-GOBJINTROSPE_SRC_URL=https://github.com/GNOME/gobject-introspection/archive/refs/tags/1.72.0.tar.gz
-STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
+LIBPAM_SRC_URL=https://github.com/linux-pam/linux-pam/releases/download/v1.5.2/Linux-PAM-1.5.2.tar.xz
+XRDP_SRC_URL=https://github.com/neutrinolabs/xrdp/releases/download/v0.9.19/xrdp-0.9.19.tar.gz
+
+# download from https://gitlab.freedesktop.org
+UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
 WAYLANDCORE_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland/-/archive/1.20.93/wayland-1.20.93.tar.gz
 WAYLANDPROT_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/1.25/wayland-protocols-1.25.tar.gz
-LIBGUDEV_SRC_URL=https://gitlab.gnome.org/GNOME/libgudev/-/archive/236/libgudev-236.tar.gz
-UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
-LIBWNCK_SRC_URL=https://download.gnome.org/sources/libwnck/3.36/libwnck-3.36.0.tar.xz
+MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/mesa-mesa-20.0.0-rc3.tar.gz
+
+LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
 GSTREAMER_SRC_URL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.2.tar.xz
+FONTCFG_SRC_URL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.96.tar.xz
+STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
+
+# download from https://gitlab.gnome.org
+GLIB_SRC_URL=https://download.gnome.org/sources/glib/2.62/glib-2.62.0.tar.xz
+PANGO_SRC_URL=https://download.gnome.org/sources/pango/1.48/pango-1.48.9.tar.xz
 GTKX_SRC_URL=https://download.gnome.org/sources/gtk%2B/3.24/gtk%2B-3.24.9.tar.xz
-XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
+LIBXML_SRC_URL=https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.8.tar.xz
+LIBWNCK_SRC_URL=https://download.gnome.org/sources/libwnck/3.36/libwnck-3.36.0.tar.xz
+LIBNOTIFY_SRC_URL=https://download.gnome.org/sources/libnotify/0.8/libnotify-0.8.0.tar.xz
+LIBATK_CORE_SRC_URL=https://download.gnome.org/sources/at-spi2-core/2.38/at-spi2-core-2.38.0.tar.xz
+LIBATK_BRIDGE_SRC_URL=https://download.gnome.org/sources/at-spi2-atk/2.38/at-spi2-atk-2.38.0.tar.xz
+
+LIBATK_SRC_URL=https://gitlab.gnome.org/GNOME/atk/-/archive/2.38.0/atk-2.38.0.tar.gz
+LIBGUDEV_SRC_URL=https://gitlab.gnome.org/GNOME/libgudev/-/archive/236/libgudev-236.tar.gz
+GDKPIXBUF_SRC_URL=https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/2.42.8/gdk-pixbuf-2.42.8.tar.gz
+GOBJINTROSPE_SRC_URL=https://github.com/GNOME/gobject-introspection/archive/refs/tags/1.72.0.tar.gz
+
+# download from https://www.x.org/releases/individual
+XI_SRC_URL=https://www.x.org/releases/individual/lib/libXi-1.8.tar.gz
+XTST_SRC_URL=https://www.x.org/releases/individual/lib/libXtst-1.2.3.tar.gz
+LIBSM_SRC_URL=https://www.x.org/releases/individual/lib/libSM-1.2.3.tar.gz
+LIBICE_SRC_URL=https://www.x.org/releases/individual/lib/libICE-1.0.10.tar.gz
+LIBX11_SRC_URL=https://www.x.org/releases/individual/lib/libX11-1.8.tar.gz
+LIBXCB_SRC_URL=https://www.x.org/releases/individual/lib/libxcb-1.15.tar.xz
+XAU_SRC_URL=https://www.x.org/releases/individual/lib/libXau-1.0.10.tar.xz
+XEXT_SRC_URL=https://www.x.org/releases/individual/lib/libXext-1.3.4.tar.gz
+XDMCP_SRC_URL=https://www.x.org/releases/individual/lib/libXdmcp-1.1.3.tar.gz
+XINERAMA_SRC_URL=https://www.x.org/releases/individual/lib/libXinerama-1.1.4.tar.gz
+XFIXES_SRC_URL=https://www.x.org/releases/individual/lib/libXfixes-6.0.0.tar.gz
+XTRANS_SRC_URL=https://www.x.org/releases/individual/lib/xtrans-1.4.0.tar.gz
+XRANDR_SRC_URL=https://www.x.org/releases/individual/lib/libXrandr-1.5.2.tar.gz
+XRENDER_SRC_URL=https://www.x.org/releases/individual/lib/libXrender-0.9.10.tar.gz
+XDAMAGE_SRC_URL=https://www.x.org/releases/individual/lib/libXdamage-1.1.5.tar.gz
+XXF86VM_SRC_URL=https://www.x.org/releases/individual/lib/libXxf86vm-1.1.4.tar.gz
+XSHMFENCE_SRC_URL=https://www.x.org/releases/individual/lib/libxshmfence-1.3.tar.gz
+PCIACCESS_SRC_URL=https://www.x.org/releases/individual/lib/libpciaccess-0.16.tar.gz
+XORGMACROS_SRC_URL=https://www.x.org/releases/individual/util/util-macros-1.19.3.tar.gz
+ICEAUTH_SRC_URL=https://www.x.org/releases/individual/app/iceauth-1.0.9.tar.xz
+XCBUTIL_SRC_URL=https://www.x.org/releases/individual/xcb/xcb-util-0.4.0.tar.gz
+KBPROTO_SRC_URL=https://www.x.org/releases/individual/proto/kbproto-1.0.7.tar.gz
+LIBXPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xproto-7.0.31.tar.gz
+XEXTPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xextproto-7.3.0.tar.gz
+XCBPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xcb-proto-1.15.2.tar.gz
+XORGPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xorgproto-2022.2.tar.xz
 
 #----------------------------
 #
@@ -82,7 +129,9 @@ LIBFFI_SRC_NAME=$(download_src ${LIBFFI_SRC_URL})
 LIBXML_SRC_NAME=$(download_src ${LIBXML_SRC_URL})
 LIBMNT_SRC_NAME=$(download_src ${LIBMNT_SRC_URL})
 LIBPNG_SRC_NAME=$(download_src ${LIBPNG_SRC_URL})
+ZLIB_SRC_NAME=$(download_src ${ZLIB_SRC_URL})
 LIBZIP_SRC_NAME=$(download_src ${LIBZIP_SRC_URL})
+LIBELF_SRC_NAME=$(download_src ${LIBELF_SRC_URL})
 LIBTHAI_SRC_NAME=$(download_src ${LIBTHAI_SRC_URL})
 LIBDATRIE_SRC_NAME=$(download_src ${LIBDATRIE_SRC_URL})
 LIBPCRE2_SRC_NAME=$(download_src ${LIBPCRE2_SRC_URL})
@@ -106,17 +155,57 @@ UPOWER_SRC_NAME=$(download_src ${UPOWER_SRC_URL})
 LIBWNCK_SRC_NAME=$(download_src ${LIBWNCK_SRC_URL})
 LIBATK_CORE_SRC_NAME=$(download_src ${LIBATK_CORE_SRC_URL})
 LIBATK_BRIDGE_SRC_NAME=$(download_src ${LIBATK_BRIDGE_SRC_URL})
+LIBJPEGTURBO_SRC_NAME=$(download_src ${LIBJPEGTURBO_SRC_URL})
+LIBXPROTO_SRC_NAME=$(download_src ${LIBXPROTO_SRC_URL})
+XTRANS_SRC_NAME=$(download_src ${XTRANS_SRC_URL})
+LIBSM_SRC_NAME=$(download_src ${LIBSM_SRC_URL})
+LIBICE_SRC_NAME=$(download_src ${LIBICE_SRC_URL})
+LIBX11_SRC_NAME=$(download_src ${LIBX11_SRC_URL})
+XRANDR_SRC_NAME=$(download_src ${XRANDR_SRC_URL})
+XINERAMA_SRC_NAME=$(download_src ${XINERAMA_SRC_URL})
+XRENDER_SRC_NAME=$(download_src ${XRENDER_SRC_URL})
+KBPROTO_SRC_NAME=$(download_src ${KBPROTO_SRC_URL})
+XKBCOMMON_SRC_NAME=$(download_src ${XKBCOMMON_SRC_URL})
+XEXT_SRC_NAME=$(download_src ${XEXT_SRC_URL})
+XEXTPROTO_SRC_NAME=$(download_src ${XEXTPROTO_SRC_URL})
+XCBPROTO_SRC_NAME=$(download_src ${XCBPROTO_SRC_URL})
+LIBXCB_SRC_NAME=$(download_src ${LIBXCB_SRC_URL})
+XCBUTIL_SRC_NAME=$(download_src ${XCBUTIL_SRC_URL})
+ICEAUTH_SRC_NAME=$(download_src ${ICEAUTH_SRC_URL})
+XAU_SRC_NAME=$(download_src ${XAU_SRC_URL})
+XDMCP_SRC_NAME=$(download_src ${XDMCP_SRC_URL})
+XRANDR_SRC_NAME=$(download_src ${XRANDR_SRC_URL})
+XRENDER_SRC_NAME=$(download_src ${XRENDER_SRC_URL})
+KBPROTO_SRC_NAME=$(download_src ${KBPROTO_SRC_URL})
+XEXT_SRC_NAME=$(download_src ${XEXT_SRC_URL})
+XEXTPROTO_SRC_NAME=$(download_src ${XEXTPROTO_SRC_URL})
+XCBPROTO_SRC_NAME=$(download_src ${XCBPROTO_SRC_URL})
+LIBXCB_SRC_NAME=$(download_src ${LIBXCB_SRC_URL})
+XCBUTIL_SRC_NAME=$(download_src ${XCBUTIL_SRC_URL})
+XAU_SRC_NAME=$(download_src ${XAU_SRC_URL})
+XDMCP_SRC_NAME=$(download_src ${XDMCP_SRC_URL})
+XORGPROTO_SRC_NAME=$(download_src ${XORGPROTO_SRC_URL})
+XFIXES_SRC_NAME=$(download_src ${XFIXES_SRC_URL})
+XDAMAGE_SRC_NAME=$(download_src ${XDAMAGE_SRC_URL})
+XSHMFENCE_SRC_NAME=$(download_src ${XSHMFENCE_SRC_URL})
+XXF86VM_SRC_NAME=$(download_src ${XXF86VM_SRC_URL})
+XI_SRC_NAME=$(download_src ${XI_SRC_URL})
+XTST_SRC_NAME=$(download_src ${XTST_SRC_URL})
 XFCE_SRC_NAME=$(download_src ${XFCE_SRC_URL})
 MESA_SRC_NAME=$(download_src ${MESA_SRC_URL})
 LIBDRM_SRC_NAME=$(download_src ${LIBDRM_SRC_URL})
 GSTREAMER_SRC_NAME=$(download_src ${GSTREAMER_SRC_URL})
+LIBPAM_SRC_NAME=$(download_src ${LIBPAM_SRC_URL})
+XRDP_SRC_NAME=$(download_src ${XRDP_SRC_URL})
+DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL} "dbus-")
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
+XORGMACROS_SRC_NAME=$(download_src ${XORGMACROS_SRC_URL})
 PCIACCESS_SRC_NAME=$(download_src ${PCIACCESS_SRC_URL} "xorg-libpciaccess-")
 GOBJINTROSPE_SRC_NAME=$(download_src ${GOBJINTROSPE_SRC_URL} "gobject-introspection-")
 # gtk 因为 + 号，需要特殊处理
 GTKX_SRC_NAME=$(echo $(file_name ${GTKX_SRC_URL}) | sed 's/%2B/+/')
-if [ ! -f ${GTKX_SRC_NAME} ]; then
+if [ ! -f "${GTKX_SRC_NAME}" ]; then
   wget -c -t 0 $GTKX_SRC_URL
 fi
 
@@ -133,7 +222,9 @@ LIBFFI_SRC_DIR=$(unzip_src ".tar.gz" ${LIBFFI_SRC_NAME}); echo "unzip ${LIBFFI_S
 LIBXML_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXML_SRC_NAME}); echo "unzip ${LIBXML_SRC_NAME} source code"
 LIBMNT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBMNT_SRC_NAME}); echo "unzip ${LIBMNT_SRC_NAME} source code"
 LIBPNG_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPNG_SRC_NAME}); echo "unzip ${LIBPNG_SRC_NAME} source code"
+ZLIB_SRC_DIR=$(unzip_src ".tar.xz" ${ZLIB_SRC_NAME}); echo "unzip ${ZLIB_SRC_NAME} source code"
 LIBZIP_SRC_DIR=$(unzip_src ".tar.xz" ${LIBZIP_SRC_NAME}); echo "unzip ${LIBZIP_SRC_NAME} source code"
+LIBELF_SRC_DIR=$(unzip_src ".tar.bz2" ${LIBELF_SRC_NAME}); echo "unzip ${LIBELF_SRC_NAME} source code"
 LIBTHAI_SRC_DIR=$(unzip_src ".tar.xz" ${LIBTHAI_SRC_NAME}); echo "unzip ${LIBTHAI_SRC_NAME} source code"
 LIBDATRIE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBDATRIE_SRC_NAME}); echo "unzip ${LIBDATRIE_SRC_NAME} source code"
 LIBPCRE2_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCRE2_SRC_NAME}); echo "unzip ${LIBPCRE2_SRC_NAME} source code"
@@ -147,6 +238,7 @@ HARFBUZZ_SRC_DIR=$(unzip_src ".tar.xz" ${HARFBUZZ_SRC_NAME}); echo "unzip ${HARF
 FRIBIDI_SRC_DIR=$(unzip_src ".tar.xz" ${FRIBIDI_SRC_NAME}); echo "unzip ${FRIBIDI_SRC_NAME} source code"
 PANGO_SRC_DIR=$(unzip_src ".tar.xz" ${PANGO_SRC_NAME}); echo "unzip ${PANGO_SRC_NAME} source code"
 GDKPIXBUF_SRC_DIR=$(unzip_src ".tar.gz" ${GDKPIXBUF_SRC_NAME}); echo "unzip ${GDKPIXBUF_SRC_NAME} source code"
+DBUS1_SRC_DIR=$(unzip_src ".tar.gz" ${DBUS1_SRC_NAME}); echo "unzip ${DBUS1_SRC_NAME} source code"
 LIBATK_SRC_DIR=$(unzip_src ".tar.gz" ${LIBATK_SRC_NAME}); echo "unzip ${LIBATK_SRC_NAME} source code"
 LIBEPOXY_SRC_DIR=$(unzip_src ".tar.gz" ${LIBEPOXY_SRC_NAME}); echo "unzip ${LIBEPOXY_SRC_NAME} source code"
 LIBATK_CORE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_CORE_SRC_NAME}); echo "unzip ${LIBATK_CORE_SRC_NAME} source code"
@@ -162,11 +254,40 @@ GOBJINTROSPE_SRC_DIR=$(unzip_src ".tar.gz" ${GOBJINTROSPE_SRC_NAME}); echo "unzi
 LIBWNCK_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWNCK_SRC_NAME}); echo "unzip ${LIBWNCK_SRC_NAME} source code"
 GSTREAMER_SRC_DIR=$(unzip_src ".tar.xz" ${GSTREAMER_SRC_NAME}); echo "unzip ${GSTREAMER_SRC_NAME} source code"
 LIBDRM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBDRM_SRC_NAME}); echo "unzip ${LIBDRM_SRC_NAME} source code"
+LIBJPEGTURBO_SRC_DIR=$(unzip_src ".tar.gz" ${LIBJPEGTURBO_SRC_NAME}); echo "unzip ${LIBJPEGTURBO_SRC_NAME} source code"
+LIBXPROTO_SRC_DIR=$(unzip_src ".tar.gz" ${LIBXPROTO_SRC_NAME}); echo "unzip ${LIBXPROTO_SRC_NAME} source code"
+LIBSM_SRC_DIR=$(unzip_src ".tar.gz" ${LIBSM_SRC_NAME}); echo "unzip ${LIBSM_SRC_NAME} source code"
+LIBICE_SRC_DIR=$(unzip_src ".tar.gz" ${LIBICE_SRC_NAME}); echo "unzip ${LIBICE_SRC_NAME} source code"
+LIBX11_SRC_DIR=$(unzip_src ".tar.gz" ${LIBX11_SRC_NAME}); echo "unzip ${LIBX11_SRC_NAME} source code"
+XRANDR_SRC_DIR=$(unzip_src ".tar.gz" ${XRANDR_SRC_NAME}); echo "unzip ${XRANDR_SRC_NAME} source code"
+XINERAMA_SRC_DIR=$(unzip_src ".tar.gz" ${XINERAMA_SRC_NAME}); echo "unzip ${XINERAMA_SRC_NAME} source code"
+XRENDER_SRC_DIR=$(unzip_src ".tar.gz" ${XRENDER_SRC_NAME}); echo "unzip ${XRENDER_SRC_NAME} source code"
+KBPROTO_SRC_DIR=$(unzip_src ".tar.gz" ${KBPROTO_SRC_NAME}); echo "unzip ${KBPROTO_SRC_NAME} source code"
+XKBCOMMON_SRC_DIR=$(unzip_src ".tar.xz" ${XKBCOMMON_SRC_NAME}); echo "unzip ${XKBCOMMON_SRC_NAME} source code"
+XEXT_SRC_DIR=$(unzip_src ".tar.gz" ${XEXT_SRC_NAME}); echo "unzip ${XEXT_SRC_NAME} source code"
+XEXTPROTO_SRC_DIR=$(unzip_src ".tar.gz" ${XEXTPROTO_SRC_NAME}); echo "unzip ${XEXTPROTO_SRC_NAME} source code"
+XTRANS_SRC_DIR=$(unzip_src ".tar.gz" ${XTRANS_SRC_NAME}); echo "unzip ${XTRANS_SRC_NAME} source code"
+XCBPROTO_SRC_DIR=$(unzip_src ".tar.gz" ${XCBPROTO_SRC_NAME}); echo "unzip ${XCBPROTO_SRC_NAME} source code"
+LIBXCB_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXCB_SRC_NAME}); echo "unzip ${LIBXCB_SRC_NAME} source code"
+XCBUTIL_SRC_DIR=$(unzip_src ".tar.gz" ${XCBUTIL_SRC_NAME}); echo "unzip ${XCBUTIL_SRC_NAME} source code"
+ICEAUTH_SRC_DIR=$(unzip_src ".tar.xz" ${ICEAUTH_SRC_NAME}); echo "unzip ${ICEAUTH_SRC_NAME} source code"
+XAU_SRC_DIR=$(unzip_src ".tar.xz" ${XAU_SRC_NAME}); echo "unzip ${XAU_SRC_NAME} source code"
+XDMCP_SRC_DIR=$(unzip_src ".tar.gz" ${XDMCP_SRC_NAME}); echo "unzip ${XDMCP_SRC_NAME} source code"
+XORGPROTO_SRC_DIR=$(unzip_src ".tar.xz" ${XORGPROTO_SRC_NAME}); echo "unzip ${XORGPROTO_SRC_NAME} source code"
+XFIXES_SRC_DIR=$(unzip_src ".tar.gz" ${XFIXES_SRC_NAME}); echo "unzip ${XFIXES_SRC_NAME} source code"
+XDAMAGE_SRC_DIR=$(unzip_src ".tar.gz" ${XDAMAGE_SRC_NAME}); echo "unzip ${XDAMAGE_SRC_NAME} source code"
+XSHMFENCE_SRC_DIR=$(unzip_src ".tar.gz" ${XSHMFENCE_SRC_NAME}); echo "unzip ${XSHMFENCE_SRC_NAME} source code"
+XXF86VM_SRC_DIR=$(unzip_src ".tar.gz" ${XXF86VM_SRC_NAME}); echo "unzip ${XXF86VM_SRC_NAME} source code"
+XI_SRC_DIR=$(unzip_src ".tar.gz" ${XI_SRC_NAME}); echo "unzip ${XI_SRC_NAME} source code"
+XTST_SRC_DIR=$(unzip_src ".tar.gz" ${XTST_SRC_NAME}); echo "unzip ${XTST_SRC_NAME} source code"
+XORGMACROS_SRC_DIR=$(unzip_src ".tar.gz" ${XORGMACROS_SRC_NAME}); echo "unzip ${XORGMACROS_SRC_NAME} source code"
 PCIACCESS_SRC_DIR=$(unzip_src ".tar.gz" ${PCIACCESS_SRC_NAME}); echo "unzip ${PCIACCESS_SRC_NAME} source code"
 MESA_SRC_DIR=$(unzip_src ".tar.gz" ${MESA_SRC_NAME}); echo "unzip ${MESA_SRC_NAME} source code"
 GTKX_SRC_DIR=$(unzip_src ".tar.xz" ${GTKX_SRC_NAME}); echo "unzip ${GTKX_SRC_NAME} source code"
+LIBPAM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPAM_SRC_NAME}); echo "unzip ${LIBPAM_SRC_NAME} source code"
+XRDP_SRC_DIR=$(unzip_src ".tar.gz" ${XRDP_SRC_NAME}); echo "unzip ${XRDP_SRC_NAME} source code"
 XFCE_SRC_DIR=${build_dir}"/"$(file_dirname ${XFCE_SRC_NAME} .tar.bz2)
-if [ ! -d ${XFCE_SRC_DIR} ]; then
+if [ ! -d "${XFCE_SRC_DIR}" ]; then
   echo "unzip ${XFCE_SRC_NAME} source code" && tar xf source/${XFCE_SRC_NAME} -C ${build_dir}
   mkdir -pv $XFCE_SRC_DIR
   tar xf ${build_dir}/src/exo-4.16.0.tar.bz2 -C ${XFCE_SRC_DIR}
@@ -216,15 +337,15 @@ include_path=" \
   -I${xfce_loc_inc}/exo-2 \
   -I${xfce_loc_inc}/libxml2 \
   -I${xfce_loc_inc}/pixman-1 \
+  -I${xfce_loc_inc}/dbus-1.0 \
   -I${xfce_loc_inc}/freetype2 \
   -I${xfce_loc_inc}/thunarx-3 \
   -I${xfce_loc_inc}/garcon-1 \
   -I${xfce_loc_inc}/garcon-gtk3-1 \
   -I${xfce_x86_64_inc} \
-  -I/usr/include/dbus-1.0 \
-  -I/usr/include/python3.8 \
-  -I/usr/include/gstreamer-1.0 \
-  -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
+  -I/usr/include/python3.8"
+  #-I/usr/include/gstreamer-1.0 \
+  #-I/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
 
 xfce_lib=${xfce_install}/usr/lib
 xfce_share=${xfce_install}/usr/share
@@ -232,15 +353,21 @@ xfce_loc_lib=${xfce_install}/usr/local/lib
 xfce_loc_share=${xfce_install}/usr/local/share
 library_path=" \
   -L${glibc_install}/lib64 \
+  -L${xfce_install}/lib64 \
   -L${xfce_lib} \
   -L${xfce_loc_lib} \
-  -L${xfce_lib}/x86_64-linux-gnu"
+  -L${xfce_lib}/x86_64-linux-gnu \
+  -L${xfce_instal}/opt/libjpeg-turbo/lib64"
 
-cfg_opt="--with-sysroot=${xfce_install}"
 pkg_cfg1="${xfce_lib}/pkgconfig"
 pkg_cfg2="${xfce_share}/pkgconfig"
 pkg_cfg3="${xfce_loc_lib}/pkgconfig"
-pkg_cfg4="${xfce_lib}/x86_64-linux-gnu/pkgconfig"
+pkg_cfg4="${xfce_loc_share}/pkgconfig"
+pkg_cfg5="${xfce_lib}/x86_64-linux-gnu/pkgconfig"
+pkg_cfg6="${xfce_install}/opt/libjpeg-turbo/lib64/pkgconfig"
+pkg_cfg7="/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/local/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig"
+cfg_opt="--with-sysroot=${xfce_install}"
+xwin_opt="--x-includes=${xfce_loc_inc} --x-libraries=${xfce_loc_lib}"
 
 export CFLAGS="${include_path}"
 export CXXFLAGS="${include_path}"
@@ -248,14 +375,23 @@ export LDFLAGS="${library_path}"
 
 export PKG_CONFIG_SYSROOT_DIR="${xfce_install}"
 export PKG_CONFIG_TOP_BUILD_DIR="${xfce_install}"
-export PKG_CONFIG_PATH="${pkg_cfg1}:${pkg_cfg2}:${pkg_cfg3}:${pkg_cfg4}"
+export PKG_CONFIG_PATH="${pkg_cfg1}:${pkg_cfg2}:${pkg_cfg3}:${pkg_cfg4}:${pkg_cfg5}:${pkg_cfg6}:${pkg_cfg7}"
+
+# 解决 libxcb 编译问题
+mkdir -pv ${xfce_share}/aclocal
+mkdir -pv ${xfce_loc_share}/aclocal
+
+# 解决 xcb-util 编译问题
+# 解决 pciaccess: must install xorg-macros 1.8 or later before running autoconf/autogen
+export ACLOCAL="aclocal -I /usr/share/aclocal -I ${xfce_share}/aclocal -I ${xfce_loc_share}/aclocal"
 
 # 编译过程中会寻找 *.gir 的文件，.gir 的目录就是这个
 export XDG_DATA_DIRS="${xfce_share}:${xfce_loc_share}:${xfce_share}/gir-1.0:$XDG_DATA_DIRS"
 export GDK_PIXBUF_PIXDATA="${xfce_install}/usr/bin/gdk-pixbuf-pixdata"
 
 # 编译过程中有工具需要 libffi.so.8 库的，需要加载一下，否则会出现找不到 libffi.so.8
-export LD_LIBRARY_PATH="${xfce_lib}:${xfce_loc_lib}:${xfce_lib}/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+export PATH="${xfce_install}/usr/bin:${xfce_install}/usr/local/bin:$PATH"
+export LD_LIBRARY_PATH="${xfce_lib}:${xfce_loc_lib}:${xfce_lib}/x86_64-linux-gnu:${xfce_install}/opt/libjpeg-turbo/lib64:$LD_LIBRARY_PATH"
 ldconfig
 
 # python 模块的搜寻目录
@@ -268,19 +404,23 @@ ldconfig
 # 所以只能做一个软链过来, PKG_CONFIG_SYSROOT_DIR 不能去掉或设置为空，因为编译 gtk+ 以及依赖库都需要设置这个变量
 #
 #----------------------------------------------------------------------------------------------------------------
-for i in $(find /usr/bin -name "g-ir-*")
-do
-  if [ -f ${xfce_install}${i} ]; then
-    continue
-  fi
-  ln -s ${i} ${xfce_install}${i}
-done
+setup_girtools() {
+  mkdir -p ${xfce_install}"/usr/bin"
+  for gir_name in $(find /usr/bin -name "g-ir-*")
+  do
+    if [ -f "${xfce_install}${gir_name}" ]; then
+      continue
+    fi
+    ln -s "${gir_name}" "${xfce_install}${gir_name}" || (echo "setup tools ${gir_name} failed" && exit)
+  done
 
-gi_makefile=/usr/share/gobject-introspection-1.0/Makefile.introspection
-mkdir -pv ${xfce_share}/gobject-introspection-1.0
-if [ ! -f ${xfce_install}${gi_makefile} ]; then
-  ln -s ${gi_makefile} ${xfce_install}${gi_makefile}
-fi
+  gi_makefile=/usr/share/gobject-introspection-1.0/Makefile.introspection
+  mkdir -pv ${xfce_share}/gobject-introspection-1.0
+  if [ ! -f "${xfce_install}${gi_makefile}" ]; then
+    ln -s "${gi_makefile}" "${xfce_install}${gi_makefile}"
+  fi
+}
+setup_girtools
 
 #---------------------------
 # meson 编译 编译参数一览 https://mesonbuild.com/Reference-tables.html
@@ -288,9 +428,11 @@ fi
 meson_build() {
   local name=$1
   local srcdir=$2
+  shift
+  shift
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && mkdir -pv build
-    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH} $3
+    meson setup build --prefix=/usr --pkg-config-path=${PKG_CONFIG_PATH} "$@"
     meson compile -C build
     meson install -C build --destdir=${xfce_install} && echo "ok" > ../.${name} || exit
     cd .. && echo "${GREEN}build ${name} end${NC}"
@@ -304,7 +446,8 @@ xfce4_build() {
   local name=$1
   local srcdir=$2
   if [ ! -f .${name} ]; then
-    echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && ./configure ${cfg_opt}
+    echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir}
+    ./configure ${cfg_opt} ${xwin_opt}
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.${name} || exit
     cd .. && echo "${GREEN}build ${name} end${NC}"
   fi
@@ -316,16 +459,19 @@ xfce4_build() {
 common_build() {
   local name=$1
   local srcdir=$2
+  shift
+  shift
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} 
     if [ -f autogen.sh ]; then
+      #autoreconf -i
       ./autogen.sh
     fi
     if [ -f CMakeLists.txt ]; then
-      cmake .
+      cmake . -DCMAKE_INSTALL_PREFIX=/usr
     fi
     if [ -f ./configure ]; then
-      ./configure ${cfg_opt} $3
+      ./configure ${cfg_opt} "$@" ${xwin_opt}
     fi
     make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../.${name} || exit
     cd .. && echo "${GREEN}build ${name} end${NC}"
@@ -350,20 +496,95 @@ common_build() {
   common_build libxml ${LIBXML_SRC_DIR}
   # 编译 util-linux ( libmount )
   common_build libmnt ${LIBMNT_SRC_DIR}
-  # 编译 libpng
-  common_build libpng ${LIBPNG_SRC_DIR}
+  # 编译 zlib
+  common_build zlib ${ZLIB_SRC_DIR}
   # 编译 libzip
   common_build libzip ${LIBZIP_SRC_DIR}
+  # 编译 libpng
+  common_build libpng ${LIBPNG_SRC_DIR}
+  # 编译 libelf
+  common_build libelf ${LIBELF_SRC_DIR}
   # 编译 libdatrie
   common_build libdatrie ${LIBDATRIE_SRC_DIR}
-  ln -s ${xfce_install}/usr/local/bin/trietool /usr/local/bin/trietool
+  if [ ! -f "/usr/local/bin/trietool" ]; then
+    ln -s ${xfce_install}/usr/local/bin/trietool /usr/local/bin/trietool
+  fi
   # 编译 libthai
   common_build libthai ${LIBTHAI_SRC_DIR}
   # 编译 libpcre2
   common_build libpcre2 ${LIBPCRE2_SRC_DIR}
   # 编译 glib
   meson_build glib ${GLIB_SRC_DIR}
-  ln -s ${xfce_install}/usr/bin/glib-mkenums /usr/bin/glib-mkenums
+  if [ ! -f "/usr/bin/glib-mkenums" ]; then
+    ln -s ${xfce_install}/usr/bin/glib-mkenums /usr/bin/glib-mkenums
+  fi
+  # 在编译机上测试 xfce4 是否能正常工作
+  if [ "${with_xfce_test}" = true ]; then
+    tar zcf tmp.tar.gz ${xfce_install}
+  fi
+  # 编译 wayland-core ( documentation 依赖 graphviz 粘连了图形库 )
+  meson_build wayland-core ${WAYLANDCORE_SRC_DIR} -Ddocumentation=false
+  if [ ! -f "/usr/bin/wayland-scanner" ]; then
+    ln -s ${xfce_install}/usr/bin/wayland-scanner /usr/bin/wayland-scanner
+  fi
+  # 编译 wayland-protocols
+  meson_build wayland-protocols ${WAYLANDPROT_SRC_DIR}
+  # 编译 libjpeg
+  common_build libjpeg-turbo ${LIBJPEGTURBO_SRC_DIR}
+  # 编译 xorg-macros
+  common_build xorg-macros ${XORGMACROS_SRC_DIR}
+  # 编译 libxproto
+  common_build libxproto ${LIBXPROTO_SRC_DIR}
+  # 编译 xorgproto
+  common_build xorgproto ${XORGPROTO_SRC_DIR}
+  # 编译 xau
+  common_build xau ${XAU_SRC_DIR}
+  # 编译 xtrans
+  common_build xtrans ${XTRANS_SRC_DIR}
+  # 编译 xcb-proto
+  common_build xcb-proto ${XCBPROTO_SRC_DIR}
+  # 编译 libxcb
+  common_build libxcb ${LIBXCB_SRC_DIR}
+  # 编译 libice
+  common_build libice ${LIBICE_SRC_DIR}
+  # 编译 libsm
+  common_build libsm ${LIBSM_SRC_DIR}
+  # 编译 libx11
+  common_build libx11 ${LIBX11_SRC_DIR} --with-keysymdefdir="${xfce_install}/usr/local/include/X11"
+  # 编译 xext
+  common_build xext ${XEXT_SRC_DIR}
+  # 编译 xrender
+  common_build xrender ${XRENDER_SRC_DIR}
+  # 编译 xrandr
+  common_build xrandr ${XRANDR_SRC_DIR}
+  # 编译 iceauth
+  common_build iceauth ${ICEAUTH_SRC_DIR}
+  # 编译 libxcb-util
+  common_build libxcb-util ${XCBUTIL_SRC_DIR}
+  # 编译 kbproto
+  common_build kbproto ${KBPROTO_SRC_DIR}
+  # 编译 xextproto
+  common_build xextproto ${XEXTPROTO_SRC_DIR}
+  # 编译 xdmcp
+  common_build xdmcp ${XDMCP_SRC_DIR}
+  # 编译 xfixes
+  common_build xfixes ${XFIXES_SRC_DIR}
+  # 编译 xdamage
+  common_build xdamage ${XDAMAGE_SRC_DIR}
+  # 编译 xinerama
+  common_build xinerama ${XINERAMA_SRC_DIR}
+  # 编译 xshmfence
+  common_build xshmfence ${XSHMFENCE_SRC_DIR}
+  # 编译 xxf86vm
+  common_build xxf86vm ${XXF86VM_SRC_DIR}
+  # 编译 xi ( 问题解决见上面的注释 )
+  common_build xi ${XI_SRC_DIR}
+  # 编译 xtst
+  common_build xtst ${XTST_SRC_DIR}
+  # 编译 xkbcommon
+  meson_build xkbcommon ${XKBCOMMON_SRC_DIR}
+  # 编译 gdkpixbuf
+  meson_build gdkpixbuf ${GDKPIXBUF_SRC_DIR}
   # 编译 pixman
   common_build pixman ${PIXMAN_SRC_DIR} --enable-libpng=yes
   # 编译 freetype
@@ -374,8 +595,8 @@ common_build() {
   common_build freetype ${FREETYPE_SRC_DIR} --with-harfbuzz=yes
   # 编译 fontconfig
   common_build fontconfig ${FONTCFG_SRC_DIR}
-  # 编译 cairo
-  cairo_opt="--with-x --enable-png=yes --enable-xlib=yes --enable-xlib-xrender=yes --enable-ft=yes --enable-fc=yes"
+  # 编译 cairo ( 这个需要 x window，所以放到 libx11 之后编译 )
+  cairo_opt="--with-x --enable-png=yes --enable-xlib=yes --enable-xlib-xrender=yes"
   common_build cairo ${CAIRO_SRC_DIR} ${cairo_opt}
   # 编译 harfbuzz
   meson_build harfbuzz ${HARFBUZZ_SRC_DIR} -Dcairo=enabled
@@ -383,13 +604,8 @@ common_build() {
   meson_build fribidi ${FRIBIDI_SRC_DIR}
   # 编译 pango
   meson_build pango ${PANGO_SRC_DIR}
-  # 编译 gobject-introspection
-  # ms_flag="--sysroot=${xfce_install}"
-  # ms_link="-Wl,-rpath-link=${xfce_loc_lib}"
-  # gobject_inttro="-Dc_flags=${ms_flag} -Dc_link_args=${ms_link}"
-  # meson_build gobject-introspection ${GOBJINTROSPE_SRC_DIR} ${gobject_intro}
-  # 编译 gdkpixbuf
-  meson_build gdkpixbuf ${GDKPIXBUF_SRC_DIR}
+  # 编译 dbus-1
+  common_build dbus-1 ${DBUS1_SRC_DIR}
   # 编译 libatk
   meson_build libatk ${LIBATK_SRC_DIR}
   # 编译 libatk-core ( 依赖: libxml )
@@ -402,42 +618,50 @@ common_build() {
   meson_build libdrm ${LIBDRM_SRC_DIR}
   # 编译 graphene
   meson_build graphene ${GRAPHENE_SRC_DIR}
-  # 编译 wayland-core
-  meson_build wayland-core ${WAYLANDCORE_SRC_DIR}
-  ln -s ${xfce_install}/usr/bin/wayland-scanner /usr/bin/wayland-scanner
-  # 编译 wayland-protocols
-  meson_build wayland-protocols ${WAYLANDPROT_SRC_DIR}
+  # 编译 mesa
+  meson_build mesa ${MESA_SRC_DIR}
+  # 编译 libepoxy
+  meson_build libepoxy ${LIBEPOXY_SRC_DIR}
+  # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
+  meson_build libgudev ${LIBGUDEV_SRC_DIR}
+  # 编译 upower ( xfce4-power-manager 依赖此库， 依赖: libgudev )
+  upower_flags="-DENOTSUP=95"
+  meson_build upower ${UPOWER_SRC_DIR} -Dc_args=${upower_flags}
+  # 编译 gstreamer
+  meson_build gstreamer ${GSTREAMER_SRC_DIR}
+  # 编译 gtk+
+  meson_build gtk+ ${GTKX_SRC_DIR}
   # 编译 mesa
   meson_build mesa ${MESA_SRC_DIR}
   # 编译 libepoxy
   meson_build libepoxy ${LIBEPOXY_SRC_DIR}
   # 编译 libstartup-notification0 ( 很多 xfce4 应用依赖此库, 依赖: libxcb-util-dev )
-  common_build startupnoti ${STARTUPNOTI_SRC_DIR}
+  # common_build startupnoti ${STARTUPNOTI_SRC_DIR}
   # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
   meson_build libgudev ${LIBGUDEV_SRC_DIR}
   # 编译 upower ( xfce4-power-manager 依赖此库， 依赖: libgudev )
   upower_flags="-DENOTSUP=95"
   meson_build upower ${UPOWER_SRC_DIR} -Dc_args=${upower_flags}
   # 编译 gettext 解决 libintl 的问题 gtk+
-  common_build gettext ${GETTEXT_SRC_DIR}
+  #common_build gettext ${GETTEXT_SRC_DIR}
   # 编译 gstreamer
   meson_build gstreamer ${GSTREAMER_SRC_DIR}
   # 编译 gtk+
   meson_build gtk+ ${GTKX_SRC_DIR}
-  # 在编译机上测试 xfce4 是否能正常工作
-  if [ "${with_xfce_test}" = true ]; then
-    tar zcf tmp.tar.gz ${xfce_install}
-  fi
   # 编译 libwnck
   meson_build libwnck ${LIBWNCK_SRC_DIR}
   # 编译 libnotify
   meson_build libnotify ${LIBNOTIFY_SRC_DIR}
+  # 编译 libpam
+  common_build libpam ${LIBPAM_SRC_DIR}
+  # 编译 xrdp
+  common_build xrdp ${XRDP_SRC_DIR}
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
 
   # 必须去掉这个，否则 xfce 编译不过，做的还是有点差，和 gtk+ 的编译还是差一个档次
-  unset PKG_CONFIG_SYSROOT_DIR
+  #unset PKG_CONFIG_SYSROOT_DIR
   unset PKG_CONFIG_TOP_BUILD_DIR
   xfce4_inc="${xfce_loc_inc}/xfce4"
   base_inc="${xfce_inc}/gtk-3.0:${xfce_inc}/pango-1.0:${xfce_inc}/harfbuzz:${xfce_inc}/atk-1.0:${xfce_inc}/gdk-pixbuf-2.0"
@@ -446,10 +670,9 @@ common_build() {
   xfce_mod_inc="${xfce4_inc}:${xfce4_inc}/xfconf-0:${xfce4_inc}/libxfce4kbd-private-3:${xfce4_inc}/libxfce4ui-2"
   other_mod_inc="${xfce_inc}/libwnck-3.0:${xfce_loc_inc}/cairo:${xfce_loc_inc}/exo-2:${xfce_loc_inc}/thunarx-3"
   export C_INCLUDE_PATH="${base_inc}:${garcon_inc}:${startup_inc}:${xfce_mod_inc}:${other_mod_inc}"
-
   xfce4_build xfce4-dev-tools xfce4-dev-tools-4.16.0
-  xfce4_build libxfce4util libxfce4util-4.16.0 
-  xfce4_build xfconf xfconf-4.16.0 
+  xfce4_build libxfce4util libxfce4util-4.16.0
+  xfce4_build xfconf xfconf-4.16.0
   xfce4_build libxfce4ui libxfce4ui-4.16.0
   xfce4_build garcon garcon-0.8.0
   xfce4_build exo exo-4.16.0
@@ -457,12 +680,12 @@ common_build() {
   xfce4_build thunar thunar-4.16.0
   xfce4_build xfce4-settings xfce4-settings-4.16.0
   xfce4_build xfce4-session xfce4-session-4.16.0
-  xfce4_build xfwm4 xfwm4-4.16.0 
-  xfce4_build xfdesktop xfdesktop-4.16.0 
+  xfce4_build xfwm4 xfwm4-4.16.0
+  xfce4_build xfdesktop xfdesktop-4.16.0
   xfce4_build thunar-volman thunar-volman-4.16.0
-  xfce4_build tumbler tumbler-4.16.0 
-  xfce4_build xfce4-power-manager xfce4-power-manager-4.16.0 
-  xfce4_build xfce4-appfinder xfce4-appfinder-4.16.0 
+  xfce4_build tumbler tumbler-4.16.0
+  xfce4_build xfce4-power-manager xfce4-power-manager-4.16.0
+  xfce4_build xfce4-appfinder xfce4-appfinder-4.16.0
 
   cd ..
 
@@ -502,11 +725,17 @@ if [ "${with_xfce_test}" = true ]; then
   cd $to_dir && (cp ./ / -r -n) && cd ..
 
   # 预装运行环境
-  apt install dbus-x11 xrdp -y
+  #apt install dbus-x11 xrdp -y
+  #apt install xrdp -y
+  # 运行 xrdp
+  xrdp
+
+  # 运行 sess-man
 
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
-  echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu\" xfce4-session" > ~/.xsession
+  libjpegdir=`pwd`"/a/opt/libjpeg-turbo/lib64"
+  echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu:${libjpegdir}\" xfce4-session" > ~/.xsession
 
   # 重启系统，然后可以利用 windows 下 remote desktop 体验最新版本的 xfce4 了, 最新版本的 xfce4 还是很漂亮的
 
