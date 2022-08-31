@@ -6,7 +6,7 @@
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
   apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config llvm-10 clang-10 intltool gobject-introspection -y || exit
-  apt install bison flex python3-pip python3.8-dev libpython-dev gperf doxygen gtk-doc-tools xsltproc docbook-xsl-ns -y || exit
+  apt install bison flex python3-pip python3.8-dev libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev libudev-dev -y || exit
   #apt install cmake make gperf bison flex intltool libtool llvm-10 clang-10 graphviz xmlto doxygen docbook-xsl docbook-xsl-ns gobject-introspection gtk-doc-tools -y
   #apt install python3.8-dev python3.8-dbg python3-pip python-docutils -y
@@ -116,6 +116,12 @@ LIBXPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xproto-7.0.31.tar.
 XEXTPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xextproto-7.3.0.tar.gz
 XCBPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xcb-proto-1.15.2.tar.gz
 XORGPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xorgproto-2022.2.tar.xz
+XKBCOMP_SRC_URL=https://www.x.org/releases/individual/app/xkbcomp-1.4.5.tar.gz
+LIBXCVT_SRC_URL=https://www.x.org/releases/individual/lib/libxcvt-0.1.2.tar.xz
+XKBFILE_SRC_URL=https://www.x.org/releases/individual/lib/libxkbfile-1.1.0.tar.gz
+FONTENC_SRC_URL=https://www.x.org/releases/individual/lib/libfontenc-1.1.6.tar.xz
+XFONT_SRC_URL=https://www.x.org/releases/individual/lib/libXfont2-2.0.6.tar.xz
+XSERVER_SRC_URL=https://www.x.org/releases/individual/xserver/xorg-server-21.1.4.tar.xz
 
 #----------------------------
 #
@@ -197,6 +203,12 @@ LIBDRM_SRC_NAME=$(download_src ${LIBDRM_SRC_URL})
 GSTREAMER_SRC_NAME=$(download_src ${GSTREAMER_SRC_URL})
 LIBPAM_SRC_NAME=$(download_src ${LIBPAM_SRC_URL})
 XRDP_SRC_NAME=$(download_src ${XRDP_SRC_URL})
+XKBCOMP_SRC_NAME=$(download_src ${XKBCOMP_SRC_URL})
+LIBXCVT_SRC_NAME=$(download_src ${LIBXCVT_SRC_URL})
+XKBFILE_SRC_NAME=$(download_src ${XKBFILE_SRC_URL})
+FONTENC_SRC_NAME=$(download_src ${FONTENC_SRC_URL})
+XFONT_SRC_NAME=$(download_src ${XFONT_SRC_URL})
+XSERVER_SRC_NAME=$(download_src ${XSERVER_SRC_URL})
 DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL} "dbus-")
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
@@ -286,6 +298,12 @@ MESA_SRC_DIR=$(unzip_src ".tar.gz" ${MESA_SRC_NAME}); echo "unzip ${MESA_SRC_NAM
 GTKX_SRC_DIR=$(unzip_src ".tar.xz" ${GTKX_SRC_NAME}); echo "unzip ${GTKX_SRC_NAME} source code"
 LIBPAM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPAM_SRC_NAME}); echo "unzip ${LIBPAM_SRC_NAME} source code"
 XRDP_SRC_DIR=$(unzip_src ".tar.gz" ${XRDP_SRC_NAME}); echo "unzip ${XRDP_SRC_NAME} source code"
+XKBCOMP_SRC_DIR=$(unzip_src ".tar.gz" ${XKBCOMP_SRC_NAME}); echo "unzip ${XKBCOMP_SRC_NAME} source code"
+LIBXCVT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXCVT_SRC_NAME}); echo "unzip ${LIBXCVT_SRC_NAME} source code"
+XKBFILE_SRC_DIR=$(unzip_src ".tar.gz" ${XKBFILE_SRC_NAME}); echo "unzip ${XKBFILE_SRC_NAME} source code"
+FONTENC_SRC_DIR=$(unzip_src ".tar.xz" ${FONTENC_SRC_NAME}); echo "unzip ${FONTENC_SRC_NAME} source code"
+XFONT_SRC_DIR=$(unzip_src ".tar.xz" ${XFONT_SRC_NAME}); echo "unzip ${XFONT_SRC_NAME} source code"
+XSERVER_SRC_DIR=$(unzip_src ".tar.xz" ${XSERVER_SRC_NAME}); echo "unzip ${XSERVER_SRC_NAME} source code"
 XFCE_SRC_DIR=${build_dir}"/"$(file_dirname ${XFCE_SRC_NAME} .tar.bz2)
 if [ ! -d "${XFCE_SRC_DIR}" ]; then
   echo "unzip ${XFCE_SRC_NAME} source code" && tar xf source/${XFCE_SRC_NAME} -C ${build_dir}
@@ -582,7 +600,7 @@ common_build() {
   # 编译 xtst
   common_build xtst ${XTST_SRC_DIR}
   # 编译 xkbcommon
-  meson_build xkbcommon ${XKBCOMMON_SRC_DIR}
+  meson_build xkbcommon ${XKBCOMMON_SRC_DIR} -Denable-docs=false
   # 编译 gdkpixbuf
   meson_build gdkpixbuf ${GDKPIXBUF_SRC_DIR}
   # 编译 pixman
@@ -596,7 +614,7 @@ common_build() {
   # 编译 fontconfig
   common_build fontconfig ${FONTCFG_SRC_DIR}
   # 编译 cairo ( 这个需要 x window，所以放到 libx11 之后编译 )
-  cairo_opt="--with-x --enable-png=yes --enable-xlib=yes --enable-xlib-xrender=yes"
+  cairo_opt="--with-x --enable-png=yes --enable-xlib=yes --enable-xlib-xrender=yes --enable-gtk-doc-html=no"
   common_build cairo ${CAIRO_SRC_DIR} ${cairo_opt}
   # 编译 harfbuzz
   meson_build harfbuzz ${HARFBUZZ_SRC_DIR} -Dcairo=enabled
@@ -651,11 +669,23 @@ common_build() {
   # 编译 libwnck
   meson_build libwnck ${LIBWNCK_SRC_DIR}
   # 编译 libnotify
-  meson_build libnotify ${LIBNOTIFY_SRC_DIR}
+  meson_build libnotify ${LIBNOTIFY_SRC_DIR} -Dman=false -Dgtk_doc=false -Ddocbook_docs=disabled
   # 编译 libpam
   common_build libpam ${LIBPAM_SRC_DIR}
   # 编译 xrdp
   common_build xrdp ${XRDP_SRC_DIR}
+  # 编译 libxcvt
+  meson_build libxcvt ${LIBXCVT_SRC_DIR}
+  # 编译 xkbcomp
+  common_build xkbcomp ${XKBCOMP_SRC_DIR}
+  # 编译 xkbfile
+  common_build xkbfile ${XKBFILE_SRC_DIR}
+  # 编译 fontenc
+  common_build fontenc ${FONTENC_SRC_DIR}
+  # 编译 xfont
+  common_build xfont ${XFONT_SRC_DIR}
+  # 编译 xserver
+  common_build xserver ${XSERVER_SRC_DIR}
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
@@ -727,10 +757,6 @@ if [ "${with_xfce_test}" = true ]; then
   # 预装运行环境
   #apt install dbus-x11 xrdp -y
   #apt install xrdp -y
-  # 运行 xrdp
-  xrdp
-
-  # 运行 sess-man
 
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
