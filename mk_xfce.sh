@@ -646,7 +646,7 @@ common_build() {
   upower_flags="-DENOTSUP=95"
   meson_build upower ${UPOWER_SRC_DIR} -Dc_args=${upower_flags}
   # 编译 gstreamer
-  meson_build gstreamer ${GSTREAMER_SRC_DIR}
+  meson_build gstreamer ${GSTREAMER_SRC_DIR} -Ddoc=disabled
   # 编译 gtk+
   meson_build gtk+ ${GTKX_SRC_DIR}
   # 编译 mesa
@@ -676,10 +676,10 @@ common_build() {
   common_build xrdp ${XRDP_SRC_DIR}
   # 编译 libxcvt
   meson_build libxcvt ${LIBXCVT_SRC_DIR}
-  # 编译 xkbcomp
-  common_build xkbcomp ${XKBCOMP_SRC_DIR}
   # 编译 xkbfile
   common_build xkbfile ${XKBFILE_SRC_DIR}
+  # 编译 xkbcomp
+  common_build xkbcomp ${XKBCOMP_SRC_DIR}
   # 编译 fontenc
   common_build fontenc ${FONTENC_SRC_DIR}
   # 编译 xfont
