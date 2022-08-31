@@ -398,3 +398,16 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     ```
     解决：缺失显卡驱动  
     apt install libgl1-mesa-dri
+
+13. Xorg（xserver）启动时，提示错误
+    ```shell
+    XKB: Failed to compile keymap
+    Keyboard initialization failed. This could be a missing or incorrect setup of xkeyboard-config.
+    (EE) 
+    Fatal server error:
+    (EE) Failed to activate virtual core keyboard: 2(EE) 
+    (EE) 
+    ```
+    解决：
+    ln -s /usr/share/X11/xkb /usr/local/share/X11/xkb  
+    这样再运行 Xorg 就可以正常运行了。
