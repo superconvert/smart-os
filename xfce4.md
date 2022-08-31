@@ -385,3 +385,16 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
 
 11. 如果我们运行 xsession 提示 Can't open display， 即使我们设置环境变量 export DISPLAY=:10 ，也是这个提示，引起这个问题的原因有很多，但我们首先第一步要做的是要检查 xserver 服务在不在，一般情况通常会忽略这个检查
 
+12. Xorg（xserver） 启动时，提示错误
+    ```shell
+    Using system config directory "/usr/local/share/X11/xorg.conf.d"
+    MESA-LOADER: failed to open vmwgfx (search paths /usr/lib/x86_64-linux-gnu/dri)
+    failed to load driver: vmwgfx
+    MESA-LOADER: failed to open kms_swrast (search paths /usr/lib/x86_64-linux-gnu/dri)
+    failed to load driver: kms_swrast
+    MESA-LOADER: failed to open swrast (search paths /usr/lib/x86_64-linux-gnu/dri)
+    failed to load swrast driver
+    couldn't get display device
+    ```
+    解决：缺失显卡驱动  
+    apt install libgl1-mesa-dri
