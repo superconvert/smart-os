@@ -382,3 +382,6 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     Aug 28 11:30:52 freeabc xrdp[2173]: (2173)(139849385854784)[ERROR] Cannot read private key file /etc/xrdp/key.pem: Permission denied
     ```
     我们看到是 key.pem 的权限不允许导致的,  sudo adduser xrdp ssl-cert  重启系统，这个问题解决
+
+11. 如果我们运行 xsession 提示 Can't open display， 即使我们设置环境变量 export DISPLAY=:10 ，也是这个提示，引起这个问题的原因有很多，但我们首先第一步要做的是要检查 xserver 服务在不在，一般情况通常会忽略这个检查
+
