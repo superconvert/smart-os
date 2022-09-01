@@ -49,6 +49,8 @@ FREETYPE_SRC_URL=https://nchc.dl.sourceforge.net/project/freetype/freetype2/2.12
 LIBJPEGTURBO_SRC_URL=https://sourceforge.net/projects/libjpeg-turbo/files/2.1.0/libjpeg-turbo-2.1.0.tar.gz
 XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
+XTERM_SRC_URL=https://invisible-island.net/datafiles/release/xterm.tar.gz
+NCURSES_SRC_URL=https://invisible-island.net/datafiles/release/ncurses.tar.gz
 
 # download from https://github.com
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
@@ -96,7 +98,11 @@ LIBSM_SRC_URL=https://www.x.org/releases/individual/lib/libSM-1.2.3.tar.gz
 LIBICE_SRC_URL=https://www.x.org/releases/individual/lib/libICE-1.0.10.tar.gz
 LIBX11_SRC_URL=https://www.x.org/releases/individual/lib/libX11-1.8.tar.gz
 LIBXCB_SRC_URL=https://www.x.org/releases/individual/lib/libxcb-1.15.tar.xz
+XT_SRC_URL=https://www.x.org/releases/individual/lib/libXt-1.2.1.tar.gz
 XAU_SRC_URL=https://www.x.org/releases/individual/lib/libXau-1.0.10.tar.xz
+XAW_SRC_URL=https://www.x.org/releases/individual/lib/libXaw-1.0.14.tar.gz
+XMU_SRC_URL=https://www.x.org/releases/individual/lib/libXmu-1.1.3.tar.gz
+XPM_SRC_URL=https://www.x.org/releases/individual/lib/libXpm-3.5.13.tar.gz
 XEXT_SRC_URL=https://www.x.org/releases/individual/lib/libXext-1.3.4.tar.gz
 XDMCP_SRC_URL=https://www.x.org/releases/individual/lib/libXdmcp-1.1.3.tar.gz
 XINERAMA_SRC_URL=https://www.x.org/releases/individual/lib/libXinerama-1.1.4.tar.gz
@@ -178,7 +184,11 @@ XCBPROTO_SRC_NAME=$(download_src ${XCBPROTO_SRC_URL})
 LIBXCB_SRC_NAME=$(download_src ${LIBXCB_SRC_URL})
 XCBUTIL_SRC_NAME=$(download_src ${XCBUTIL_SRC_URL})
 ICEAUTH_SRC_NAME=$(download_src ${ICEAUTH_SRC_URL})
+XT_SRC_NAME=$(download_src ${XT_SRC_URL})
 XAU_SRC_NAME=$(download_src ${XAU_SRC_URL})
+XAW_SRC_NAME=$(download_src ${XAW_SRC_URL})
+XMU_SRC_NAME=$(download_src ${XMU_SRC_URL})
+XPM_SRC_NAME=$(download_src ${XPM_SRC_URL})
 XDMCP_SRC_NAME=$(download_src ${XDMCP_SRC_URL})
 XRANDR_SRC_NAME=$(download_src ${XRANDR_SRC_URL})
 XRENDER_SRC_NAME=$(download_src ${XRENDER_SRC_URL})
@@ -209,6 +219,8 @@ XKBFILE_SRC_NAME=$(download_src ${XKBFILE_SRC_URL})
 FONTENC_SRC_NAME=$(download_src ${FONTENC_SRC_URL})
 XFONT_SRC_NAME=$(download_src ${XFONT_SRC_URL})
 XSERVER_SRC_NAME=$(download_src ${XSERVER_SRC_URL})
+NCURSES_SRC_NAME=$(download_src ${NCURSES_SRC_URL})
+XTERM_SRC_NAME=$(download_src ${XTERM_SRC_URL})
 DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL} "dbus-")
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
@@ -283,7 +295,11 @@ XCBPROTO_SRC_DIR=$(unzip_src ".tar.gz" ${XCBPROTO_SRC_NAME}); echo "unzip ${XCBP
 LIBXCB_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXCB_SRC_NAME}); echo "unzip ${LIBXCB_SRC_NAME} source code"
 XCBUTIL_SRC_DIR=$(unzip_src ".tar.gz" ${XCBUTIL_SRC_NAME}); echo "unzip ${XCBUTIL_SRC_NAME} source code"
 ICEAUTH_SRC_DIR=$(unzip_src ".tar.xz" ${ICEAUTH_SRC_NAME}); echo "unzip ${ICEAUTH_SRC_NAME} source code"
+XT_SRC_DIR=$(unzip_src ".tar.gz" ${XT_SRC_NAME}); echo "unzip ${XT_SRC_NAME} source code"
 XAU_SRC_DIR=$(unzip_src ".tar.xz" ${XAU_SRC_NAME}); echo "unzip ${XAU_SRC_NAME} source code"
+XAW_SRC_DIR=$(unzip_src ".tar.gz" ${XAW_SRC_NAME}); echo "unzip ${XAW_SRC_NAME} source code"
+XMU_SRC_DIR=$(unzip_src ".tar.gz" ${XMU_SRC_NAME}); echo "unzip ${XMU_SRC_NAME} source code"
+XPM_SRC_DIR=$(unzip_src ".tar.gz" ${XPM_SRC_NAME}); echo "unzip ${XPM_SRC_NAME} source code"
 XDMCP_SRC_DIR=$(unzip_src ".tar.gz" ${XDMCP_SRC_NAME}); echo "unzip ${XDMCP_SRC_NAME} source code"
 XORGPROTO_SRC_DIR=$(unzip_src ".tar.xz" ${XORGPROTO_SRC_NAME}); echo "unzip ${XORGPROTO_SRC_NAME} source code"
 XFIXES_SRC_DIR=$(unzip_src ".tar.gz" ${XFIXES_SRC_NAME}); echo "unzip ${XFIXES_SRC_NAME} source code"
@@ -304,6 +320,8 @@ XKBFILE_SRC_DIR=$(unzip_src ".tar.gz" ${XKBFILE_SRC_NAME}); echo "unzip ${XKBFIL
 FONTENC_SRC_DIR=$(unzip_src ".tar.xz" ${FONTENC_SRC_NAME}); echo "unzip ${FONTENC_SRC_NAME} source code"
 XFONT_SRC_DIR=$(unzip_src ".tar.xz" ${XFONT_SRC_NAME}); echo "unzip ${XFONT_SRC_NAME} source code"
 XSERVER_SRC_DIR=$(unzip_src ".tar.xz" ${XSERVER_SRC_NAME}); echo "unzip ${XSERVER_SRC_NAME} source code"
+NCURSES_SRC_DIR=$(unzip_src ".tar.gz" ${NCURSES_SRC_NAME}); echo "unzip ${NCURSES_SRC_NAME} source code"
+XTERM_SRC_DIR=$(unzip_src ".tar.gz" ${XTERM_SRC_NAME}); echo "unzip ${XTERM_SRC_NAME} source code"
 XFCE_SRC_DIR=${build_dir}"/"$(file_dirname ${XFCE_SRC_NAME} .tar.bz2)
 if [ ! -d "${XFCE_SRC_DIR}" ]; then
   echo "unzip ${XFCE_SRC_NAME} source code" && tar xf source/${XFCE_SRC_NAME} -C ${build_dir}
@@ -557,6 +575,14 @@ common_build() {
   common_build xorgproto ${XORGPROTO_SRC_DIR}
   # 编译 xau
   common_build xau ${XAU_SRC_DIR}
+  # 编译 xt ( xterm )
+  common_build xt ${XT_SRC_DIR}
+  # 编译 xmu ( xterm )
+  common_build xmu ${XMU_SRC_DIR}
+  # 编译 xpm ( xterm )
+  common_build xpm ${XPM_SRC_DIR}
+  # 编译 xaw ( xterm )
+  common_build xaw ${XAW_SRC_DIR}
   # 编译 xtrans
   common_build xtrans ${XTRANS_SRC_DIR}
   # 编译 xcb-proto
@@ -686,6 +712,10 @@ common_build() {
   common_build xfont ${XFONT_SRC_DIR}
   # 编译 xserver
   common_build xserver ${XSERVER_SRC_DIR}
+  # 编译 ncurses 
+  common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
+  # 编译 xterm
+  common_build xterm ${XTERM_SRC_DIR}"-372"
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
