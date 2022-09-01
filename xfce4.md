@@ -312,8 +312,10 @@ Xorg 就是我们通常说的 xserver, 有关整个流程的调试，我们可�
 ```shell
 env LD_LIBRARY_PATH="/root/test/build/test/a/usr/lib:/root/test/build/test/a/usr/local/lib:/root/test/build/test/a/usr/lib/x86_64-linux-gnu:/root/test/build/test/a/opt/libjpeg-turbo/lib64" DBUS_SESSION_BUS_ADDRESS="unix:path=/var/run/dbus/session_bus_socket" strace -f xrdp-sesman -n
 ```
-
-
+基本上 xrdp-sesman 会启动 Xorg ( xserver ), Xorg 会通过 dbus-1 与别的组件进行通讯；还会启动 xsession, 还会启动 xrdp-chansrv，从上述我们可以得知，这些组件都必须启动成功，否则，就会看不到图像界面。我们通过 strace -f 跟踪得知 xrdp-sesman 是通过接口 execve 启动的 Xorg ，这个接口执行后，来自父进程的环境变量将会被清除，导致 LD_LIBRARY_PATH 失效，因此 Xorg 所依赖的动态库就找不到，解决方法就是把库直接拷贝到系统库的位置，就行，比如：
+```shell
+cp /root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu/libharfbuzz.so.0 /usr/lib/x86_64-linux-gnu/
+```
 
 # 常见问题解决方法
 1. 解决 Fontconfig error: Cannot load default config file: No such file
@@ -390,7 +392,7 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     ```
     我们看到是 key.pem 的权限不允许导致的,  sudo adduser xrdp ssl-cert  重启系统，这个问题解决
 
-11. 如果我们运行 xsession 提示 Can't open display， 即使我们设置环境变量 export DISPLAY=:10 ，也是这个提示，引起这个问题的原因有很多，但我们首先第一步要做的是要检查 xserver 服务在不在，一般情况通常会忽略这个检查
+11. 如果我们运行 xsession 提示 Can't open display， 即使我们设置环境变量 export DISPLAY=:10 ，也是这个提示，引起这个问题的原因有很多，但我们首先第一步要做的是要检查 Xorg( xserver ) 服务在不在，一般情况通常会忽略这个检查
 
 12. Xorg（xserver） 启动时，提示错误
     ```shell
