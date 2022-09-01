@@ -308,7 +308,11 @@ systemd--
                                     |-xrdp-chansrv---{xrdp-chansrv}
 ```
 
-Xorg 就是我们通常说的 xserver, 有关整个流程的调试，我们可以用下述语句
+Xorg 就是我们通常说的 xserver, 有关整个流程的调试，我们可以用下述命令进行错误排除
+```shell
+env LD_LIBRARY_PATH="/root/test/build/test/a/usr/lib:/root/test/build/test/a/usr/local/lib:/root/test/build/test/a/usr/lib/x86_64-linux-gnu:/root/test/build/test/a/opt/libjpeg-turbo/lib64" DBUS_SESSION_BUS_ADDRESS="unix:path=/var/run/dbus/session_bus_socket" strace -f xrdp-sesman -n
+```
+
 
 
 # 常见问题解决方法
