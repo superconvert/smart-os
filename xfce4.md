@@ -308,6 +308,9 @@ systemd--
                                     |-xrdp-chansrv---{xrdp-chansrv}
 ```
 
+Xorg 就是我们通常说的 xserver, 有关整个流程的调试，我们可以用下述语句
+
+
 # 常见问题解决方法
 1. 解决 Fontconfig error: Cannot load default config file: No such file
 cp /root/test/a/usr/local/etc/* /usr/local/etc/ -rf
