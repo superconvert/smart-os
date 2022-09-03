@@ -575,14 +575,6 @@ common_build() {
   common_build xorgproto ${XORGPROTO_SRC_DIR}
   # 编译 xau
   common_build xau ${XAU_SRC_DIR}
-  # 编译 xt ( xterm )
-  common_build xt ${XT_SRC_DIR}
-  # 编译 xmu ( xterm )
-  common_build xmu ${XMU_SRC_DIR}
-  # 编译 xpm ( xterm )
-  common_build xpm ${XPM_SRC_DIR}
-  # 编译 xaw ( xterm )
-  common_build xaw ${XAW_SRC_DIR}
   # 编译 xtrans
   common_build xtrans ${XTRANS_SRC_DIR}
   # 编译 xcb-proto
@@ -649,7 +641,7 @@ common_build() {
   # 编译 pango
   meson_build pango ${PANGO_SRC_DIR}
   # 编译 dbus-1
-  common_build dbus-1 ${DBUS1_SRC_DIR}
+  common_build dbus-1 ${DBUS1_SRC_DIR} --disable-tests
   # 编译 libatk
   meson_build libatk ${LIBATK_SRC_DIR}
   # 编译 libatk-core ( 依赖: libxml )
@@ -712,6 +704,14 @@ common_build() {
   common_build xfont ${XFONT_SRC_DIR}
   # 编译 xserver
   common_build xserver ${XSERVER_SRC_DIR}
+  # 编译 xt ( xterm )
+  common_build xt ${XT_SRC_DIR}
+  # 编译 xmu ( xterm )
+  common_build xmu ${XMU_SRC_DIR}
+  # 编译 xpm ( xterm )
+  common_build xpm ${XPM_SRC_DIR}
+  # 编译 xaw ( xterm )
+  common_build xaw ${XAW_SRC_DIR}
   # 编译 ncurses 
   common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
   # 编译 xterm
