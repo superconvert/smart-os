@@ -420,3 +420,12 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     解决：
     ln -s /usr/share/X11/xkb /usr/local/share/X11/xkb  
     这样再运行 Xorg 就可以正常运行了。
+
+14. failed to load driver: swrast
+    ```shell
+    LD_LIBRARY_PATH="/root/smart-os/build/test/a/usr/lib:/root/smart-os/build/test/a/usr/local/lib:/root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu:/root/smart-os/build/test/a/opt/libjpeg-turbo/lib64" xfwm4
+    MESA-LOADER: failed to open swrast (search paths /usr/lib/x86_64-linux-gnu/dri)
+    libGL error: failed to load driver: swrast
+    ```
+    解决：  
+    apt install libgl1-mesa-dri
