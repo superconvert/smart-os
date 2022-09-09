@@ -8,6 +8,8 @@ if [ -f "/usr/bin/apt" ]; then
   apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config llvm-10 clang-10 intltool gobject-introspection -y || exit
   apt install bison flex python3-pip python3.8-dev libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev libudev-dev -y || exit
+  # 需要安装键盘数据 xkb-data, 安装主题, 显卡驱动
+  apt install libdbus-1-dev xkb-data hicolor-icon-theme libgl1-mesa-dri -y || exit
   #apt install cmake make gperf bison flex intltool libtool llvm-10 clang-10 graphviz xmlto doxygen docbook-xsl docbook-xsl-ns gobject-introspection gtk-doc-tools -y
   #apt install python3.8-dev python3.8-dbg python3-pip python-docutils -y
   #apt install libxrender-dev libsm-dev libxext-dev libxkbcommon-dev libdbus-1-dev libxtst-dev libgirepository1.0-dev -y
@@ -640,8 +642,8 @@ common_build() {
   meson_build fribidi ${FRIBIDI_SRC_DIR}
   # 编译 pango
   meson_build pango ${PANGO_SRC_DIR}
-  # 编译 dbus-1
-  common_build dbus-1 ${DBUS1_SRC_DIR} --disable-tests
+  # 编译 dbus-1( 我们的系统需要编译，如果在当前系统上运行 xfce4，需要注释掉，否则就会和系统自带的 dbus-1 冲突 )
+  # common_build dbus-1 ${DBUS1_SRC_DIR} --disable-tests
   # 编译 libatk
   meson_build libatk ${LIBATK_SRC_DIR}
   # 编译 libatk-core ( 依赖: libxml )
@@ -704,6 +706,9 @@ common_build() {
   common_build xfont ${XFONT_SRC_DIR}
   # 编译 xserver
   common_build xserver ${XSERVER_SRC_DIR}
+  # 鼠标 ( driver )
+  # 键盘 ( driver )
+  # 显卡 ( driver )
   # 编译 xt ( xterm )
   common_build xt ${XT_SRC_DIR}
   # 编译 xmu ( xterm )
@@ -713,9 +718,9 @@ common_build() {
   # 编译 xaw ( xterm )
   common_build xaw ${XAW_SRC_DIR}
   # 编译 ncurses 
-  common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
+  # common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
   # 编译 xterm
-  common_build xterm ${XTERM_SRC_DIR}"-372"
+  # common_build xterm ${XTERM_SRC_DIR}"-372"
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
