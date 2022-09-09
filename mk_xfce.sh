@@ -381,9 +381,9 @@ include_path=" \
   -I${xfce_loc_inc}/garcon-1 \
   -I${xfce_loc_inc}/garcon-gtk3-1 \
   -I${xfce_x86_64_inc} \
-  -I/usr/include/python3.8"
-  #-I/usr/include/gstreamer-1.0 \
-  #-I/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
+  -I/usr/include/python3.8 \
+  -I/usr/include/dbus-1.0 \
+  -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
 
 xfce_lib=${xfce_install}/usr/lib
 xfce_share=${xfce_install}/usr/share
