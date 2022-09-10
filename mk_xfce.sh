@@ -53,6 +53,7 @@ XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 XTERM_SRC_URL=https://invisible-island.net/datafiles/release/xterm.tar.gz
 NCURSES_SRC_URL=https://invisible-island.net/datafiles/release/ncurses.tar.gz
+MTDEV_SRC_URL=https://bitmath.org/code/mtdev/mtdev-1.1.6.tar.bz2
 
 # download from https://github.com
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
@@ -66,6 +67,7 @@ LIBEPOXY_SRC_URL=https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar
 GRAPHENE_SRC_URL=https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar.gz
 LIBPAM_SRC_URL=https://github.com/linux-pam/linux-pam/releases/download/v1.5.2/Linux-PAM-1.5.2.tar.xz
 XRDP_SRC_URL=https://github.com/neutrinolabs/xrdp/releases/download/v0.9.19/xrdp-0.9.19.tar.gz
+LIBWACOM_SRC_URL=https://github.com/linuxwacom/libwacom/releases/download/libwacom-2.4.0/libwacom-2.4.0.tar.xz
 
 # download from https://gitlab.freedesktop.org
 UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
@@ -77,6 +79,8 @@ LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
 GSTREAMER_SRC_URL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.2.tar.xz
 FONTCFG_SRC_URL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.96.tar.xz
 STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
+LIBEVDEV_SRC_URL=https://www.freedesktop.org/software/libevdev/libevdev-1.13.0.tar.xz
+LIBINPUT_SRC_URL=https://www.freedesktop.org/software/libinput/libinput-1.19.4.tar.xz
 
 # download from https://gitlab.gnome.org
 GLIB_SRC_URL=https://download.gnome.org/sources/glib/2.62/glib-2.62.0.tar.xz
@@ -130,6 +134,7 @@ XKBFILE_SRC_URL=https://www.x.org/releases/individual/lib/libxkbfile-1.1.0.tar.g
 FONTENC_SRC_URL=https://www.x.org/releases/individual/lib/libfontenc-1.1.6.tar.xz
 XFONT_SRC_URL=https://www.x.org/releases/individual/lib/libXfont2-2.0.6.tar.xz
 XSERVER_SRC_URL=https://www.x.org/releases/individual/xserver/xorg-server-21.1.4.tar.xz
+XF86INPUT_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-libinput-1.2.1.tar.xz
 
 #----------------------------
 #
@@ -223,6 +228,11 @@ XFONT_SRC_NAME=$(download_src ${XFONT_SRC_URL})
 XSERVER_SRC_NAME=$(download_src ${XSERVER_SRC_URL})
 NCURSES_SRC_NAME=$(download_src ${NCURSES_SRC_URL})
 XTERM_SRC_NAME=$(download_src ${XTERM_SRC_URL})
+MTDEV_SRC_NAME=$(download_src ${MTDEV_SRC_URL})
+LIBEVDEV_SRC_NAME=$(download_src ${LIBEVDEV_SRC_URL})
+LIBWACOM_SRC_NAME=$(download_src ${LIBWACOM_SRC_URL})
+LIBINPUT_SRC_NAME=$(download_src ${LIBINPUT_SRC_URL})
+XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
 DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL} "dbus-")
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
@@ -322,6 +332,11 @@ XKBFILE_SRC_DIR=$(unzip_src ".tar.gz" ${XKBFILE_SRC_NAME}); echo "unzip ${XKBFIL
 FONTENC_SRC_DIR=$(unzip_src ".tar.xz" ${FONTENC_SRC_NAME}); echo "unzip ${FONTENC_SRC_NAME} source code"
 XFONT_SRC_DIR=$(unzip_src ".tar.xz" ${XFONT_SRC_NAME}); echo "unzip ${XFONT_SRC_NAME} source code"
 XSERVER_SRC_DIR=$(unzip_src ".tar.xz" ${XSERVER_SRC_NAME}); echo "unzip ${XSERVER_SRC_NAME} source code"
+MTDEV_SRC_DIR=$(unzip_src ".tar.bz2" ${MTDEV_SRC_NAME}); echo "unzip ${MTDEV_SRC_NAME} source code"
+LIBWACOM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWACOM_SRC_NAME}); echo "unzip ${LIBWACOM_SRC_NAME} source code"
+LIBEVDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBEVDEV_SRC_NAME}); echo "unzip ${LIBEVDEV_SRC_NAME} source code"
+LIBINPUT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBINPUT_SRC_NAME}); echo "unzip ${LIBINPUT_SRC_NAME} source code"
+XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
 NCURSES_SRC_DIR=$(unzip_src ".tar.gz" ${NCURSES_SRC_NAME}); echo "unzip ${NCURSES_SRC_NAME} source code"
 XTERM_SRC_DIR=$(unzip_src ".tar.gz" ${XTERM_SRC_NAME}); echo "unzip ${XTERM_SRC_NAME} source code"
 XFCE_SRC_DIR=${build_dir}"/"$(file_dirname ${XFCE_SRC_NAME} .tar.bz2)
@@ -721,6 +736,17 @@ common_build() {
   # common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
   # 编译 xterm
   # common_build xterm ${XTERM_SRC_DIR}"-372"
+  # mtdev ( libinput )
+  common_build mtdev ${MTDEV_SRC_DIR}
+  # libevdev ( libinput )
+  meson_build libevdev ${LIBEVDEV_SRC_DIR} -Ddocumentation=disabled
+  # libwacom ( libinput )
+  meson_build libwacom ${LIBWACOM_SRC_DIR} -Ddocumentation=disabled -Dtests=disabled
+  # libinput ( xf86input )
+  meson_build libinput ${LIBINPUT_SRC_DIR}
+  # xf86input ( xf86-input-libinput 只是 libinput 的一个封装，能够使 libinput 用于 X 上的输入设备 )
+  # 代替其他用于 X 输入的软件包（即以 xf86-input- 为前缀的软件包 )
+  common_build xf86input ${XF86INPUT_SRC_DIR}
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
