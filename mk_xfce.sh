@@ -10,6 +10,8 @@ if [ -f "/usr/bin/apt" ]; then
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev libudev-dev -y || exit
   # 需要安装键盘数据 xkb-data, 安装主题, 显卡驱动
   apt install check libdbus-1-dev xkb-data hicolor-icon-theme libgl1-mesa-dri -y || exit
+  # dbus-launch
+  apt install dbus-x11 -y || exit
   #apt install cmake make gperf bison flex intltool libtool llvm-10 clang-10 graphviz xmlto doxygen docbook-xsl docbook-xsl-ns gobject-introspection gtk-doc-tools -y
   #apt install python3.8-dev python3.8-dbg python3-pip python-docutils -y
   #apt install libxrender-dev libsm-dev libxext-dev libxkbcommon-dev libdbus-1-dev libxtst-dev libgirepository1.0-dev -y
@@ -74,6 +76,9 @@ UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/up
 WAYLANDCORE_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland/-/archive/1.20.93/wayland-1.20.93.tar.gz
 WAYLANDPROT_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/1.25/wayland-protocols-1.25.tar.gz
 MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/mesa-mesa-20.0.0-rc3.tar.gz
+MKFONTDIR_SRC_URL=https://gitlab.freedesktop.org/xorg/app/mkfontdir/-/archive/mkfontdir-1.0.7/mkfontdir-mkfontdir-1.0.7.tar.bz2
+BDFTOPCF_SRC_URL=https://gitlab.freedesktop.org/xorg/util/bdftopcf/-/archive/bdftopcf-1.1/bdftopcf-bdftopcf-1.1.tar.gz
+MKFONTSCALE_SRC_URL=https://gitlab.freedesktop.org/xorg/app/mkfontscale/-/archive/mkfontscale-1.2.2/mkfontscale-mkfontscale-1.2.2.tar.bz2
 
 LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
 GSTREAMER_SRC_URL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.2.tar.xz
@@ -132,6 +137,8 @@ XKBCOMP_SRC_URL=https://www.x.org/releases/individual/app/xkbcomp-1.4.5.tar.gz
 LIBXCVT_SRC_URL=https://www.x.org/releases/individual/lib/libxcvt-0.1.2.tar.xz
 XKBFILE_SRC_URL=https://www.x.org/releases/individual/lib/libxkbfile-1.1.0.tar.gz
 FONTENC_SRC_URL=https://www.x.org/releases/individual/lib/libfontenc-1.1.6.tar.xz
+FONTUTIL_SRC_URL=https://www.x.org/releases/individual/font/font-util-1.3.3.tar.xz
+FONTMISC_SRC_URL=https://www.x.org/releases/individual/font/font-misc-misc-1.1.2.tar.bz2
 XFONT_SRC_URL=https://www.x.org/releases/individual/lib/libXfont2-2.0.6.tar.xz
 XSERVER_SRC_URL=https://www.x.org/releases/individual/xserver/xorg-server-21.1.4.tar.xz
 XF86INPUT_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-libinput-1.2.1.tar.xz
@@ -225,6 +232,11 @@ LIBXCVT_SRC_NAME=$(download_src ${LIBXCVT_SRC_URL})
 XKBFILE_SRC_NAME=$(download_src ${XKBFILE_SRC_URL})
 FONTENC_SRC_NAME=$(download_src ${FONTENC_SRC_URL})
 XFONT_SRC_NAME=$(download_src ${XFONT_SRC_URL})
+FONTUTIL_SRC_NAME=$(download_src ${FONTUTIL_SRC_URL})
+MKFONTDIR_SRC_NAME=$(download_src ${MKFONTDIR_SRC_URL})
+MKFONTSCALE_SRC_NAME=$(download_src ${MKFONTSCALE_SRC_URL})
+BDFTOPCF_SRC_NAME=$(download_src ${BDFTOPCF_SRC_URL})
+FONTMISC_SRC_NAME=$(download_src ${FONTMISC_SRC_URL})
 XSERVER_SRC_NAME=$(download_src ${XSERVER_SRC_URL})
 NCURSES_SRC_NAME=$(download_src ${NCURSES_SRC_URL})
 XTERM_SRC_NAME=$(download_src ${XTERM_SRC_URL})
@@ -331,6 +343,11 @@ LIBXCVT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXCVT_SRC_NAME}); echo "unzip ${LIBXCV
 XKBFILE_SRC_DIR=$(unzip_src ".tar.gz" ${XKBFILE_SRC_NAME}); echo "unzip ${XKBFILE_SRC_NAME} source code"
 FONTENC_SRC_DIR=$(unzip_src ".tar.xz" ${FONTENC_SRC_NAME}); echo "unzip ${FONTENC_SRC_NAME} source code"
 XFONT_SRC_DIR=$(unzip_src ".tar.xz" ${XFONT_SRC_NAME}); echo "unzip ${XFONT_SRC_NAME} source code"
+FONTUTIL_SRC_DIR=$(unzip_src ".tar.xz" ${FONTUTIL_SRC_NAME}); echo "unzip ${FONTUTIL_SRC_NAME} source code"
+MKFONTDIR_SRC_DIR=$(unzip_src ".tar.bz2" ${MKFONTDIR_SRC_NAME}); echo "unzip ${MKFONTDIR_SRC_NAME} source code"
+MKFONTSCALE_SRC_DIR=$(unzip_src ".tar.bz2" ${MKFONTSCALE_SRC_NAME}); echo "unzip ${MKFONTSCALE_SRC_NAME} source code"
+BDFTOPCF_SRC_DIR=$(unzip_src ".tar.gz" ${BDFTOPCF_SRC_NAME}); echo "unzip ${BDFTOPCF_SRC_NAME} source code"
+FONTMISC_SRC_DIR=$(unzip_src ".tar.bz2" ${FONTMISC_SRC_NAME}); echo "unzip ${FONTMISC_SRC_NAME} source code"
 XSERVER_SRC_DIR=$(unzip_src ".tar.xz" ${XSERVER_SRC_NAME}); echo "unzip ${XSERVER_SRC_NAME} source code"
 MTDEV_SRC_DIR=$(unzip_src ".tar.bz2" ${MTDEV_SRC_NAME}); echo "unzip ${MTDEV_SRC_NAME} source code"
 LIBWACOM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWACOM_SRC_NAME}); echo "unzip ${LIBWACOM_SRC_NAME} source code"
@@ -678,8 +695,7 @@ common_build() {
   # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
   meson_build libgudev ${LIBGUDEV_SRC_DIR}
   # 编译 upower ( xfce4-power-manager 依赖此库， 依赖: libgudev )
-  upower_flags="-DENOTSUP=95"
-  meson_build upower ${UPOWER_SRC_DIR} -Dc_args=${upower_flags}
+  meson_build upower ${UPOWER_SRC_DIR} -Dc_args="-DENOTSUP=95"
   # 编译 gstreamer
   meson_build gstreamer ${GSTREAMER_SRC_DIR} -Ddoc=disabled
   # 编译 gtk+
@@ -693,8 +709,7 @@ common_build() {
   # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
   meson_build libgudev ${LIBGUDEV_SRC_DIR}
   # 编译 upower ( xfce4-power-manager 依赖此库， 依赖: libgudev )
-  upower_flags="-DENOTSUP=95"
-  meson_build upower ${UPOWER_SRC_DIR} -Dc_args=${upower_flags}
+  meson_build upower ${UPOWER_SRC_DIR} -Dc_args="-DENOTSUP=95"
   # 编译 gettext 解决 libintl 的问题 gtk+
   #common_build gettext ${GETTEXT_SRC_DIR}
   # 编译 gstreamer
@@ -736,6 +751,18 @@ common_build() {
   # common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
   # 编译 xterm
   # common_build xterm ${XTERM_SRC_DIR}"-372"
+  # fontutil
+  common_build fontutil ${FONTUTIL_SRC_DIR}
+  # mkfontdir
+  common_build mkfontdir ${MKFONTDIR_SRC_DIR}
+  # bdftopcf
+  common_build bdftopcf ${BDFTOPCF_SRC_DIR}
+  # mkfontscale
+  common_build mkfontscale ${MKFONTSCALE_SRC_DIR}
+  # fontmisc
+  mkdir -p /usr/local/share/fonts/X11/util
+  cp ${FONTUTIL_SRC_DIR}/map-* /usr/local/share/fonts/X11/util/
+  common_build fontmisc ${FONTMISC_SRC_DIR}
   # mtdev ( libinput )
   common_build mtdev ${MTDEV_SRC_DIR}
   # libevdev ( libinput )
