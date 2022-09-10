@@ -9,7 +9,7 @@ if [ -f "/usr/bin/apt" ]; then
   apt install bison flex python3-pip python3.8-dev libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev libudev-dev -y || exit
   # 需要安装键盘数据 xkb-data, 安装主题, 显卡驱动
-  apt install libdbus-1-dev xkb-data hicolor-icon-theme libgl1-mesa-dri -y || exit
+  apt install check libdbus-1-dev xkb-data hicolor-icon-theme libgl1-mesa-dri -y || exit
   #apt install cmake make gperf bison flex intltool libtool llvm-10 clang-10 graphviz xmlto doxygen docbook-xsl docbook-xsl-ns gobject-introspection gtk-doc-tools -y
   #apt install python3.8-dev python3.8-dbg python3-pip python-docutils -y
   #apt install libxrender-dev libsm-dev libxext-dev libxkbcommon-dev libdbus-1-dev libxtst-dev libgirepository1.0-dev -y
@@ -720,7 +720,7 @@ common_build() {
   # 编译 xfont
   common_build xfont ${XFONT_SRC_DIR}
   # 编译 xserver
-  common_build xserver ${XSERVER_SRC_DIR}
+  common_build xserver ${XSERVER_SRC_DIR} --with-log-dir="/var/log"
   # 鼠标 ( driver )
   # 键盘 ( driver )
   # 显卡 ( driver )
