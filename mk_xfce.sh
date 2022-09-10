@@ -695,7 +695,7 @@ common_build() {
   # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
   meson_build libgudev ${LIBGUDEV_SRC_DIR}
   # 编译 upower ( xfce4-power-manager 依赖此库， 依赖: libgudev )
-  meson_build upower ${UPOWER_SRC_DIR} -Dc_args="-DENOTSUP=95"
+  # meson_build upower ${UPOWER_SRC_DIR} -Dc_args="-DENOTSUP=95"
   # 编译 gstreamer
   meson_build gstreamer ${GSTREAMER_SRC_DIR} -Ddoc=disabled
   # 编译 gtk+
@@ -735,7 +735,7 @@ common_build() {
   # 编译 xfont
   common_build xfont ${XFONT_SRC_DIR}
   # 编译 xserver
-  common_build xserver ${XSERVER_SRC_DIR} --with-log-dir="/var/log"
+  common_build xserver ${XSERVER_SRC_DIR} --with-log-dir="/var/log"  --with-fontrootdir="/usr/local/share/fonts/X11"
   # 鼠标 ( driver )
   # 键盘 ( driver )
   # 显卡 ( driver )
