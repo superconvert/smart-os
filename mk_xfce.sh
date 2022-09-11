@@ -5,24 +5,13 @@
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config llvm-10 clang-10 intltool gobject-introspection -y || exit
-  apt install bison flex python3-pip python3.8-dev libpython-dev gperf gtk-doc-tools xsltproc -y || exit
-  apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev libudev-dev -y || exit
-  # 需要安装键盘数据 xkb-data, 安装主题, 显卡驱动, 安装字库否则不能正常显示
-  apt install check libdbus-1-dev xkb-data hicolor-icon-theme libgl1-mesa-dri fonts-dejavu-core -y || exit
+  apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config llvm-10 clang-10 intltool -y || exit
+  apt install check bison flex python3-pip python3.8-dev libpython-dev gperf gtk-doc-tools xsltproc -y || exit
+  apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev -y || exit
+  # 需要安装, 安装主题, 显卡驱动, 安装字库否则不能正常显示
+  apt install libudev-dev libdbus-1-dev hicolor-icon-theme libgl1-mesa-dri fonts-dejavu-core -y || exit
   # dbus-launch
-  apt install dbus-x11 -y || exit
-  #apt install cmake make gperf bison flex intltool libtool llvm-10 clang-10 graphviz xmlto doxygen docbook-xsl docbook-xsl-ns gobject-introspection gtk-doc-tools -y
-  #apt install python3.8-dev python3.8-dbg python3-pip python-docutils -y
-  #apt install libxrender-dev libsm-dev libxext-dev libxkbcommon-dev libdbus-1-dev libxtst-dev libgirepository1.0-dev -y
-  # 安装 OpenGL
-  #apt-get install libgl1-mesa-dev libglu1-mesa-dev libglut-dev -y
-  # gtk+ 编译
-  #apt install libcups2-dev libxrandr-dev libxi-dev libxinerama-dev libvulkan-dev libxdamage-dev -y
-  # elf 编译
-  #apt install libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev -y
-  # xfce 编译
-  #apt install xutils-dev x11-xserver-utils libx11-xcb-dev libxxf86vm-dev libxcb-util-dev libxcb-glx0-dev libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libudev-dev libxshmfence-dev -y
+  apt install dbus-x11 gobject-introspection -y || exit
 fi
 
 if [ -f "/usr/bin/yum" ]; then
@@ -140,6 +129,8 @@ FONTENC_SRC_URL=https://www.x.org/releases/individual/lib/libfontenc-1.1.6.tar.x
 FONTUTIL_SRC_URL=https://www.x.org/releases/individual/font/font-util-1.3.3.tar.xz
 FONTMISC_SRC_URL=https://www.x.org/releases/individual/font/font-misc-misc-1.1.2.tar.bz2
 XFONT_SRC_URL=https://www.x.org/releases/individual/lib/libXfont2-2.0.6.tar.xz
+XKBDATA_SRC_URL=https://www.x.org/releases/individual/data/xkbdata-1.0.1.tar.bz2
+XKBDCFG_SRC_URL=https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.36.tar.xz
 XSERVER_SRC_URL=https://www.x.org/releases/individual/xserver/xorg-server-21.1.4.tar.xz
 XF86INPUT_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-libinput-1.2.1.tar.xz
 
@@ -240,6 +231,8 @@ FONTMISC_SRC_NAME=$(download_src ${FONTMISC_SRC_URL})
 XSERVER_SRC_NAME=$(download_src ${XSERVER_SRC_URL})
 NCURSES_SRC_NAME=$(download_src ${NCURSES_SRC_URL})
 XTERM_SRC_NAME=$(download_src ${XTERM_SRC_URL})
+XKBDATA_SRC_NAME=$(download_src ${XKBDATA_SRC_URL})
+XKBDCFG_SRC_NAME=$(download_src ${XKBDCFG_SRC_URL})
 MTDEV_SRC_NAME=$(download_src ${MTDEV_SRC_URL})
 LIBEVDEV_SRC_NAME=$(download_src ${LIBEVDEV_SRC_URL})
 LIBWACOM_SRC_NAME=$(download_src ${LIBWACOM_SRC_URL})
@@ -356,6 +349,8 @@ LIBINPUT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBINPUT_SRC_NAME}); echo "unzip ${LIBI
 XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
 NCURSES_SRC_DIR=$(unzip_src ".tar.gz" ${NCURSES_SRC_NAME}); echo "unzip ${NCURSES_SRC_NAME} source code"
 XTERM_SRC_DIR=$(unzip_src ".tar.gz" ${XTERM_SRC_NAME}); echo "unzip ${XTERM_SRC_NAME} source code"
+XKBDCFG_SRC_DIR=$(unzip_src ".tar.xz" ${XKBDCFG_SRC_NAME}); echo "unzip ${XKBDCFG_SRC_NAME} source code"
+XKBDATA_SRC_DIR=$(unzip_src ".tar.bz2" ${XKBDATA_SRC_NAME}); echo "unzip ${XKBDATA_SRC_NAME} source code"
 XFCE_SRC_DIR=${build_dir}"/"$(file_dirname ${XFCE_SRC_NAME} .tar.bz2)
 if [ ! -d "${XFCE_SRC_DIR}" ]; then
   echo "unzip ${XFCE_SRC_NAME} source code" && tar xf source/${XFCE_SRC_NAME} -C ${build_dir}
@@ -736,9 +731,6 @@ common_build() {
   common_build xfont ${XFONT_SRC_DIR}
   # 编译 xserver
   common_build xserver ${XSERVER_SRC_DIR} --with-log-dir="/var/log"  --with-fontrootdir="/usr/local/share/fonts/X11"
-  # 鼠标 ( driver )
-  # 键盘 ( driver )
-  # 显卡 ( driver )
   # 编译 xt ( xterm )
   common_build xt ${XT_SRC_DIR}
   # 编译 xmu ( xterm )
@@ -747,6 +739,10 @@ common_build() {
   common_build xpm ${XPM_SRC_DIR}
   # 编译 xaw ( xterm )
   common_build xaw ${XAW_SRC_DIR}
+  # 编译 xkbcfg ( 键盘数据 xkbdata, Xorg need it )
+  meson_build xkbcfg ${XKBDCFG_SRC_DIR}
+  # 编译 xkbdata
+  # common_build xkbdata ${XKBDATA_SRC_DIR}
   # 编译 ncurses 
   # common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
   # 编译 xterm
@@ -841,10 +837,6 @@ if [ "${with_xfce_test}" = true ]; then
   find $to_dir -type d -empty -delete
   # 拷贝编译后的 xfce4 到系统目录
   cd $to_dir && (cp ./ / -r -n) && cd ..
-
-  # 建立键盘数据目录
-  rm /usr/local/share/X11/xkb -rf
-  ln -s /usr/share/X11/xkb /usr/local/share/X11
 
   # 预装运行环境
   #apt install dbus-x11 xrdp -y
