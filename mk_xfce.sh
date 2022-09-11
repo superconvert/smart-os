@@ -839,8 +839,8 @@ if [ "${with_xfce_test}" = true ]; then
   cd $to_dir && (cp ./ / -r -n) && cd ..
 
   # 预装运行环境
-  #apt install dbus-x11 xrdp -y
-  #apt install xrdp -y
+  rm /usr/local/share/X11/xkb -rf
+  ln -s /usr/share/X11/xkb /usr/share/X11
 
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
