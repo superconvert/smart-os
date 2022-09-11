@@ -8,8 +8,8 @@ if [ -f "/usr/bin/apt" ]; then
   apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config llvm-10 clang-10 intltool gobject-introspection -y || exit
   apt install bison flex python3-pip python3.8-dev libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev libudev-dev -y || exit
-  # 需要安装键盘数据 xkb-data, 安装主题, 显卡驱动
-  apt install check libdbus-1-dev xkb-data hicolor-icon-theme libgl1-mesa-dri -y || exit
+  # 需要安装键盘数据 xkb-data, 安装主题, 显卡驱动, 安装字库否则不能正常显示
+  apt install check libdbus-1-dev xkb-data hicolor-icon-theme libgl1-mesa-dri fonts-dejavu-core -y || exit
   # dbus-launch
   apt install dbus-x11 -y || exit
   #apt install cmake make gperf bison flex intltool libtool llvm-10 clang-10 graphviz xmlto doxygen docbook-xsl docbook-xsl-ns gobject-introspection gtk-doc-tools -y
@@ -841,6 +841,10 @@ if [ "${with_xfce_test}" = true ]; then
   find $to_dir -type d -empty -delete
   # 拷贝编译后的 xfce4 到系统目录
   cd $to_dir && (cp ./ / -r -n) && cd ..
+
+  # 建立键盘数据目录
+  rm /usr/local/share/X11/xkb -rf
+  ln -s /usr/share/X11/xkb /usr/local/share/X11
 
   # 预装运行环境
   #apt install dbus-x11 xrdp -y
