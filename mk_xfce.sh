@@ -9,7 +9,7 @@ if [ -f "/usr/bin/apt" ]; then
   apt install check bison flex python3-pip libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev -y || exit
   # 需要安装, 安装主题, 显卡驱动, 安装字库否则不能正常显示
-  apt install libudev-dev libdbus-1-dev libgl1-mesa-dri fonts-dejavu-core -y || exit
+  apt install libudev-dev libdbus-1-dev fonts-dejavu-core -y || exit
   # dbus-launch
   apt install dbus-x11 gobject-introspection icon-naming-utils -y || exit
 fi
@@ -777,7 +777,7 @@ common_build() {
   meson_build libinput ${LIBINPUT_SRC_DIR}
   # xf86input ( libinput 的封装，使 libinput 用于 X 上的输入设备代替其他用于 X 输入的软件包即以 xf86-input- 为前缀的软件包 )
   common_build xf86input ${XF86INPUT_SRC_DIR}
-  # xf86videovesa ( vesa是一个支持大部分显卡的通用驱动，不提供任何 2D 和 3D 加速功能 )
+  # xf86videovesa ( vesa是一个支持大部分显卡的通用驱动，不提供任何 2D 和 3D 加速功能 也可以 apt install libgl1-mesa-dri )
   common_build xf86videovesa ${XF86VIDEOVESA_SRC_DIR}
 
   # 编译 dejavu-fonts ( 否则界面字体显示为小方块 ) 或者安装 apt install fonts-dejavu-core
