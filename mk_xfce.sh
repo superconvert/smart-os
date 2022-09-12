@@ -6,12 +6,12 @@
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
   apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config llvm-10 clang-10 intltool -y || exit
-  apt install check bison flex python3-pip python3.8-dev libpython-dev gperf gtk-doc-tools xsltproc -y || exit
+  apt install check bison flex python3-pip libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev -y || exit
   # 需要安装, 安装主题, 显卡驱动, 安装字库否则不能正常显示
   apt install libudev-dev libdbus-1-dev libgl1-mesa-dri fonts-dejavu-core -y || exit
   # dbus-launch
-  apt install dbus-x11 gobject-introspection -y || exit
+  apt install dbus-x11 gobject-introspection icon-naming-utils -y || exit
 fi
 
 if [ -f "/usr/bin/yum" ]; then
@@ -74,6 +74,7 @@ MKFONTSCALE_SRC_URL=https://gitlab.freedesktop.org/xorg/app/mkfontscale/-/archiv
 
 LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
 GSTREAMER_SRC_URL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.2.tar.xz
+HICOLORICONTHEME_SRC_URL=https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.17.tar.xz
 FONTCFG_SRC_URL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.96.tar.xz
 STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
 LIBEVDEV_SRC_URL=https://www.freedesktop.org/software/libevdev/libevdev-1.13.0.tar.xz
@@ -243,6 +244,7 @@ LIBINPUT_SRC_NAME=$(download_src ${LIBINPUT_SRC_URL})
 XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
 DEJAVUFONTS_SRC_NAME=$(download_src ${DEJAVUFONTS_SRC_URL})
 GNOMEICONTHEME_SRC_NAME=$(download_src ${GNOMEICONTHEME_SRC_URL})
+HICOLORICONTHEME_SRC_NAME=$(download_src ${HICOLORICONTHEME_SRC_URL})
 DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL} "dbus-")
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
@@ -354,6 +356,7 @@ LIBINPUT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBINPUT_SRC_NAME}); echo "unzip ${LIBI
 XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
 DEJAVUFONTS_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS_SRC_NAME}); echo "unzip ${DEJAVUFONTS_SRC_NAME} source code"
 GNOMEICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${GNOMEICONTHEME_SRC_NAME}); echo "unzip ${GNOMEICONTHEME_SRC_NAME} source code"
+HICOLORICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${HICOLORICONTHEME_SRC_NAME}); echo "unzip ${HICOLORICONTHEME_SRC_NAME} source code"
 NCURSES_SRC_DIR=$(unzip_src ".tar.gz" ${NCURSES_SRC_NAME}); echo "unzip ${NCURSES_SRC_NAME} source code"
 XTERM_SRC_DIR=$(unzip_src ".tar.gz" ${XTERM_SRC_NAME}); echo "unzip ${XTERM_SRC_NAME} source code"
 XKBDCFG_SRC_DIR=$(unzip_src ".tar.xz" ${XKBDCFG_SRC_NAME}); echo "unzip ${XKBDCFG_SRC_NAME} source code"
@@ -690,16 +693,6 @@ common_build() {
   meson_build libdrm ${LIBDRM_SRC_DIR}
   # 编译 graphene
   meson_build graphene ${GRAPHENE_SRC_DIR}
-  # 编译 mesa
-  meson_build mesa ${MESA_SRC_DIR}
-  # 编译 libepoxy
-  meson_build libepoxy ${LIBEPOXY_SRC_DIR}
-  # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
-  meson_build libgudev ${LIBGUDEV_SRC_DIR}
-  # 编译 upower ( xfce4-power-manager 依赖此库， 依赖: libgudev )
-  # meson_build upower ${UPOWER_SRC_DIR} -Dc_args="-DENOTSUP=95"
-  # 编译 gstreamer
-  meson_build gstreamer ${GSTREAMER_SRC_DIR} -Ddoc=disabled
   # 编译 gtk+
   meson_build gtk+ ${GTKX_SRC_DIR}
   # 编译 mesa
@@ -716,8 +709,6 @@ common_build() {
   #common_build gettext ${GETTEXT_SRC_DIR}
   # 编译 gstreamer
   meson_build gstreamer ${GSTREAMER_SRC_DIR}
-  # 编译 gtk+
-  meson_build gtk+ ${GTKX_SRC_DIR}
   # 编译 libwnck
   meson_build libwnck ${LIBWNCK_SRC_DIR}
   # 编译 libnotify
@@ -748,10 +739,10 @@ common_build() {
   common_build xaw ${XAW_SRC_DIR}
   # 编译 xkbcfg ( 键盘数据 xkbdata, Xorg need it ) 或者安装 apt install xkb-data
   meson_build xkbcfg ${XKBDCFG_SRC_DIR}
-  # 编译 xkbdata
-  # common_build xkbdata ${XKBDATA_SRC_DIR}
-  # 编译 icon-theme
+  # 编译 gnome-icon-theme
   common_build gnomeicontheme ${GNOMEICONTHEME_SRC_DIR}
+  # 编译 hicolor-icon-theme
+  common_build hicoloricontheme ${HICOLORICONTHEME_SRC_DIR}
   # 编译 ncurses 
   # common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
   # 编译 xterm
@@ -776,8 +767,7 @@ common_build() {
   meson_build libwacom ${LIBWACOM_SRC_DIR} -Ddocumentation=disabled -Dtests=disabled
   # libinput ( xf86input )
   meson_build libinput ${LIBINPUT_SRC_DIR}
-  # xf86input ( xf86-input-libinput 只是 libinput 的一个封装，能够使 libinput 用于 X 上的输入设备 )
-  # 代替其他用于 X 输入的软件包（即以 xf86-input- 为前缀的软件包 )
+  # xf86input ( libinput 的封装，使 libinput 用于 X 上的输入设备代替其他用于 X 输入的软件包即以 xf86-input- 为前缀的软件包 )
   common_build xf86input ${XF86INPUT_SRC_DIR}
 
   # 编译 dejavu-fonts ( 否则界面字体显示为小方块 ) 或者安装 apt install fonts-dejavu-core
@@ -882,23 +872,27 @@ if [ "${with_xfce_test}" = true ]; then
 
   # 预装运行环境
   rm /usr/local/share/X11/xkb -rf
-  ln -s /usr/share/X11/xkb /usr/share/X11
+  ln -s /usr/share/X11/xkb /usr/local/share/X11
 
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
+  libpath="${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu"
   libjpegdir=`pwd`"/a/opt/libjpeg-turbo/lib64"
-  echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu:${libjpegdir}\" xfce4-session" > ~/.xsession
+  echo "LD_LIBRARY_PATH=\"${libpath}:${libjpegdir}\" xfce4-session" > ~/.xsession
 
   # 整个流程说明
   # 0. 运行说明
-  #    需要鼠标键盘驱动 ( libinput ), 需要显卡驱动, 需要键盘数据，需要字体
-  # 1. 在虚拟机里面运行 X :10
-  # 2. 在 ssh 的终端里, 电源管理以服务的形式启动会失败，需要单独手工启动
-  #   export DISPLAY=:10 
-  #   LD_LIBRARY_PATH="/root/smart-os/build/test/a/usr/lib:/root/smart-os/build/test/a/usr/local/lib:/root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu:/root/smart-os/build/test/a/opt/libjpeg-turbo/lib64"  /usr/libexec/upowerd -v
-  # 3. 在 ssh 的终端里
-  #   export DISPLAY=:10
-  #   LD_LIBRARY_PATH="/root/smart-os/build/test/a/usr/lib:/root/smart-os/build/test/a/usr/local/lib:/root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu:/root/smart-os/build/test/a/opt/libjpeg-turbo/lib64" xfce4-session 
+  #    Xorg 需要鼠标键盘驱动 ( libinput ), 需要显卡驱动, 需要键盘数据，需要字体, 需要 hicolor & gnome theme
+  # 1. 编译源码 ./mk_xfce.sh, 编译完毕, 更新一下系统库
+  #    ldconfig
+  # 2. 在虚拟机里面运行 xserver
+  #    X :10
+  # 3. 在 ssh 的终端里, 电源管理以服务的形式启动会失败，需要单独手工启动
+  #    export DISPLAY=:10 
+  #    LD_LIBRARY_PATH="${libpath}:${libjpegdir}"  /usr/libexec/upowerd -v
+  # 4. 在 ssh 的终端里
+  #    export DISPLAY=:10
+  #    LD_LIBRARY_PATH="${libpath}:${libjpegdir}" xfce4-session 
 
 fi
 
