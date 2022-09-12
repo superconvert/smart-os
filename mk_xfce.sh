@@ -68,9 +68,6 @@ UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/up
 WAYLANDCORE_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland/-/archive/1.20.93/wayland-1.20.93.tar.gz
 WAYLANDPROT_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/1.25/wayland-protocols-1.25.tar.gz
 MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/mesa-mesa-20.0.0-rc3.tar.gz
-MKFONTDIR_SRC_URL=https://gitlab.freedesktop.org/xorg/app/mkfontdir/-/archive/mkfontdir-1.0.7/mkfontdir-mkfontdir-1.0.7.tar.bz2
-BDFTOPCF_SRC_URL=https://gitlab.freedesktop.org/xorg/util/bdftopcf/-/archive/bdftopcf-1.1/bdftopcf-bdftopcf-1.1.tar.gz
-MKFONTSCALE_SRC_URL=https://gitlab.freedesktop.org/xorg/app/mkfontscale/-/archive/mkfontscale-1.2.2/mkfontscale-mkfontscale-1.2.2.tar.bz2
 
 LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
 GSTREAMER_SRC_URL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.2.tar.xz
@@ -130,6 +127,9 @@ XORGPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xorgproto-2022.2.t
 XKBCOMP_SRC_URL=https://www.x.org/releases/individual/app/xkbcomp-1.4.5.tar.gz
 LIBXCVT_SRC_URL=https://www.x.org/releases/individual/lib/libxcvt-0.1.2.tar.xz
 XKBFILE_SRC_URL=https://www.x.org/releases/individual/lib/libxkbfile-1.1.0.tar.gz
+MKFONTDIR_SRC_URL=https://www.x.org/releases/individual/app/mkfontdir-1.0.7.tar.bz2
+BDFTOPCF_SRC_URL=https://www.x.org/releases/individual/app/bdftopcf-1.1.tar.bz2
+MKFONTSCALE_SRC_URL=https://www.x.org/releases/individual/app/mkfontscale-1.2.2.tar.xz
 FONTENC_SRC_URL=https://www.x.org/releases/individual/lib/libfontenc-1.1.6.tar.xz
 FONTUTIL_SRC_URL=https://www.x.org/releases/individual/font/font-util-1.3.3.tar.xz
 FONTMISC_SRC_URL=https://www.x.org/releases/individual/font/font-misc-misc-1.1.2.tar.bz2
@@ -138,6 +138,7 @@ XKBDATA_SRC_URL=https://www.x.org/releases/individual/data/xkbdata-1.0.1.tar.bz2
 XKBDCFG_SRC_URL=https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.36.tar.xz
 XSERVER_SRC_URL=https://www.x.org/releases/individual/xserver/xorg-server-21.1.4.tar.xz
 XF86INPUT_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-libinput-1.2.1.tar.xz
+XF86VIDEOVESA_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-vesa-2.5.0.tar.bz2
 
 #----------------------------
 #
@@ -243,6 +244,7 @@ LIBEVDEV_SRC_NAME=$(download_src ${LIBEVDEV_SRC_URL})
 LIBWACOM_SRC_NAME=$(download_src ${LIBWACOM_SRC_URL})
 LIBINPUT_SRC_NAME=$(download_src ${LIBINPUT_SRC_URL})
 XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
+XF86VIDEOVESA_SRC_NAME=$(download_src ${XF86VIDEOVESA_SRC_URL})
 DEJAVUFONTS_SRC_NAME=$(download_src ${DEJAVUFONTS_SRC_URL})
 GNOMEICONTHEME_SRC_NAME=$(download_src ${GNOMEICONTHEME_SRC_URL})
 HICOLORICONTHEME_SRC_NAME=$(download_src ${HICOLORICONTHEME_SRC_URL})
@@ -347,8 +349,8 @@ FONTENC_SRC_DIR=$(unzip_src ".tar.xz" ${FONTENC_SRC_NAME}); echo "unzip ${FONTEN
 XFONT_SRC_DIR=$(unzip_src ".tar.xz" ${XFONT_SRC_NAME}); echo "unzip ${XFONT_SRC_NAME} source code"
 FONTUTIL_SRC_DIR=$(unzip_src ".tar.xz" ${FONTUTIL_SRC_NAME}); echo "unzip ${FONTUTIL_SRC_NAME} source code"
 MKFONTDIR_SRC_DIR=$(unzip_src ".tar.bz2" ${MKFONTDIR_SRC_NAME}); echo "unzip ${MKFONTDIR_SRC_NAME} source code"
-MKFONTSCALE_SRC_DIR=$(unzip_src ".tar.bz2" ${MKFONTSCALE_SRC_NAME}); echo "unzip ${MKFONTSCALE_SRC_NAME} source code"
-BDFTOPCF_SRC_DIR=$(unzip_src ".tar.gz" ${BDFTOPCF_SRC_NAME}); echo "unzip ${BDFTOPCF_SRC_NAME} source code"
+MKFONTSCALE_SRC_DIR=$(unzip_src ".tar.xz" ${MKFONTSCALE_SRC_NAME}); echo "unzip ${MKFONTSCALE_SRC_NAME} source code"
+BDFTOPCF_SRC_DIR=$(unzip_src ".tar.bz2" ${BDFTOPCF_SRC_NAME}); echo "unzip ${BDFTOPCF_SRC_NAME} source code"
 FONTMISC_SRC_DIR=$(unzip_src ".tar.bz2" ${FONTMISC_SRC_NAME}); echo "unzip ${FONTMISC_SRC_NAME} source code"
 XSERVER_SRC_DIR=$(unzip_src ".tar.xz" ${XSERVER_SRC_NAME}); echo "unzip ${XSERVER_SRC_NAME} source code"
 MTDEV_SRC_DIR=$(unzip_src ".tar.bz2" ${MTDEV_SRC_NAME}); echo "unzip ${MTDEV_SRC_NAME} source code"
@@ -356,10 +358,11 @@ LIBWACOM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWACOM_SRC_NAME}); echo "unzip ${LIBW
 LIBEVDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBEVDEV_SRC_NAME}); echo "unzip ${LIBEVDEV_SRC_NAME} source code"
 LIBINPUT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBINPUT_SRC_NAME}); echo "unzip ${LIBINPUT_SRC_NAME} source code"
 XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
+XF86VIDEOVESA_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOVESA_SRC_NAME}); echo "unzip ${XF86VIDEOVESA_SRC_NAME} source code"
 DEJAVUFONTS_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS_SRC_NAME}); echo "unzip ${DEJAVUFONTS_SRC_NAME} source code"
 GNOMEICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${GNOMEICONTHEME_SRC_NAME}); echo "unzip ${GNOMEICONTHEME_SRC_NAME} source code"
 HICOLORICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${HICOLORICONTHEME_SRC_NAME}); echo "unzip ${HICOLORICONTHEME_SRC_NAME} source code"
-ICONNAMINGUTILS_SRC_DIR=$(unzip_src ".tar.xz" ${ICONNAMINGUTILS_SRC_NAME}); echo "unzip ${ICONNAMINGUTILS_SRC_NAME} source code"
+ICONNAMINGUTILS_SRC_DIR=$(unzip_src ".tar.bz2" ${ICONNAMINGUTILS_SRC_NAME}); echo "unzip ${ICONNAMINGUTILS_SRC_NAME} source code"
 NCURSES_SRC_DIR=$(unzip_src ".tar.gz" ${NCURSES_SRC_NAME}); echo "unzip ${NCURSES_SRC_NAME} source code"
 XTERM_SRC_DIR=$(unzip_src ".tar.gz" ${XTERM_SRC_NAME}); echo "unzip ${XTERM_SRC_NAME} source code"
 XKBDCFG_SRC_DIR=$(unzip_src ".tar.xz" ${XKBDCFG_SRC_NAME}); echo "unzip ${XKBDCFG_SRC_NAME} source code"
@@ -742,6 +745,8 @@ common_build() {
   common_build xaw ${XAW_SRC_DIR}
   # 编译 xkbcfg ( 键盘数据 xkbdata, Xorg need it ) 或者安装 apt install xkb-data
   meson_build xkbcfg ${XKBDCFG_SRC_DIR}
+  # 编译 icon-naming-util
+  # common_build iconnamingutil ${ICONNAMINGUTIL_SRC_DIR}
   # 编译 gnome-icon-theme
   common_build gnomeicontheme ${GNOMEICONTHEME_SRC_DIR}
   # 编译 hicolor-icon-theme
@@ -772,6 +777,8 @@ common_build() {
   meson_build libinput ${LIBINPUT_SRC_DIR}
   # xf86input ( libinput 的封装，使 libinput 用于 X 上的输入设备代替其他用于 X 输入的软件包即以 xf86-input- 为前缀的软件包 )
   common_build xf86input ${XF86INPUT_SRC_DIR}
+  # xf86videovesa ( vesa是一个支持大部分显卡的通用驱动，不提供任何 2D 和 3D 加速功能 )
+  common_build xf86videovesa ${XF86VIDEOVESA_SRC_DIR}
 
   # 编译 dejavu-fonts ( 否则界面字体显示为小方块 ) 或者安装 apt install fonts-dejavu-core
   # meson_build dejavu-fonts ${DEJAVUFONTS_SRC_DIR}
