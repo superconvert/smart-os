@@ -879,15 +879,21 @@ if [ "${with_xfce_test}" = true ]; then
   rm /usr/local/share/X11/xkb -rf
   ln -s /usr/share/X11/xkb /usr/share/X11
 
-  # 电源管理以服务的形式启动会失败，需要单独手工启动
-  # LD_LIBRARY_PATH="/root/smart-os/build/test/a/usr/lib:/root/smart-os/build/test/a/usr/local/lib:/root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu:/root/smart-os/build/test/a/opt/libjpeg-turbo/lib64"  /usr/libexec/upowerd -v
-
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
   libjpegdir=`pwd`"/a/opt/libjpeg-turbo/lib64"
   echo "LD_LIBRARY_PATH=\"${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu:${libjpegdir}\" xfce4-session" > ~/.xsession
 
-  # 重启系统，然后可以利用 windows 下 remote desktop 体验最新版本的 xfce4 了, 最新版本的 xfce4 还是很漂亮的
+  # 整个流程说明
+  # 0. 运行说明
+  #    需要鼠标键盘驱动 ( libinput ), 需要显卡驱动, 需要键盘数据，需要字体
+  # 1. 在虚拟机里面运行 X :10
+  # 2. 在 ssh 的终端里, 电源管理以服务的形式启动会失败，需要单独手工启动
+  #   export DISPLAY=:10 
+  #   LD_LIBRARY_PATH="/root/smart-os/build/test/a/usr/lib:/root/smart-os/build/test/a/usr/local/lib:/root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu:/root/smart-os/build/test/a/opt/libjpeg-turbo/lib64"  /usr/libexec/upowerd -v
+  # 3. 在 ssh 的终端里
+  #   export DISPLAY=:10
+  #   LD_LIBRARY_PATH="/root/smart-os/build/test/a/usr/lib:/root/smart-os/build/test/a/usr/local/lib:/root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu:/root/smart-os/build/test/a/opt/libjpeg-turbo/lib64" xfce4-session 
 
 fi
 
