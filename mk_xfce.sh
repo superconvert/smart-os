@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # set +e
-# 所有的编译基于 Ubuntu 18.04.6 LTS 编译通过, 其它系统请自行调整脚本
+# 所有的编译基于 Ubuntu 18.04.6 Server LTS 编译通过, 纯净的系统，其它系统请自行调整脚本
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
@@ -40,6 +40,7 @@ LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/li
 ZLIB_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.xz
 FREETYPE_SRC_URL=https://nchc.dl.sourceforge.net/project/freetype/freetype2/2.12.0/freetype-2.12.0.tar.xz
 LIBJPEGTURBO_SRC_URL=https://sourceforge.net/projects/libjpeg-turbo/files/2.1.0/libjpeg-turbo-2.1.0.tar.gz
+
 XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 XTERM_SRC_URL=https://invisible-island.net/datafiles/release/xterm.tar.gz
@@ -59,6 +60,7 @@ GRAPHENE_SRC_URL=https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar
 LIBPAM_SRC_URL=https://github.com/linux-pam/linux-pam/releases/download/v1.5.2/Linux-PAM-1.5.2.tar.xz
 XRDP_SRC_URL=https://github.com/neutrinolabs/xrdp/releases/download/v0.9.19/xrdp-0.9.19.tar.gz
 LIBWACOM_SRC_URL=https://github.com/linuxwacom/libwacom/releases/download/libwacom-2.4.0/libwacom-2.4.0.tar.xz
+DEJAVUFONTS_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.tar.bz2
 
 # download from https://gitlab.freedesktop.org
 UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
@@ -238,6 +240,7 @@ LIBEVDEV_SRC_NAME=$(download_src ${LIBEVDEV_SRC_URL})
 LIBWACOM_SRC_NAME=$(download_src ${LIBWACOM_SRC_URL})
 LIBINPUT_SRC_NAME=$(download_src ${LIBINPUT_SRC_URL})
 XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
+DEJAVUFONTS_SRC_NAME=$(download_src ${DEJAVUFONTS_SRC_URL})
 DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL} "dbus-")
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
@@ -347,6 +350,7 @@ LIBWACOM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWACOM_SRC_NAME}); echo "unzip ${LIBW
 LIBEVDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBEVDEV_SRC_NAME}); echo "unzip ${LIBEVDEV_SRC_NAME} source code"
 LIBINPUT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBINPUT_SRC_NAME}); echo "unzip ${LIBINPUT_SRC_NAME} source code"
 XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
+DEJAVUFONTS_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS_SRC_NAME}); echo "unzip ${DEJAVUFONTS_SRC_NAME} source code"
 NCURSES_SRC_DIR=$(unzip_src ".tar.gz" ${NCURSES_SRC_NAME}); echo "unzip ${NCURSES_SRC_NAME} source code"
 XTERM_SRC_DIR=$(unzip_src ".tar.gz" ${XTERM_SRC_NAME}); echo "unzip ${XTERM_SRC_NAME} source code"
 XKBDCFG_SRC_DIR=$(unzip_src ".tar.xz" ${XKBDCFG_SRC_NAME}); echo "unzip ${XKBDCFG_SRC_NAME} source code"
@@ -739,7 +743,7 @@ common_build() {
   common_build xpm ${XPM_SRC_DIR}
   # 编译 xaw ( xterm )
   common_build xaw ${XAW_SRC_DIR}
-  # 编译 xkbcfg ( 键盘数据 xkbdata, Xorg need it )
+  # 编译 xkbcfg ( 键盘数据 xkbdata, Xorg need it ) 或者安装 apt install xkb-data
   meson_build xkbcfg ${XKBDCFG_SRC_DIR}
   # 编译 xkbdata
   # common_build xkbdata ${XKBDATA_SRC_DIR}
@@ -770,6 +774,39 @@ common_build() {
   # xf86input ( xf86-input-libinput 只是 libinput 的一个封装，能够使 libinput 用于 X 上的输入设备 )
   # 代替其他用于 X 输入的软件包（即以 xf86-input- 为前缀的软件包 )
   common_build xf86input ${XF86INPUT_SRC_DIR}
+
+  # 编译 dejavu-fonts ( 否则界面字体显示为小方块 ) 或者安装 apt install fonts-dejavu-core
+  # meson_build dejavu-fonts ${DEJAVUFONTS_SRC_DIR}
+  # /etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-sans-mono.conf
+  # /etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-sans.conf
+  # /etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-serif.conf
+  # /etc/fonts/conf.avail/20-unhint-small-dejavu-sans-mono.conf
+  # /etc/fonts/conf.avail/20-unhint-small-dejavu-sans.conf
+  # /etc/fonts/conf.avail/20-unhint-small-dejavu-serif.conf
+  # /etc/fonts/conf.avail/57-dejavu-sans-mono.conf
+  # /etc/fonts/conf.avail/57-dejavu-sans.conf
+  # /etc/fonts/conf.avail/57-dejavu-serif.conf
+  # /etc/fonts/conf.avail/58-dejavu-lgc-sans-mono.conf
+  # /etc/fonts/conf.avail/58-dejavu-lgc-sans.conf
+  # /etc/fonts/conf.avail/58-dejavu-lgc-serif.conf
+  # /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans-mono.conf
+  # /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans.conf
+  # /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-serif.conf
+  # /etc/fonts/conf.d/20-unhint-small-dejavu-sans-mono.conf
+  # /etc/fonts/conf.d/20-unhint-small-dejavu-sans.conf
+  # /etc/fonts/conf.d/20-unhint-small-dejavu-serif.conf
+  # /etc/fonts/conf.d/57-dejavu-sans-mono.conf
+  # /etc/fonts/conf.d/57-dejavu-sans.conf
+  # /etc/fonts/conf.d/57-dejavu-serif.conf
+  # /etc/fonts/conf.d/58-dejavu-lgc-sans-mono.conf
+  # /etc/fonts/conf.d/58-dejavu-lgc-sans.conf
+  # /etc/fonts/conf.d/58-dejavu-lgc-serif.conf
+  # /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
+  # /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+  # /usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf
+  # /usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf
+  # /usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf
+  # /usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
@@ -841,6 +878,9 @@ if [ "${with_xfce_test}" = true ]; then
   # 预装运行环境
   rm /usr/local/share/X11/xkb -rf
   ln -s /usr/share/X11/xkb /usr/share/X11
+
+  # 电源管理以服务的形式启动会失败，需要单独手工启动
+  # LD_LIBRARY_PATH="/root/smart-os/build/test/a/usr/lib:/root/smart-os/build/test/a/usr/local/lib:/root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu:/root/smart-os/build/test/a/opt/libjpeg-turbo/lib64"  /usr/libexec/upowerd -v
 
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
