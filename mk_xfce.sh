@@ -9,7 +9,7 @@ if [ -f "/usr/bin/apt" ]; then
   apt install check bison flex python3-pip python3.8-dev libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev -y || exit
   # 需要安装, 安装主题, 显卡驱动, 安装字库否则不能正常显示
-  apt install libudev-dev libdbus-1-dev hicolor-icon-theme libgl1-mesa-dri fonts-dejavu-core -y || exit
+  apt install libudev-dev libdbus-1-dev libgl1-mesa-dri fonts-dejavu-core -y || exit
   # dbus-launch
   apt install dbus-x11 gobject-introspection -y || exit
 fi
@@ -40,6 +40,7 @@ LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/li
 ZLIB_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.xz
 FREETYPE_SRC_URL=https://nchc.dl.sourceforge.net/project/freetype/freetype2/2.12.0/freetype-2.12.0.tar.xz
 LIBJPEGTURBO_SRC_URL=https://sourceforge.net/projects/libjpeg-turbo/files/2.1.0/libjpeg-turbo-2.1.0.tar.gz
+GNOMEICONTHEME_SRC_URL=https://download.gnome.org/sources/gnome-icon-theme/3.12/gnome-icon-theme-3.12.0.tar.xz
 
 XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
@@ -241,6 +242,7 @@ LIBWACOM_SRC_NAME=$(download_src ${LIBWACOM_SRC_URL})
 LIBINPUT_SRC_NAME=$(download_src ${LIBINPUT_SRC_URL})
 XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
 DEJAVUFONTS_SRC_NAME=$(download_src ${DEJAVUFONTS_SRC_URL})
+GNOMEICONTHEME_SRC_NAME=$(download_src ${GNOMEICONTHEME_SRC_URL})
 DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL} "dbus-")
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
@@ -351,6 +353,7 @@ LIBEVDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBEVDEV_SRC_NAME}); echo "unzip ${LIBE
 LIBINPUT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBINPUT_SRC_NAME}); echo "unzip ${LIBINPUT_SRC_NAME} source code"
 XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
 DEJAVUFONTS_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS_SRC_NAME}); echo "unzip ${DEJAVUFONTS_SRC_NAME} source code"
+GNOMEICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${GNOMEICONTHEME_SRC_NAME}); echo "unzip ${GNOMEICONTHEME_SRC_NAME} source code"
 NCURSES_SRC_DIR=$(unzip_src ".tar.gz" ${NCURSES_SRC_NAME}); echo "unzip ${NCURSES_SRC_NAME} source code"
 XTERM_SRC_DIR=$(unzip_src ".tar.gz" ${XTERM_SRC_NAME}); echo "unzip ${XTERM_SRC_NAME} source code"
 XKBDCFG_SRC_DIR=$(unzip_src ".tar.xz" ${XKBDCFG_SRC_NAME}); echo "unzip ${XKBDCFG_SRC_NAME} source code"
@@ -747,6 +750,8 @@ common_build() {
   meson_build xkbcfg ${XKBDCFG_SRC_DIR}
   # 编译 xkbdata
   # common_build xkbdata ${XKBDATA_SRC_DIR}
+  # 编译 icon-theme
+  common_build gnomeicontheme ${GNOMEICONTHEME_SRC_DIR}
   # 编译 ncurses 
   # common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
   # 编译 xterm
