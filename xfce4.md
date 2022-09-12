@@ -429,3 +429,15 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     ```
     解决：  
     apt install libgl1-mesa-dri
+    
+15. 我们的 upower.service 运行依赖我们编译的 glib 库，系统自带的 glib 版本有点低，我们为 systemd 的服务单元增加环境变量，才能让 unit 正确运行  
+    因此我们需要编辑 vi /lib/systemd/system/upower.service
+    ```shell
+    [Service]
+    Type=dbus
+    BusName=org.freedesktop.UPower
+    ExecStart=/usr/libexec/upowerd
+    Restart=on-failure
+    Environment="LD_LIBRARY_PATH=/root/smart-os/build/test/a/usr/lib:/root/smart-os/build/test/a/usr/local/lib:/root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu:/root/smart-os/build/test/a/opt/libjpeg-turbo/lib64"
+    ```
+    
