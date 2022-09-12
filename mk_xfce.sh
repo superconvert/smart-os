@@ -74,6 +74,7 @@ MKFONTSCALE_SRC_URL=https://gitlab.freedesktop.org/xorg/app/mkfontscale/-/archiv
 
 LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
 GSTREAMER_SRC_URL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.2.tar.xz
+ICONNAMINGUTILS_SRC_URL=http://tango.freedesktop.org/releases/icon-naming-utils-0.8.90.tar.bz2
 HICOLORICONTHEME_SRC_URL=https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.17.tar.xz
 FONTCFG_SRC_URL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.96.tar.xz
 STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
@@ -245,6 +246,7 @@ XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
 DEJAVUFONTS_SRC_NAME=$(download_src ${DEJAVUFONTS_SRC_URL})
 GNOMEICONTHEME_SRC_NAME=$(download_src ${GNOMEICONTHEME_SRC_URL})
 HICOLORICONTHEME_SRC_NAME=$(download_src ${HICOLORICONTHEME_SRC_URL})
+ICONNAMINGUTILS_SRC_NAME=$(download_src ${ICONNAMINGUTILS_SRC_URL})
 DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL} "dbus-")
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
@@ -357,6 +359,7 @@ XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF
 DEJAVUFONTS_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS_SRC_NAME}); echo "unzip ${DEJAVUFONTS_SRC_NAME} source code"
 GNOMEICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${GNOMEICONTHEME_SRC_NAME}); echo "unzip ${GNOMEICONTHEME_SRC_NAME} source code"
 HICOLORICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${HICOLORICONTHEME_SRC_NAME}); echo "unzip ${HICOLORICONTHEME_SRC_NAME} source code"
+ICONNAMINGUTILS_SRC_DIR=$(unzip_src ".tar.xz" ${ICONNAMINGUTILS_SRC_NAME}); echo "unzip ${ICONNAMINGUTILS_SRC_NAME} source code"
 NCURSES_SRC_DIR=$(unzip_src ".tar.gz" ${NCURSES_SRC_NAME}); echo "unzip ${NCURSES_SRC_NAME} source code"
 XTERM_SRC_DIR=$(unzip_src ".tar.gz" ${XTERM_SRC_NAME}); echo "unzip ${XTERM_SRC_NAME} source code"
 XKBDCFG_SRC_DIR=$(unzip_src ".tar.xz" ${XKBDCFG_SRC_NAME}); echo "unzip ${XKBDCFG_SRC_NAME} source code"
@@ -570,7 +573,7 @@ common_build() {
   # 编译 libxml
   common_build libxml ${LIBXML_SRC_DIR}
   # 编译 util-linux ( libmount )
-  common_build libmnt ${LIBMNT_SRC_DIR}
+  common_build libmnt ${LIBMNT_SRC_DIR} --without-python
   # 编译 zlib
   common_build zlib ${ZLIB_SRC_DIR}
   # 编译 libzip
@@ -693,12 +696,12 @@ common_build() {
   meson_build libdrm ${LIBDRM_SRC_DIR}
   # 编译 graphene
   meson_build graphene ${GRAPHENE_SRC_DIR}
-  # 编译 gtk+
-  meson_build gtk+ ${GTKX_SRC_DIR}
   # 编译 mesa
   meson_build mesa ${MESA_SRC_DIR}
   # 编译 libepoxy
   meson_build libepoxy ${LIBEPOXY_SRC_DIR}
+  # 编译 gtk+
+  meson_build gtk+ ${GTKX_SRC_DIR}
   # 编译 libstartup-notification0 ( 很多 xfce4 应用依赖此库, 依赖: libxcb-util-dev )
   # common_build startupnoti ${STARTUPNOTI_SRC_DIR}
   # 编译 libgudev ( upower 依赖此库, 依赖: apt install libudev-dev )
