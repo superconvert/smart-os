@@ -9,9 +9,7 @@ if [ -f "/usr/bin/apt" ]; then
   apt install check bison flex python3-pip libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev -y || exit
   # 需要安装, 安装主题, 显卡驱动, 安装字库否则不能正常显示
-  apt install libudev-dev libdbus-1-dev fonts-dejavu-core -y || exit
-  # dbus-launch
-  apt install dbus-x11 gobject-introspection icon-naming-utils -y || exit
+  apt install libudev-dev libdbus-1-dev dbus-x11 gobject-introspection icon-naming-utils -y || exit
 fi
 
 if [ -f "/usr/bin/yum" ]; then
@@ -36,17 +34,18 @@ LIBZIP_SRC_URL=https://libzip.org/download/libzip-1.9.2.tar.xz
 LIBELF_SRC_URL=https://sourceware.org/elfutils/ftp/0.186/elfutils-0.186.tar.bz2
 CAIRO_SRC_URL=https://www.cairographics.org/releases/cairo-1.16.0.tar.xz
 PIXMAN_SRC_URL=https://www.cairographics.org/releases/pixman-0.40.0.tar.gz
-LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
 ZLIB_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.xz
+LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
 FREETYPE_SRC_URL=https://nchc.dl.sourceforge.net/project/freetype/freetype2/2.12.0/freetype-2.12.0.tar.xz
+DEJAVUFONTS1_SRC_URL=https://nchc.dl.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2
+DEJAVUFONTS2_SRC_URL=https://nchc.dl.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-lgc-fonts-ttf-2.37.tar.bz2
 LIBJPEGTURBO_SRC_URL=https://sourceforge.net/projects/libjpeg-turbo/files/2.1.0/libjpeg-turbo-2.1.0.tar.gz
-GNOMEICONTHEME_SRC_URL=https://download.gnome.org/sources/gnome-icon-theme/3.12/gnome-icon-theme-3.12.0.tar.xz
 
+MTDEV_SRC_URL=https://bitmath.org/code/mtdev/mtdev-1.1.6.tar.bz2
 XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 XTERM_SRC_URL=https://invisible-island.net/datafiles/release/xterm.tar.gz
 NCURSES_SRC_URL=https://invisible-island.net/datafiles/release/ncurses.tar.gz
-MTDEV_SRC_URL=https://bitmath.org/code/mtdev/mtdev-1.1.6.tar.bz2
 
 # download from https://github.com
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
@@ -55,13 +54,9 @@ LIBDATRIE_SRC_URL=https://github.com/tlwg/libdatrie/releases/download/v0.2.13/li
 LIBPCRE2_SRC_URL=https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz
 HARFBUZZ_SRC_URL=https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz
 FRIBIDI_SRC_URL=https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz
-DBUS1_SRC_URL=https://github.com/freedesktop/dbus/archive/refs/tags/dbus-1.12.22.tar.gz
-LIBEPOXY_SRC_URL=https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar.gz
-GRAPHENE_SRC_URL=https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar.gz
 LIBPAM_SRC_URL=https://github.com/linux-pam/linux-pam/releases/download/v1.5.2/Linux-PAM-1.5.2.tar.xz
 XRDP_SRC_URL=https://github.com/neutrinolabs/xrdp/releases/download/v0.9.19/xrdp-0.9.19.tar.gz
 LIBWACOM_SRC_URL=https://github.com/linuxwacom/libwacom/releases/download/libwacom-2.4.0/libwacom-2.4.0.tar.xz
-DEJAVUFONTS_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.tar.bz2
 
 # download from https://gitlab.freedesktop.org
 UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
@@ -70,70 +65,73 @@ WAYLANDPROT_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland-protocols/-/a
 MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/mesa-mesa-20.0.0-rc3.tar.gz
 
 LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
+DBUS1_SRC_URL=https://dbus.freedesktop.org/releases/dbus/dbus-1.12.12.tar.gz
 GSTREAMER_SRC_URL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.2.tar.xz
 ICONNAMINGUTILS_SRC_URL=http://tango.freedesktop.org/releases/icon-naming-utils-0.8.90.tar.bz2
 HICOLORICONTHEME_SRC_URL=https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.17.tar.xz
-FONTCFG_SRC_URL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.96.tar.xz
-STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
 LIBEVDEV_SRC_URL=https://www.freedesktop.org/software/libevdev/libevdev-1.13.0.tar.xz
 LIBINPUT_SRC_URL=https://www.freedesktop.org/software/libinput/libinput-1.19.4.tar.xz
+FONTCFG_SRC_URL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.96.tar.xz
+STARTUPNOTI_SRC_URL=http://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
 
-# download from https://gitlab.gnome.org
+# download from https://download.gnome.org
 GLIB_SRC_URL=https://download.gnome.org/sources/glib/2.62/glib-2.62.0.tar.xz
+LIBATK_SRC_URL=https://download.gnome.org/sources/atk/2.38/atk-2.38.0.tar.xz
 PANGO_SRC_URL=https://download.gnome.org/sources/pango/1.48/pango-1.48.9.tar.xz
 GTKX_SRC_URL=https://download.gnome.org/sources/gtk%2B/3.24/gtk%2B-3.24.9.tar.xz
 LIBXML_SRC_URL=https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.8.tar.xz
+LIBGUDEV_SRC_URL=https://download.gnome.org/sources/libgudev/236/libgudev-236.tar.xz
 LIBWNCK_SRC_URL=https://download.gnome.org/sources/libwnck/3.36/libwnck-3.36.0.tar.xz
+LIBEPOXY_SRC_URL=https://download.gnome.org/sources/libepoxy/1.5/libepoxy-1.5.10.tar.xz
+GRAPHENE_SRC_URL=https://download.gnome.org/sources/graphene/1.10/graphene-1.10.8.tar.xz
 LIBNOTIFY_SRC_URL=https://download.gnome.org/sources/libnotify/0.8/libnotify-0.8.0.tar.xz
+GDKPIXBUF_SRC_URL=https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-2.42.9.tar.xz
 LIBATK_CORE_SRC_URL=https://download.gnome.org/sources/at-spi2-core/2.38/at-spi2-core-2.38.0.tar.xz
 LIBATK_BRIDGE_SRC_URL=https://download.gnome.org/sources/at-spi2-atk/2.38/at-spi2-atk-2.38.0.tar.xz
-
-LIBATK_SRC_URL=https://gitlab.gnome.org/GNOME/atk/-/archive/2.38.0/atk-2.38.0.tar.gz
-LIBGUDEV_SRC_URL=https://gitlab.gnome.org/GNOME/libgudev/-/archive/236/libgudev-236.tar.gz
-GDKPIXBUF_SRC_URL=https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/2.42.8/gdk-pixbuf-2.42.8.tar.gz
-GOBJINTROSPE_SRC_URL=https://github.com/GNOME/gobject-introspection/archive/refs/tags/1.72.0.tar.gz
+GNOMEICONTHEME_SRC_URL=https://download.gnome.org/sources/gnome-icon-theme/3.12/gnome-icon-theme-3.12.0.tar.xz
+GOBJINTROSPE_SRC_URL=https://download.gnome.org/sources/gobject-introspection/1.72/gobject-introspection-1.72.0.tar.xz
 
 # download from https://www.x.org/releases/individual
 XI_SRC_URL=https://www.x.org/releases/individual/lib/libXi-1.8.tar.gz
-XTST_SRC_URL=https://www.x.org/releases/individual/lib/libXtst-1.2.3.tar.gz
-LIBSM_SRC_URL=https://www.x.org/releases/individual/lib/libSM-1.2.3.tar.gz
-LIBICE_SRC_URL=https://www.x.org/releases/individual/lib/libICE-1.0.10.tar.gz
-LIBX11_SRC_URL=https://www.x.org/releases/individual/lib/libX11-1.8.tar.gz
-LIBXCB_SRC_URL=https://www.x.org/releases/individual/lib/libxcb-1.15.tar.xz
 XT_SRC_URL=https://www.x.org/releases/individual/lib/libXt-1.2.1.tar.gz
+XMU_SRC_URL=https://www.x.org/releases/individual/lib/libXmu-1.1.3.tar.gz
+LIBSM_SRC_URL=https://www.x.org/releases/individual/lib/libSM-1.2.3.tar.gz
 XAU_SRC_URL=https://www.x.org/releases/individual/lib/libXau-1.0.10.tar.xz
 XAW_SRC_URL=https://www.x.org/releases/individual/lib/libXaw-1.0.14.tar.gz
-XMU_SRC_URL=https://www.x.org/releases/individual/lib/libXmu-1.1.3.tar.gz
 XPM_SRC_URL=https://www.x.org/releases/individual/lib/libXpm-3.5.13.tar.gz
+LIBX11_SRC_URL=https://www.x.org/releases/individual/lib/libX11-1.8.tar.gz
 XEXT_SRC_URL=https://www.x.org/releases/individual/lib/libXext-1.3.4.tar.gz
-XDMCP_SRC_URL=https://www.x.org/releases/individual/lib/libXdmcp-1.1.3.tar.gz
-XINERAMA_SRC_URL=https://www.x.org/releases/individual/lib/libXinerama-1.1.4.tar.gz
-XFIXES_SRC_URL=https://www.x.org/releases/individual/lib/libXfixes-6.0.0.tar.gz
+LIBXCB_SRC_URL=https://www.x.org/releases/individual/lib/libxcb-1.15.tar.xz
+XTST_SRC_URL=https://www.x.org/releases/individual/lib/libXtst-1.2.3.tar.gz
 XTRANS_SRC_URL=https://www.x.org/releases/individual/lib/xtrans-1.4.0.tar.gz
+LIBICE_SRC_URL=https://www.x.org/releases/individual/lib/libICE-1.0.10.tar.gz
+XDMCP_SRC_URL=https://www.x.org/releases/individual/lib/libXdmcp-1.1.3.tar.gz
+XFONT_SRC_URL=https://www.x.org/releases/individual/lib/libXfont2-2.0.6.tar.xz
+LIBXCVT_SRC_URL=https://www.x.org/releases/individual/lib/libxcvt-0.1.2.tar.xz
 XRANDR_SRC_URL=https://www.x.org/releases/individual/lib/libXrandr-1.5.2.tar.gz
-XRENDER_SRC_URL=https://www.x.org/releases/individual/lib/libXrender-0.9.10.tar.gz
+XFIXES_SRC_URL=https://www.x.org/releases/individual/lib/libXfixes-6.0.0.tar.gz
+XKBFILE_SRC_URL=https://www.x.org/releases/individual/lib/libxkbfile-1.1.0.tar.gz
+FONTENC_SRC_URL=https://www.x.org/releases/individual/lib/libfontenc-1.1.6.tar.xz
 XDAMAGE_SRC_URL=https://www.x.org/releases/individual/lib/libXdamage-1.1.5.tar.gz
 XXF86VM_SRC_URL=https://www.x.org/releases/individual/lib/libXxf86vm-1.1.4.tar.gz
+XRENDER_SRC_URL=https://www.x.org/releases/individual/lib/libXrender-0.9.10.tar.gz
 XSHMFENCE_SRC_URL=https://www.x.org/releases/individual/lib/libxshmfence-1.3.tar.gz
+XINERAMA_SRC_URL=https://www.x.org/releases/individual/lib/libXinerama-1.1.4.tar.gz
 PCIACCESS_SRC_URL=https://www.x.org/releases/individual/lib/libpciaccess-0.16.tar.gz
 XORGMACROS_SRC_URL=https://www.x.org/releases/individual/util/util-macros-1.19.3.tar.gz
 ICEAUTH_SRC_URL=https://www.x.org/releases/individual/app/iceauth-1.0.9.tar.xz
+XKBCOMP_SRC_URL=https://www.x.org/releases/individual/app/xkbcomp-1.4.5.tar.gz
+BDFTOPCF_SRC_URL=https://www.x.org/releases/individual/app/bdftopcf-1.1.tar.bz2
+MKFONTDIR_SRC_URL=https://www.x.org/releases/individual/app/mkfontdir-1.0.7.tar.bz2
+MKFONTSCALE_SRC_URL=https://www.x.org/releases/individual/app/mkfontscale-1.2.2.tar.xz
 XCBUTIL_SRC_URL=https://www.x.org/releases/individual/xcb/xcb-util-0.4.0.tar.gz
 KBPROTO_SRC_URL=https://www.x.org/releases/individual/proto/kbproto-1.0.7.tar.gz
 LIBXPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xproto-7.0.31.tar.gz
 XEXTPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xextproto-7.3.0.tar.gz
 XCBPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xcb-proto-1.15.2.tar.gz
 XORGPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xorgproto-2022.2.tar.xz
-XKBCOMP_SRC_URL=https://www.x.org/releases/individual/app/xkbcomp-1.4.5.tar.gz
-LIBXCVT_SRC_URL=https://www.x.org/releases/individual/lib/libxcvt-0.1.2.tar.xz
-XKBFILE_SRC_URL=https://www.x.org/releases/individual/lib/libxkbfile-1.1.0.tar.gz
-MKFONTDIR_SRC_URL=https://www.x.org/releases/individual/app/mkfontdir-1.0.7.tar.bz2
-BDFTOPCF_SRC_URL=https://www.x.org/releases/individual/app/bdftopcf-1.1.tar.bz2
-MKFONTSCALE_SRC_URL=https://www.x.org/releases/individual/app/mkfontscale-1.2.2.tar.xz
-FONTENC_SRC_URL=https://www.x.org/releases/individual/lib/libfontenc-1.1.6.tar.xz
 FONTUTIL_SRC_URL=https://www.x.org/releases/individual/font/font-util-1.3.3.tar.xz
 FONTMISC_SRC_URL=https://www.x.org/releases/individual/font/font-misc-misc-1.1.2.tar.bz2
-XFONT_SRC_URL=https://www.x.org/releases/individual/lib/libXfont2-2.0.6.tar.xz
 XKBDATA_SRC_URL=https://www.x.org/releases/individual/data/xkbdata-1.0.1.tar.bz2
 XKBDCFG_SRC_URL=https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.36.tar.xz
 XSERVER_SRC_URL=https://www.x.org/releases/individual/xserver/xorg-server-21.1.4.tar.xz
@@ -245,16 +243,18 @@ LIBWACOM_SRC_NAME=$(download_src ${LIBWACOM_SRC_URL})
 LIBINPUT_SRC_NAME=$(download_src ${LIBINPUT_SRC_URL})
 XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
 XF86VIDEOVESA_SRC_NAME=$(download_src ${XF86VIDEOVESA_SRC_URL})
-DEJAVUFONTS_SRC_NAME=$(download_src ${DEJAVUFONTS_SRC_URL})
+DEJAVUFONTS1_SRC_NAME=$(download_src ${DEJAVUFONTS1_SRC_URL})
+DEJAVUFONTS2_SRC_NAME=$(download_src ${DEJAVUFONTS2_SRC_URL})
 GNOMEICONTHEME_SRC_NAME=$(download_src ${GNOMEICONTHEME_SRC_URL})
 HICOLORICONTHEME_SRC_NAME=$(download_src ${HICOLORICONTHEME_SRC_URL})
 ICONNAMINGUTILS_SRC_NAME=$(download_src ${ICONNAMINGUTILS_SRC_URL})
-DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL} "dbus-")
-LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL} "libepoxy-")
-GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL} "graphene-")
+DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL})
+GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL})
+LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL})
 XORGMACROS_SRC_NAME=$(download_src ${XORGMACROS_SRC_URL})
+GOBJINTROSPE_SRC_NAME=$(download_src ${GOBJINTROSPE_SRC_URL})
 PCIACCESS_SRC_NAME=$(download_src ${PCIACCESS_SRC_URL} "xorg-libpciaccess-")
-GOBJINTROSPE_SRC_NAME=$(download_src ${GOBJINTROSPE_SRC_URL} "gobject-introspection-")
+
 # gtk 因为 + 号，需要特殊处理
 GTKX_SRC_NAME=$(echo $(file_name ${GTKX_SRC_URL}) | sed 's/%2B/+/')
 if [ ! -f "${GTKX_SRC_NAME}" ]; then
@@ -289,20 +289,20 @@ FONTCFG_SRC_DIR=$(unzip_src ".tar.xz" ${FONTCFG_SRC_NAME}); echo "unzip ${FONTCF
 HARFBUZZ_SRC_DIR=$(unzip_src ".tar.xz" ${HARFBUZZ_SRC_NAME}); echo "unzip ${HARFBUZZ_SRC_NAME} source code"
 FRIBIDI_SRC_DIR=$(unzip_src ".tar.xz" ${FRIBIDI_SRC_NAME}); echo "unzip ${FRIBIDI_SRC_NAME} source code"
 PANGO_SRC_DIR=$(unzip_src ".tar.xz" ${PANGO_SRC_NAME}); echo "unzip ${PANGO_SRC_NAME} source code"
-GDKPIXBUF_SRC_DIR=$(unzip_src ".tar.gz" ${GDKPIXBUF_SRC_NAME}); echo "unzip ${GDKPIXBUF_SRC_NAME} source code"
+GDKPIXBUF_SRC_DIR=$(unzip_src ".tar.xz" ${GDKPIXBUF_SRC_NAME}); echo "unzip ${GDKPIXBUF_SRC_NAME} source code"
 DBUS1_SRC_DIR=$(unzip_src ".tar.gz" ${DBUS1_SRC_NAME}); echo "unzip ${DBUS1_SRC_NAME} source code"
-LIBATK_SRC_DIR=$(unzip_src ".tar.gz" ${LIBATK_SRC_NAME}); echo "unzip ${LIBATK_SRC_NAME} source code"
-LIBEPOXY_SRC_DIR=$(unzip_src ".tar.gz" ${LIBEPOXY_SRC_NAME}); echo "unzip ${LIBEPOXY_SRC_NAME} source code"
+LIBATK_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_SRC_NAME}); echo "unzip ${LIBATK_SRC_NAME} source code"
+LIBEPOXY_SRC_DIR=$(unzip_src ".tar.xz" ${LIBEPOXY_SRC_NAME}); echo "unzip ${LIBEPOXY_SRC_NAME} source code"
 LIBATK_CORE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_CORE_SRC_NAME}); echo "unzip ${LIBATK_CORE_SRC_NAME} source code"
 LIBATK_BRIDGE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_BRIDGE_SRC_NAME}); echo "unzip ${LIBATK_BRIDGE_SRC_NAME} source code"
-GRAPHENE_SRC_DIR=$(unzip_src ".tar.gz" ${GRAPHENE_SRC_NAME}); echo "unzip ${GRAPHENE_SRC_NAME} source code"
+GRAPHENE_SRC_DIR=$(unzip_src ".tar.xz" ${GRAPHENE_SRC_NAME}); echo "unzip ${GRAPHENE_SRC_NAME} source code"
 GETTEXT_SRC_DIR=$(unzip_src ".tar.gz" ${GETTEXT_SRC_NAME}); echo "unzip ${GETTEXT_SRC_NAME} source code"
 WAYLANDCORE_SRC_DIR=$(unzip_src ".tar.gz" ${WAYLANDCORE_SRC_NAME}); echo "unzip ${WAYLANDCORE_SRC_NAME} source code"
 WAYLANDPROT_SRC_DIR=$(unzip_src ".tar.gz" ${WAYLANDPROT_SRC_NAME}); echo "unzip ${WAYLANDPROT_SRC_NAME} source code"
 STARTUPNOTI_SRC_DIR=$(unzip_src ".tar.gz" ${STARTUPNOTI_SRC_NAME}); echo "unzip ${STARTUPNOTI_SRC_NAME} source code"
-LIBGUDEV_SRC_DIR=$(unzip_src ".tar.gz" ${LIBGUDEV_SRC_NAME}); echo "unzip ${LIBGUDEV_SRC_NAME} source code"
+LIBGUDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBGUDEV_SRC_NAME}); echo "unzip ${LIBGUDEV_SRC_NAME} source code"
 UPOWER_SRC_DIR=$(unzip_src ".tar.gz" ${UPOWER_SRC_NAME}); echo "unzip ${UPOWER_SRC_NAME} source code"
-GOBJINTROSPE_SRC_DIR=$(unzip_src ".tar.gz" ${GOBJINTROSPE_SRC_NAME}); echo "unzip ${GOBJINTROSPE_SRC_NAME} source code"
+GOBJINTROSPE_SRC_DIR=$(unzip_src ".tar.xz" ${GOBJINTROSPE_SRC_NAME}); echo "unzip ${GOBJINTROSPE_SRC_NAME} source code"
 LIBWNCK_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWNCK_SRC_NAME}); echo "unzip ${LIBWNCK_SRC_NAME} source code"
 GSTREAMER_SRC_DIR=$(unzip_src ".tar.xz" ${GSTREAMER_SRC_NAME}); echo "unzip ${GSTREAMER_SRC_NAME} source code"
 LIBDRM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBDRM_SRC_NAME}); echo "unzip ${LIBDRM_SRC_NAME} source code"
@@ -359,7 +359,8 @@ LIBEVDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBEVDEV_SRC_NAME}); echo "unzip ${LIBE
 LIBINPUT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBINPUT_SRC_NAME}); echo "unzip ${LIBINPUT_SRC_NAME} source code"
 XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
 XF86VIDEOVESA_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOVESA_SRC_NAME}); echo "unzip ${XF86VIDEOVESA_SRC_NAME} source code"
-DEJAVUFONTS_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS_SRC_NAME}); echo "unzip ${DEJAVUFONTS_SRC_NAME} source code"
+DEJAVUFONTS1_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS1_SRC_NAME}); echo "unzip ${DEJAVUFONTS1_SRC_NAME} source code"
+DEJAVUFONTS2_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS2_SRC_NAME}); echo "unzip ${DEJAVUFONTS2_SRC_NAME} source code"
 GNOMEICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${GNOMEICONTHEME_SRC_NAME}); echo "unzip ${GNOMEICONTHEME_SRC_NAME} source code"
 HICOLORICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${HICOLORICONTHEME_SRC_NAME}); echo "unzip ${HICOLORICONTHEME_SRC_NAME} source code"
 ICONNAMINGUTILS_SRC_DIR=$(unzip_src ".tar.bz2" ${ICONNAMINGUTILS_SRC_NAME}); echo "unzip ${ICONNAMINGUTILS_SRC_NAME} source code"
@@ -665,7 +666,7 @@ common_build() {
   # 编译 xkbcommon
   meson_build xkbcommon ${XKBCOMMON_SRC_DIR} -Denable-docs=false
   # 编译 gdkpixbuf
-  meson_build gdkpixbuf ${GDKPIXBUF_SRC_DIR}
+  meson_build gdkpixbuf ${GDKPIXBUF_SRC_DIR} -Dman=false
   # 编译 pixman
   common_build pixman ${PIXMAN_SRC_DIR} --enable-libpng=yes
   # 编译 freetype
@@ -781,37 +782,25 @@ common_build() {
   common_build xf86videovesa ${XF86VIDEOVESA_SRC_DIR}
 
   # 编译 dejavu-fonts ( 否则界面字体显示为小方块 ) 或者安装 apt install fonts-dejavu-core
-  # meson_build dejavu-fonts ${DEJAVUFONTS_SRC_DIR}
-  # /etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-sans-mono.conf
-  # /etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-sans.conf
-  # /etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-serif.conf
-  # /etc/fonts/conf.avail/20-unhint-small-dejavu-sans-mono.conf
-  # /etc/fonts/conf.avail/20-unhint-small-dejavu-sans.conf
-  # /etc/fonts/conf.avail/20-unhint-small-dejavu-serif.conf
-  # /etc/fonts/conf.avail/57-dejavu-sans-mono.conf
-  # /etc/fonts/conf.avail/57-dejavu-sans.conf
-  # /etc/fonts/conf.avail/57-dejavu-serif.conf
-  # /etc/fonts/conf.avail/58-dejavu-lgc-sans-mono.conf
-  # /etc/fonts/conf.avail/58-dejavu-lgc-sans.conf
-  # /etc/fonts/conf.avail/58-dejavu-lgc-serif.conf
-  # /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans-mono.conf
-  # /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans.conf
-  # /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-serif.conf
-  # /etc/fonts/conf.d/20-unhint-small-dejavu-sans-mono.conf
-  # /etc/fonts/conf.d/20-unhint-small-dejavu-sans.conf
-  # /etc/fonts/conf.d/20-unhint-small-dejavu-serif.conf
-  # /etc/fonts/conf.d/57-dejavu-sans-mono.conf
-  # /etc/fonts/conf.d/57-dejavu-sans.conf
-  # /etc/fonts/conf.d/57-dejavu-serif.conf
-  # /etc/fonts/conf.d/58-dejavu-lgc-sans-mono.conf
-  # /etc/fonts/conf.d/58-dejavu-lgc-sans.conf
-  # /etc/fonts/conf.d/58-dejavu-lgc-serif.conf
-  # /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
-  # /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
-  # /usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf
-  # /usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf
-  # /usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf
-  # /usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf
+  mkdir -p ${xfce_install}/etc/fonts/conf.d
+  mkdir -p ${xfce_install}/etc/fonts/conf.avail
+  mkdir -p ${xfce_install}/usr/share/fonts/truetype/dejavu
+
+  cp ${DEJAVUFONTS1_SRC_DIR}/ttf/* ${xfce_install}/usr/share/fonts/truetype/dejavu
+  for font_name in $(find ${DEJAVUFONTS1_SRC_DIR}/fontconfig -name "*.conf")
+  do
+    tmp_name=$(file_name ${font_name})
+    cp ${font_name} ${xfce_install}/etc/fonts/conf.avail
+    ln -s ../conf.avail/${tmp_name} ${xfce_install}/etc/fonts/conf.d/${tmp_name}
+  done
+
+  cp ${DEJAVUFONTS2_SRC_DIR}/ttf/* ${xfce_install}/usr/share/fonts/truetype/dejavu
+  for font_name in $(find ${DEJAVUFONTS2_SRC_DIR}/fontconfig -name "*.conf")
+  do
+    tmp_name=$(file_name ${font_name})
+    cp ${font_name} ${xfce_install}/etc/fonts/conf.avail
+    ln -s ../conf.avail/${tmp_name} ${xfce_install}/etc/fonts/conf.d/${tmp_name}
+  done
 
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
