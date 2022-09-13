@@ -59,9 +59,9 @@ XRDP_SRC_URL=https://github.com/neutrinolabs/xrdp/releases/download/v0.9.19/xrdp
 LIBWACOM_SRC_URL=https://github.com/linuxwacom/libwacom/releases/download/libwacom-2.4.0/libwacom-2.4.0.tar.xz
 
 # download from https://gitlab.freedesktop.org
+WAYLANDCORE_SRC_URL=https://wayland.freedesktop.org/releases/wayland-1.20.0.tar.xz
+WAYLANDPROT_SRC_URL=https://wayland.freedesktop.org/releases/wayland-protocols-1.25.tar.xz
 UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
-WAYLANDCORE_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland/-/archive/1.20.93/wayland-1.20.93.tar.gz
-WAYLANDPROT_SRC_URL=https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/1.25/wayland-protocols-1.25.tar.gz
 MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/mesa-mesa-20.0.0-rc3.tar.gz
 
 LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
@@ -297,8 +297,8 @@ LIBATK_CORE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_CORE_SRC_NAME}); echo "unzip 
 LIBATK_BRIDGE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_BRIDGE_SRC_NAME}); echo "unzip ${LIBATK_BRIDGE_SRC_NAME} source code"
 GRAPHENE_SRC_DIR=$(unzip_src ".tar.xz" ${GRAPHENE_SRC_NAME}); echo "unzip ${GRAPHENE_SRC_NAME} source code"
 GETTEXT_SRC_DIR=$(unzip_src ".tar.gz" ${GETTEXT_SRC_NAME}); echo "unzip ${GETTEXT_SRC_NAME} source code"
-WAYLANDCORE_SRC_DIR=$(unzip_src ".tar.gz" ${WAYLANDCORE_SRC_NAME}); echo "unzip ${WAYLANDCORE_SRC_NAME} source code"
-WAYLANDPROT_SRC_DIR=$(unzip_src ".tar.gz" ${WAYLANDPROT_SRC_NAME}); echo "unzip ${WAYLANDPROT_SRC_NAME} source code"
+WAYLANDCORE_SRC_DIR=$(unzip_src ".tar.xz" ${WAYLANDCORE_SRC_NAME}); echo "unzip ${WAYLANDCORE_SRC_NAME} source code"
+WAYLANDPROT_SRC_DIR=$(unzip_src ".tar.xz" ${WAYLANDPROT_SRC_NAME}); echo "unzip ${WAYLANDPROT_SRC_NAME} source code"
 STARTUPNOTI_SRC_DIR=$(unzip_src ".tar.gz" ${STARTUPNOTI_SRC_NAME}); echo "unzip ${STARTUPNOTI_SRC_NAME} source code"
 LIBGUDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBGUDEV_SRC_NAME}); echo "unzip ${LIBGUDEV_SRC_NAME} source code"
 UPOWER_SRC_DIR=$(unzip_src ".tar.gz" ${UPOWER_SRC_NAME}); echo "unzip ${UPOWER_SRC_NAME} source code"
