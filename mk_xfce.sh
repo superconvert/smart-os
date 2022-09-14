@@ -8,7 +8,7 @@ if [ -f "/usr/bin/apt" ]; then
   apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config llvm-10 clang-10 intltool -y || exit
   apt install check bison flex python3-pip libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev -y || exit
-  # 需要安装, 安装主题, 显卡驱动, 安装字库否则不能正常显示
+  # 需要安装, 安装主题, 显卡驱动, 安装字库否则不能正常显示, gsettings-desktop-schemas 保证 xfdesktop-settings 能运行
   apt install libudev-dev libdbus-1-dev dbus-x11 gobject-introspection icon-naming-utils -y || exit
 fi
 
@@ -28,6 +28,7 @@ pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple gi-docgen
 #-----------------------------------------------
 . ./common.sh
 
+MTDEV_SRC_URL=https://bitmath.org/code/mtdev/mtdev-1.1.6.tar.bz2
 GETTEXT_SRC_URL=https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz
 LIBMNT_SRC_URL=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.tar.xz
 LIBZIP_SRC_URL=https://libzip.org/download/libzip-1.9.2.tar.xz
@@ -40,22 +41,20 @@ FREETYPE_SRC_URL=https://nchc.dl.sourceforge.net/project/freetype/freetype2/2.12
 DEJAVUFONTS1_SRC_URL=https://nchc.dl.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2
 DEJAVUFONTS2_SRC_URL=https://nchc.dl.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-lgc-fonts-ttf-2.37.tar.bz2
 LIBJPEGTURBO_SRC_URL=https://sourceforge.net/projects/libjpeg-turbo/files/2.1.0/libjpeg-turbo-2.1.0.tar.gz
-
-MTDEV_SRC_URL=https://bitmath.org/code/mtdev/mtdev-1.1.6.tar.bz2
 XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
-XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 XTERM_SRC_URL=https://invisible-island.net/datafiles/release/xterm.tar.gz
 NCURSES_SRC_URL=https://invisible-island.net/datafiles/release/ncurses.tar.gz
+XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 
 # download from https://github.com
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 LIBTHAI_SRC_URL=https://github.com/tlwg/libthai/releases/download/v0.1.29/libthai-0.1.29.tar.xz
 LIBDATRIE_SRC_URL=https://github.com/tlwg/libdatrie/releases/download/v0.2.13/libdatrie-0.2.13.tar.xz
 LIBPCRE2_SRC_URL=https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz
-HARFBUZZ_SRC_URL=https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz
-FRIBIDI_SRC_URL=https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz
-LIBPAM_SRC_URL=https://github.com/linux-pam/linux-pam/releases/download/v1.5.2/Linux-PAM-1.5.2.tar.xz
 XRDP_SRC_URL=https://github.com/neutrinolabs/xrdp/releases/download/v0.9.19/xrdp-0.9.19.tar.gz
+FRIBIDI_SRC_URL=https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz
+HARFBUZZ_SRC_URL=https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz
+LIBPAM_SRC_URL=https://github.com/linux-pam/linux-pam/releases/download/v1.5.2/Linux-PAM-1.5.2.tar.xz
 LIBWACOM_SRC_URL=https://github.com/linuxwacom/libwacom/releases/download/libwacom-2.4.0/libwacom-2.4.0.tar.xz
 
 # download from https://gitlab.freedesktop.org
@@ -63,7 +62,6 @@ WAYLANDCORE_SRC_URL=https://wayland.freedesktop.org/releases/wayland-1.20.0.tar.
 WAYLANDPROT_SRC_URL=https://wayland.freedesktop.org/releases/wayland-protocols-1.25.tar.xz
 UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
 MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/mesa-mesa-20.0.0-rc3.tar.gz
-
 LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
 DBUS1_SRC_URL=https://dbus.freedesktop.org/releases/dbus/dbus-1.12.12.tar.gz
 GSTREAMER_SRC_URL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.2.tar.xz
@@ -90,6 +88,7 @@ LIBATK_CORE_SRC_URL=https://download.gnome.org/sources/at-spi2-core/2.38/at-spi2
 LIBATK_BRIDGE_SRC_URL=https://download.gnome.org/sources/at-spi2-atk/2.38/at-spi2-atk-2.38.0.tar.xz
 GNOMEICONTHEME_SRC_URL=https://download.gnome.org/sources/gnome-icon-theme/3.12/gnome-icon-theme-3.12.0.tar.xz
 GOBJINTROSPE_SRC_URL=https://download.gnome.org/sources/gobject-introspection/1.72/gobject-introspection-1.72.0.tar.xz
+GSETDESKTOPSCHEMAS_SRC_URL=https://download.gnome.org/sources/gsettings-desktop-schemas/42/gsettings-desktop-schemas-42.0.tar.xz
 
 # download from https://www.x.org/releases/individual
 XI_SRC_URL=https://www.x.org/releases/individual/lib/libXi-1.8.tar.gz
@@ -117,7 +116,7 @@ XXF86VM_SRC_URL=https://www.x.org/releases/individual/lib/libXxf86vm-1.1.4.tar.g
 XRENDER_SRC_URL=https://www.x.org/releases/individual/lib/libXrender-0.9.10.tar.gz
 XSHMFENCE_SRC_URL=https://www.x.org/releases/individual/lib/libxshmfence-1.3.tar.gz
 XINERAMA_SRC_URL=https://www.x.org/releases/individual/lib/libXinerama-1.1.4.tar.gz
-PCIACCESS_SRC_URL=https://www.x.org/releases/individual/lib/libpciaccess-0.16.tar.gz
+LIBPCIACCESS_SRC_URL=https://www.x.org/releases/individual/lib/libpciaccess-0.16.tar.gz
 XORGMACROS_SRC_URL=https://www.x.org/releases/individual/util/util-macros-1.19.3.tar.gz
 ICEAUTH_SRC_URL=https://www.x.org/releases/individual/app/iceauth-1.0.9.tar.xz
 XKBCOMP_SRC_URL=https://www.x.org/releases/individual/app/xkbcomp-1.4.5.tar.gz
@@ -130,13 +129,13 @@ LIBXPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xproto-7.0.31.tar.
 XEXTPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xextproto-7.3.0.tar.gz
 XCBPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xcb-proto-1.15.2.tar.gz
 XORGPROTO_SRC_URL=https://www.x.org/releases/individual/proto/xorgproto-2022.2.tar.xz
+XSERVER_SRC_URL=https://www.x.org/releases/individual/xserver/xorg-server-21.1.4.tar.xz
 FONTUTIL_SRC_URL=https://www.x.org/releases/individual/font/font-util-1.3.3.tar.xz
 FONTMISC_SRC_URL=https://www.x.org/releases/individual/font/font-misc-misc-1.1.2.tar.bz2
-XKBDATA_SRC_URL=https://www.x.org/releases/individual/data/xkbdata-1.0.1.tar.bz2
-XKBDCFG_SRC_URL=https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.36.tar.xz
-XSERVER_SRC_URL=https://www.x.org/releases/individual/xserver/xorg-server-21.1.4.tar.xz
 XF86INPUT_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-libinput-1.2.1.tar.xz
 XF86VIDEOVESA_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-vesa-2.5.0.tar.bz2
+XKBDATA_SRC_URL=https://www.x.org/releases/individual/data/xkbdata-1.0.1.tar.bz2
+XKBDCFG_SRC_URL=https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.36.tar.xz
 
 #----------------------------
 #
@@ -252,9 +251,9 @@ DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL})
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL})
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL})
 XORGMACROS_SRC_NAME=$(download_src ${XORGMACROS_SRC_URL})
+LIBPCIACCESS_SRC_NAME=$(download_src ${LIBPCIACCESS_SRC_URL})
 GOBJINTROSPE_SRC_NAME=$(download_src ${GOBJINTROSPE_SRC_URL})
-PCIACCESS_SRC_NAME=$(download_src ${PCIACCESS_SRC_URL} "xorg-libpciaccess-")
-
+GSETDESKTOPSCHEMAS_SRC_NAME=$(download_src ${GSETDESKTOPSCHEMAS_SRC_URL})
 # gtk 因为 + 号，需要特殊处理
 GTKX_SRC_NAME=$(echo $(file_name ${GTKX_SRC_URL}) | sed 's/%2B/+/')
 if [ ! -f "${GTKX_SRC_NAME}" ]; then
@@ -337,7 +336,7 @@ XXF86VM_SRC_DIR=$(unzip_src ".tar.gz" ${XXF86VM_SRC_NAME}); echo "unzip ${XXF86V
 XI_SRC_DIR=$(unzip_src ".tar.gz" ${XI_SRC_NAME}); echo "unzip ${XI_SRC_NAME} source code"
 XTST_SRC_DIR=$(unzip_src ".tar.gz" ${XTST_SRC_NAME}); echo "unzip ${XTST_SRC_NAME} source code"
 XORGMACROS_SRC_DIR=$(unzip_src ".tar.gz" ${XORGMACROS_SRC_NAME}); echo "unzip ${XORGMACROS_SRC_NAME} source code"
-PCIACCESS_SRC_DIR=$(unzip_src ".tar.gz" ${PCIACCESS_SRC_NAME}); echo "unzip ${PCIACCESS_SRC_NAME} source code"
+LIBPCIACCESS_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCIACCESS_SRC_NAME}); echo "unzip ${LIBPCIACCESS_SRC_NAME} source code"
 MESA_SRC_DIR=$(unzip_src ".tar.gz" ${MESA_SRC_NAME}); echo "unzip ${MESA_SRC_NAME} source code"
 GTKX_SRC_DIR=$(unzip_src ".tar.xz" ${GTKX_SRC_NAME}); echo "unzip ${GTKX_SRC_NAME} source code"
 LIBPAM_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPAM_SRC_NAME}); echo "unzip ${LIBPAM_SRC_NAME} source code"
@@ -364,6 +363,7 @@ DEJAVUFONTS2_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS2_SRC_NAME}); echo "unz
 GNOMEICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${GNOMEICONTHEME_SRC_NAME}); echo "unzip ${GNOMEICONTHEME_SRC_NAME} source code"
 HICOLORICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${HICOLORICONTHEME_SRC_NAME}); echo "unzip ${HICOLORICONTHEME_SRC_NAME} source code"
 ICONNAMINGUTILS_SRC_DIR=$(unzip_src ".tar.bz2" ${ICONNAMINGUTILS_SRC_NAME}); echo "unzip ${ICONNAMINGUTILS_SRC_NAME} source code"
+GSETDESKTOPSCHEMAS_SRC_DIR=$(unzip_src ".tar.xz" ${GSETDESKTOPSCHEMAS_SRC_NAME}); echo "unzip ${GSETDESKTOPSCHEMAS_SRC_NAME} source code"
 NCURSES_SRC_DIR=$(unzip_src ".tar.gz" ${NCURSES_SRC_NAME}); echo "unzip ${NCURSES_SRC_NAME} source code"
 XTERM_SRC_DIR=$(unzip_src ".tar.gz" ${XTERM_SRC_NAME}); echo "unzip ${XTERM_SRC_NAME} source code"
 XKBDCFG_SRC_DIR=$(unzip_src ".tar.xz" ${XKBDCFG_SRC_NAME}); echo "unzip ${XKBDCFG_SRC_NAME} source code"
@@ -504,9 +504,9 @@ setup_girtools() {
 }
 setup_girtools
 
-#---------------------------
+#---------------------------------------------------------------------------------------------------------------
 # meson 编译 编译参数一览 https://mesonbuild.com/Reference-tables.html
-#---------------------------
+#---------------------------------------------------------------------------------------------------------------
 meson_build() {
   local name=$1
   local srcdir=$2
@@ -521,9 +521,9 @@ meson_build() {
   fi
 }
 
-#--------------------------
+#---------------------------------------------------------------------------------------------------------------
 # xfce4 编译定义
-#--------------------------
+#---------------------------------------------------------------------------------------------------------------
 xfce4_build() {
   local name=$1
   local srcdir=$2
@@ -535,9 +535,9 @@ xfce4_build() {
   fi
 }
 
-#--------------------------
+#---------------------------------------------------------------------------------------------------------------
 # 公共模块编译
-#--------------------------
+#---------------------------------------------------------------------------------------------------------------
 common_build() {
   local name=$1
   local srcdir=$2
@@ -600,8 +600,8 @@ common_build() {
   if [ ! -f "/usr/bin/glib-mkenums" ]; then
     ln -s ${xfce_install}/usr/bin/glib-mkenums /usr/bin/glib-mkenums
   fi
-  # 在编译机上测试 xfce4 是否能正常工作
-  if [ "${with_xfce_test}" = true ]; then
+  # 在编译机上测试 xfce4 是否能正常工作，在这之前编译的有系统组件，不能覆盖系统的组件，否则会导致系统不能正常运行
+  if [ "${with_xfce_test}" = true ] && [ ! -f "tmp.tar.gz" ]; then
     tar zcf tmp.tar.gz ${xfce_install}
   fi
   # 编译 wayland-core ( documentation 依赖 graphviz 粘连了图形库 )
@@ -694,8 +694,8 @@ common_build() {
   meson_build libatk-core ${LIBATK_CORE_SRC_DIR}
   # 编译 libatk-bridge ( 依赖: libatk-core )
   meson_build libatk-bridge ${LIBATK_BRIDGE_SRC_DIR}
-  # 编译 pciaccess
-  common_build pciaccess ${PCIACCESS_SRC_DIR}
+  # 编译 libpciaccess
+  common_build libpciaccess ${LIBPCIACCESS_SRC_DIR}
   # 编译 libdrm
   meson_build libdrm ${LIBDRM_SRC_DIR}
   # 编译 graphene
@@ -713,7 +713,7 @@ common_build() {
   # 编译 upower ( xfce4-power-manager 依赖此库， 依赖: libgudev )
   meson_build upower ${UPOWER_SRC_DIR} -Dc_args="-DENOTSUP=95"
   # 编译 gettext 解决 libintl 的问题 gtk+
-  #common_build gettext ${GETTEXT_SRC_DIR}
+  # common_build gettext ${GETTEXT_SRC_DIR}
   # 编译 gstreamer
   meson_build gstreamer ${GSTREAMER_SRC_DIR}
   # 编译 libwnck
@@ -780,6 +780,11 @@ common_build() {
   common_build xf86input ${XF86INPUT_SRC_DIR}
   # xf86videovesa ( vesa是一个支持大部分显卡的通用驱动，不提供任何 2D 和 3D 加速功能 也可以 apt install libgl1-mesa-dri )
   common_build xf86videovesa ${XF86VIDEOVESA_SRC_DIR}
+  # gsetting-desktop-schemas
+  meson_build gsetting-desktop-schemas ${GSETDESKTOPSCHEMAS_SRC_DIR}
+
+  # 必须编译一次 schemas, 否则会提示: No schemas installed
+  glib-compile-schemas ${xfce_install}/usr/share/glib-2.0/schemas/
 
   # 编译 dejavu-fonts ( 否则界面字体显示为小方块 ) 或者安装 apt install fonts-dejavu-core
   mkdir -p ${xfce_install}/etc/fonts/conf.d
@@ -790,16 +795,24 @@ common_build() {
   for font_name in $(find ${DEJAVUFONTS1_SRC_DIR}/fontconfig -name "*.conf")
   do
     tmp_name=$(file_name ${font_name})
-    cp ${font_name} ${xfce_install}/etc/fonts/conf.avail
-    ln -s ../conf.avail/${tmp_name} ${xfce_install}/etc/fonts/conf.d/${tmp_name}
+    if [ ! -f ${xfce_install}/etc/fonts/conf.avail/${tmp_name} ]; then
+      cp ${font_name} ${xfce_install}/etc/fonts/conf.avail
+    fi
+    if [ ! -f ${xfce_install}/etc/fonts/conf.d/${tmp_name} ]; then
+      ln -s ../conf.avail/${tmp_name} ${xfce_install}/etc/fonts/conf.d/${tmp_name}
+    fi
   done
 
   cp ${DEJAVUFONTS2_SRC_DIR}/ttf/* ${xfce_install}/usr/share/fonts/truetype/dejavu
   for font_name in $(find ${DEJAVUFONTS2_SRC_DIR}/fontconfig -name "*.conf")
   do
     tmp_name=$(file_name ${font_name})
-    cp ${font_name} ${xfce_install}/etc/fonts/conf.avail
-    ln -s ../conf.avail/${tmp_name} ${xfce_install}/etc/fonts/conf.d/${tmp_name}
+    if [ ! -f ${xfce_install}/etc/fonts/conf.avail/${tmp_name} ]; then
+      cp ${font_name} ${xfce_install}/etc/fonts/conf.avail
+    fi
+    if [ ! -f ${xfce_install}/etc/fonts/conf.d/${tmp_name} ]; then
+      ln -s ../conf.avail/${tmp_name} ${xfce_install}/etc/fonts/conf.d/${tmp_name}
+    fi
   done
 
   # 编译 xfce
@@ -867,7 +880,7 @@ if [ "${with_xfce_test}" = true ]; then
   # 删除空目录，去掉冗余目录
   find $to_dir -type d -empty -delete
   # 拷贝编译后的 xfce4 到系统目录
-  cd $to_dir && (cp ./ / -r -n) && cd ..
+  cd $to_dir && (cp ./ / -r -n); cd ..
 
   # 预装运行环境
   rm /usr/local/share/X11/xkb -rf
