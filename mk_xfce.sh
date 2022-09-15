@@ -815,6 +815,11 @@ common_build() {
     fi
   done
 
+  # 让 upower.service 能正常启动, 还需要替换系统的 libglib 库
+  # sed -i "s/LockPersonality/#LockPersonality/g" ${xfce_install}/lib/systemd/system/upower.service
+  # sed -i "s/SystemCallArchitectures/#SystemCallArchitectures/g" ${xfce_install}/lib/systemd/system/upower.service
+  # sed -i "s/SystemCallFilter/#SystemCallFilter/g" ${xfce_install}/lib/systemd/system/upower.service
+
   # 编译 xfce
   cd ${XFCE_SRC_DIR}
 
@@ -886,11 +891,18 @@ if [ "${with_xfce_test}" = true ]; then
   rm /usr/local/share/X11/xkb -rf
   ln -s /usr/share/X11/xkb /usr/local/share/X11
 
+
+
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
   libpath="${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu"
   libjpegdir=`pwd`"/a/opt/libjpeg-turbo/lib64"
+  # 可以让 xrdp 调用，也可以手工启动
   echo "LD_LIBRARY_PATH=\"${libpath}:${libjpegdir}\" xfce4-session" > ~/.xsession
+  # 不用起服务的方式了，太麻烦
+  echo "LD_LIBRARY_PATH=\"${libpath}:${libjpegdir}\" /usr/libexec/upowerd -rd" > ~/.upowerd
+  chmod +x ~/.xsession
+  chmod +x ~/.upowerd
 
   # 整个流程说明
   # 0. 运行说明
