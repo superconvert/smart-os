@@ -447,8 +447,8 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     ```
     journalctl -xf 会提示下面的错误
     ```shell
-    Sep 15 10:25:01 freeabc kernel: [ 5505.813250] audit: type=1326 audit(1663237501.505:66): auid=4294967295 uid=0 gid=0 ses=4294967295 pid=3300 comm="upowerd" exe="/usr/local/bin/upower
-d" sig=31 arch=c000003e syscall=12 compat=0 ip=0x7f40bfa9c0a9 code=0x0
+    Sep 15 10:25:01 freeabc kernel: [ 5505.813250] audit: type=1326 audit(1663237501.505:66): auid=4294967295 uid=0 gid=0 ses=4294967295 pid=3300 comm="upowerd" 
+    exe="/usr/local/bin/upowerd" sig=31 arch=c000003e syscall=12 compat=0 ip=0x7f40bfa9c0a9 code=0x0
     ```
     单独执行 /usr/libexec/upowerd -v ，也能成功执行。这个问题让我困惑了好久，目前找到解决方法了；我们需要做的是把 upower.service 里面的几句话注释掉即可
     ```shell
