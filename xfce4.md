@@ -440,4 +440,22 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     Restart=on-failure
     Environment="LD_LIBRARY_PATH=/root/smart-os/build/test/a/usr/lib:/root/smart-os/build/test/a/usr/local/lib:/root/smart-os/build/test/a/usr/lib/x86_64-linux-gnu:/root/smart-os/build/test/a/opt/libjpeg-turbo/lib64"
     ```
-    
+
+16. 通过 systemctl start upower.service ，启动会被系统强杀 SIGSYS ( syscall=12 )，apport.log 会提示下面的错误
+    ```shell
+    ERROR: apport (pid 3268) Thu Sep 15 10:25:01 2022: host pid 3257 crashed in a separate mount namespace, ignoring
+    ```
+    journalctl -xf 会提示下面的错误
+    ```shell
+    Sep 15 10:25:01 freeabc kernel: [ 5505.813250] audit: type=1326 audit(1663237501.505:66): auid=4294967295 uid=0 gid=0 ses=4294967295 pid=3300 comm="upowerd" exe="/usr/local/bin/upower
+d" sig=31 arch=c000003e syscall=12 compat=0 ip=0x7f40bfa9c0a9 code=0x0
+    ```
+    单独执行 /usr/libexec/upowerd -v ，也能成功执行。这个问题让我困惑了好久，目前找到解决方法了；我们需要做的是把 upower.service 里面的几句话注释掉即可
+    ```shell
+    # System call interfaces
+    LockPersonality=yes
+    SystemCallArchitectures=native
+    SystemCallFilter=@system-service
+    SystemCallFilter=ioprio_get
+    ```
+    猜测这样可能就不会启动 seccomp 的功能了，upower.service 调用的系统调用就能正确进行了，保证 systemctl start upower.service 启动成功
