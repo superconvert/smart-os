@@ -83,11 +83,11 @@ LIBWNCK_SRC_URL=https://download.gnome.org/sources/libwnck/3.36/libwnck-3.36.0.t
 LIBEPOXY_SRC_URL=https://download.gnome.org/sources/libepoxy/1.5/libepoxy-1.5.10.tar.xz
 GRAPHENE_SRC_URL=https://download.gnome.org/sources/graphene/1.10/graphene-1.10.8.tar.xz
 LIBNOTIFY_SRC_URL=https://download.gnome.org/sources/libnotify/0.8/libnotify-0.8.0.tar.xz
-GDKPIXBUF_SRC_URL=https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-2.42.9.tar.xz
+GDKPIXBUF_SRC_URL=https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-2.42.8.tar.xz
 LIBATK_CORE_SRC_URL=https://download.gnome.org/sources/at-spi2-core/2.38/at-spi2-core-2.38.0.tar.xz
 LIBATK_BRIDGE_SRC_URL=https://download.gnome.org/sources/at-spi2-atk/2.38/at-spi2-atk-2.38.0.tar.xz
 GNOMEICONTHEME_SRC_URL=https://download.gnome.org/sources/gnome-icon-theme/3.12/gnome-icon-theme-3.12.0.tar.xz
-GOBJINTROSPE_SRC_URL=https://download.gnome.org/sources/gobject-introspection/1.72/gobject-introspection-1.72.0.tar.xz
+GOBJINTROSPE_SRC_URL=https://download.gnome.org/sources/gobject-introspection/1.73/gobject-introspection-1.73.1.tar.xz
 GSETDESKTOPSCHEMAS_SRC_URL=https://download.gnome.org/sources/gsettings-desktop-schemas/42/gsettings-desktop-schemas-42.0.tar.xz
 
 # download from https://www.x.org/releases/individual
@@ -251,9 +251,9 @@ DBUS1_SRC_NAME=$(download_src ${DBUS1_SRC_URL})
 GRAPHENE_SRC_NAME=$(download_src ${GRAPHENE_SRC_URL})
 LIBEPOXY_SRC_NAME=$(download_src ${LIBEPOXY_SRC_URL})
 XORGMACROS_SRC_NAME=$(download_src ${XORGMACROS_SRC_URL})
-LIBPCIACCESS_SRC_NAME=$(download_src ${LIBPCIACCESS_SRC_URL})
 GOBJINTROSPE_SRC_NAME=$(download_src ${GOBJINTROSPE_SRC_URL})
 GSETDESKTOPSCHEMAS_SRC_NAME=$(download_src ${GSETDESKTOPSCHEMAS_SRC_URL})
+LIBPCIACCESS_SRC_NAME=$(download_src ${LIBPCIACCESS_SRC_URL} xorg-libpciaccess-)
 # gtk 因为 + 号，需要特殊处理
 GTKX_SRC_NAME=$(echo $(file_name ${GTKX_SRC_URL}) | sed 's/%2B/+/')
 if [ ! -f "${GTKX_SRC_NAME}" ]; then
@@ -485,6 +485,8 @@ ldconfig
 # 的路径变成了 ${sysroot}/usr/bin/g-ir-scanner，这个路径下肯定没有 g-ir-scanner，它只存在 /usr/bin 下，
 # 所以只能做一个软链过来, PKG_CONFIG_SYSROOT_DIR 不能去掉或设置为空，因为编译 gtk+ 以及依赖库都需要设置这个变量
 #
+# 上述问题解决了：glibc 版本必须用低版本 2.32 ---> 2.27 就可以让 mk_xfce.sh 编译通过了
+#
 #----------------------------------------------------------------------------------------------------------------
 setup_girtools() {
   mkdir -p ${xfce_install}"/usr/bin"
@@ -600,6 +602,8 @@ common_build() {
   if [ ! -f "/usr/bin/glib-mkenums" ]; then
     ln -s ${xfce_install}/usr/bin/glib-mkenums /usr/bin/glib-mkenums
   fi
+  # 编译 gobject-introspection ( 这个不需要了，用系统的就行 )
+  # meson_build gobject-introspection ${GOBJINTROSPE_SRC_DIR}
   # 在编译机上测试 xfce4 是否能正常工作，在这之前编译的有系统组件，不能覆盖系统的组件，否则会导致系统不能正常运行
   if [ "${with_xfce_test}" = true ] && [ ! -f "tmp.tar.gz" ]; then
     tar zcf tmp.tar.gz ${xfce_install}

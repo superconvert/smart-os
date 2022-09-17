@@ -18,7 +18,7 @@ fi
 #LINUX_SRC_URL=https://kernel.org/pub/linux/kernel/v4.x/linux-4.14.9.tar.xz
 LINUX_SRC_URL=https://mirror.bjtu.edu.cn/kernel/linux/kernel/v4.x/linux-4.14.9.tar.xz
 #GLIBC_SRC_URL=https://ftp.gnu.org/gnu/glibc/glibc-2.32.tar.bz2
-GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.32.tar.bz2
+GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.27.tar.xz
 BUSYBOX_SRC_URL=https://busybox.net/downloads/busybox-1.34.1.tar.bz2
 #GCC_SRC_URL=https://ftpmirror.gnu.org/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 GCC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
@@ -49,7 +49,7 @@ cd ..
 mkdir -pv ${build_dir} 
 
 LINUX_SRC_DIR=$(unzip_src ".tar.xz" ${LINUX_SRC_NAME}); echo "unzip ${LINUX_SRC_NAME} source code"
-GLIBC_SRC_DIR=$(unzip_src ".tar.bz2" ${GLIBC_SRC_NAME}); echo "unzip ${GLIBC_SRC_NAME} source code"
+GLIBC_SRC_DIR=$(unzip_src ".tar.xz" ${GLIBC_SRC_NAME}); echo "unzip ${GLIBC_SRC_NAME} source code"
 BUSYBOX_SRC_DIR=$(unzip_src ".tar.bz2" ${BUSYBOX_SRC_NAME}); echo "unzip ${BUSYBOX_SRC_NAME} source code"
 GCC_SRC_DIR=$(unzip_src ".tar.xz" ${GCC_SRC_NAME}); echo "unzip ${GCC_SRC_NAME} source code"
 BINUTILS_SRC_DIR=$(unzip_src ".tar.xz" ${BINUTILS_SRC_NAME}); echo "unzip ${BINUTILS_SRC_NAME} source code"
