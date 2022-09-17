@@ -917,6 +917,7 @@ if [ "${with_xfce_test}" = true ]; then
   # 4. 在 ssh 的终端里
   #    export DISPLAY=:10
   #    LD_LIBRARY_PATH="${libpath}:${libjpegdir}" xfce4-session 
+  # 5. 这样虚拟机里面就会出现真正的窗口系统
 
 fi
 

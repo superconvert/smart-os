@@ -1,5 +1,13 @@
 #!/bin/sh
 
+if [ -f "/usr/bin/apt" ]; then
+  apt -y install gcc g++ make gawk bison libelf-dev bridge-utils
+fi
+
+if [ -f "/usr/bin/yum" ]; then
+  yum -y install gcc gcc-c++ make gawk bison elfutils-libelf bridge-utils
+fi
+
 #-----------------------------------------------
 #
 # 导入公共变量
