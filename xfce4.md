@@ -459,3 +459,5 @@ xfconf-query -c xfce4-session -p /sessions/Failsafe/Client3_Command
     SystemCallFilter=ioprio_get
     ```
     猜测这样可能就不会启动 seccomp 的功能了，upower.service 调用的系统调用就能正确进行了，保证 systemctl start upower.service 启动成功
+    
+17. 如果采用高版本的 glibc 库，mk_xfce4.sh 的编译就会出现很多问题，编译 harfbuzz，gdk-pixbuf 都会遇到问题: linking of temporary binary failed，died with <Signals.SIGSEGV: 11>，目前采用降低 glibc ( 2.32 ---> 2.27 ) 版本的方法，编译通过 
