@@ -18,7 +18,7 @@ fi
 #LINUX_SRC_URL=https://kernel.org/pub/linux/kernel/v4.x/linux-4.14.9.tar.xz
 LINUX_SRC_URL=https://mirror.bjtu.edu.cn/kernel/linux/kernel/v4.x/linux-4.14.9.tar.xz
 #GLIBC_SRC_URL=https://ftp.gnu.org/gnu/glibc/glibc-2.32.tar.bz2
-GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.27.tar.xz
+GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.28.tar.xz
 BUSYBOX_SRC_URL=https://busybox.net/downloads/busybox-1.34.1.tar.bz2
 #GCC_SRC_URL=https://ftpmirror.gnu.org/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 GCC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
