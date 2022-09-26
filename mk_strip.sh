@@ -42,3 +42,7 @@ strip_dir ${gcc_install}
 #rm -rf work/binutils_install/usr/share
 strip_dir ${binutils_install}
 
+# strip xfce
+if [ "${with_xfce}" = true ]; then
+    strip_dir ${xfce_install}
+fi

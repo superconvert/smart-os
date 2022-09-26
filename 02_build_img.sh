@@ -173,6 +173,12 @@ if [ "${with_gcc}" = true ]; then
 fi
 rm -rf ${diskfs}/init ${diskfs}/lost+found
 
+# 带有 xfce 编译器
+if [ "${with_xfce}" = true ]; then
+  echo "${RED}build xfce desktop${NC}"
+  cp ${xfce_install}/* ${diskfs} -r -n
+fi
+
 # 测试用户登陆模式: root/123456
 if [ "${with_login}" = true ]; then
   echo "${RED} with-login --- it's an exciting time ${NC}"
@@ -235,6 +241,21 @@ route add default gw 192.168.100.1
 # exec 执行 /etc/init.d/rc.local 脚本
 EOF
 chmod +x  ${diskfs}/etc/init.d/rcS
+
+
+# 登陆 login shell ，非 non-login shell
+if [ "${with_login}" = true ]; then
+cat - > ${diskfs}/etc/profile << EOF
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/local/lib:/usr/lib/x86_64-linux-gnu
+EOF
+else
+cat - > ${diskfs}/etc/bash.bashrc << EOF
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/local/lib:/usr/lib/x86_64-linux-gnu
+EOF
+fi
+
 echo "${GREEN}+++ build diskfs ok +++${NC}"
 
 # 卸载映射

@@ -21,9 +21,6 @@ core_num=`nproc`
 # 是否开启 gcc
 with_gcc=true
 
-# 是否开启 xorg
-with_xorg=false
-
 # 是否开启 xfce
 with_xfce=false
 
