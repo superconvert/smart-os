@@ -691,7 +691,9 @@ common_build() {
   # 编译 pango
   meson_build pango ${PANGO_SRC_DIR}
   # 编译 dbus-1( 我们的系统需要编译，如果在当前系统上运行 xfce4，需要注释掉，否则就会和系统自带的 dbus-1 冲突 )
-  # common_build dbus-1 ${DBUS1_SRC_DIR} --disable-tests
+  if [ "$1" = "img" ]; then
+    common_build dbus-1 ${DBUS1_SRC_DIR} --disable-tests
+  fi
   # 编译 libatk
   meson_build libatk ${LIBATK_SRC_DIR}
   # 编译 libatk-core ( 依赖: libxml )

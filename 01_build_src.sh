@@ -161,7 +161,7 @@ cd ..
 
 # 编译 xfce [ no same time with xorg ]
 if [ "${with_xfce}" = true ]; then
-  ./mk_xfce.sh
+  ./mk_xfce.sh img
 fi
 
 echo "Run the next script: 02_build_img.sh"
