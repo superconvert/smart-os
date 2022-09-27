@@ -70,7 +70,6 @@ find rootfs/ -name "*.a" -exec rm -rf {} \;
 if [ "${with_gcc}" = false ]; then
   rm -rf rootfs/usr/include
 else
-  echo "${RED} with-gcc tools --- you can build your world${NC}"
   cp ${glibc_install}/usr/lib64/libc_nonshared.a rootfs/usr/lib64 
 fi
 
@@ -167,7 +166,7 @@ echo "${CYAN}--- build diskfs ---${NC}"
 cp rootfs/* ${diskfs} -r
 # 带有 gcc 编译器
 if [ "${with_gcc}" = true ]; then
-  echo "${RED} with-gcc tools --- you can build your world${NC}"
+  echo "${RED} ... build gcc tools${NC}"
   cp ${gcc_install}/* ${diskfs} -r
   cp ${binutils_install}/usr/x86_64-pc-linux-gnu/* ${diskfs} -r
 fi
@@ -175,13 +174,13 @@ rm -rf ${diskfs}/init ${diskfs}/lost+found
 
 # 带有 xfce 编译器
 if [ "${with_xfce}" = true ]; then
-  echo "${RED}build xfce desktop${NC}"
+  echo "${RED} ... build xfce desktop${NC}"
   cp ${xfce_install}/* ${diskfs} -r -n
 fi
 
 # 测试用户登陆模式: root/123456
 if [ "${with_login}" = true ]; then
-  echo "${RED} with-login --- it's an exciting time ${NC}"
+  echo "${RED} ... with-login${NC}"
   ./mk_login.sh ${diskfs}
 fi
 
