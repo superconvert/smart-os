@@ -18,7 +18,7 @@ fi
 #LINUX_SRC_URL=https://kernel.org/pub/linux/kernel/v4.x/linux-4.14.9.tar.xz
 LINUX_SRC_URL=https://mirror.bjtu.edu.cn/kernel/linux/kernel/v4.x/linux-4.14.9.tar.xz
 #GLIBC_SRC_URL=https://ftp.gnu.org/gnu/glibc/glibc-2.32.tar.bz2
-GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.27.tar.xz
+GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.28.tar.xz
 BUSYBOX_SRC_URL=https://busybox.net/downloads/busybox-1.34.1.tar.bz2
 #GCC_SRC_URL=https://ftpmirror.gnu.org/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 GCC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
@@ -139,6 +139,8 @@ if [ ! -d "busybox_install" ]; then
   # 静态编译 sed -i "s/# CONFIG_STATIC is not set/CONFIG_STATIC=y/g" .config
   sed -i "s|.*CONFIG_SYSROOT.*|CONFIG_SYSROOT=\"${glibc_install}\"|" .config
   sed -i "s|.*CONFIG_EXTRA_CFLAGS.*|CONFIG_EXTRA_CFLAGS=\"-I${linux_install}/include -I${glibc_install}/include -L${glibc_install}/usr/lib64 $CFLAGS\"|" .config
+  # 环境变量 PATH 的设定，因为 busybox 的 init 会覆盖用户设置的 PATH，只能源码进行编译
+  sed -i "s|#define BB_ADDITIONAL_PATH \"\"|#define BB_ADDITIONAL_PATH \":/usr/local/sbin:/usr/local/bin\"|" include/libbb.h
   make busybox -j8 && make CONFIG_PREFIX=${busybox_install} install && cd ..
 fi
 

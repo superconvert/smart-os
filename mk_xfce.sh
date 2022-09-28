@@ -43,6 +43,9 @@ DEJAVUFONTS2_SRC_URL=https://nchc.dl.sourceforge.net/project/dejavu/dejavu/2.37/
 LIBJPEGTURBO_SRC_URL=https://sourceforge.net/projects/libjpeg-turbo/files/2.1.0/libjpeg-turbo-2.1.0.tar.gz
 XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
 XTERM_SRC_URL=https://invisible-island.net/datafiles/release/xterm.tar.gz
+LIBUDEV_SRC_URL=https://dev.gentoo.org/~blueness/eudev/eudev-3.2.9.tar.gz
+LIBNETTLE_SRC_URL=https://ftp.gnu.org/gnu/nettle/nettle-3.8.1.tar.gz
+LIBPCRE_SRC_URL=https://nchc.dl.sourceforge.net/project/pcre/pcre/8.39/pcre-8.39.tar.gz
 NCURSES_SRC_URL=https://invisible-island.net/datafiles/release/ncurses.tar.gz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 
@@ -152,8 +155,11 @@ LIBPNG_SRC_NAME=$(download_src ${LIBPNG_SRC_URL})
 ZLIB_SRC_NAME=$(download_src ${ZLIB_SRC_URL})
 LIBZIP_SRC_NAME=$(download_src ${LIBZIP_SRC_URL})
 LIBELF_SRC_NAME=$(download_src ${LIBELF_SRC_URL})
+LIBUDEV_SRC_NAME=$(download_src ${LIBUDEV_SRC_URL})
 LIBTHAI_SRC_NAME=$(download_src ${LIBTHAI_SRC_URL})
+LIBNETTLE_SRC_NAME=$(download_src ${LIBNETTLE_SRC_URL})
 LIBDATRIE_SRC_NAME=$(download_src ${LIBDATRIE_SRC_URL})
+LIBPCRE_SRC_NAME=$(download_src ${LIBPCRE_SRC_URL})
 LIBPCRE2_SRC_NAME=$(download_src ${LIBPCRE2_SRC_URL})
 LIBNOTIFY_SRC_NAME=$(download_src ${LIBNOTIFY_SRC_URL})
 GLIB_SRC_NAME=$(download_src ${GLIB_SRC_URL})
@@ -276,8 +282,11 @@ LIBPNG_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPNG_SRC_NAME}); echo "unzip ${LIBPNG_S
 ZLIB_SRC_DIR=$(unzip_src ".tar.xz" ${ZLIB_SRC_NAME}); echo "unzip ${ZLIB_SRC_NAME} source code"
 LIBZIP_SRC_DIR=$(unzip_src ".tar.xz" ${LIBZIP_SRC_NAME}); echo "unzip ${LIBZIP_SRC_NAME} source code"
 LIBELF_SRC_DIR=$(unzip_src ".tar.bz2" ${LIBELF_SRC_NAME}); echo "unzip ${LIBELF_SRC_NAME} source code"
+LIBUDEV_SRC_DIR=$(unzip_src ".tar.gz" ${LIBUDEV_SRC_NAME}); echo "unzip ${LIUDEV_SRC_NAME} source code"
 LIBTHAI_SRC_DIR=$(unzip_src ".tar.xz" ${LIBTHAI_SRC_NAME}); echo "unzip ${LIBTHAI_SRC_NAME} source code"
+LIBNETTLE_SRC_DIR=$(unzip_src ".tar.gz" ${LIBNETTLE_SRC_NAME}); echo "unzip ${LIBNETTLE_SRC_NAME} source code"
 LIBDATRIE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBDATRIE_SRC_NAME}); echo "unzip ${LIBDATRIE_SRC_NAME} source code"
+LIBPCRE_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCRE_SRC_NAME}); echo "unzip ${LIBPCRE_SRC_NAME} source code"
 LIBPCRE2_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCRE2_SRC_NAME}); echo "unzip ${LIBPCRE2_SRC_NAME} source code"
 LIBNOTIFY_SRC_DIR=$(unzip_src ".tar.xz" ${LIBNOTIFY_SRC_NAME}); echo "unzip ${LIBNOTIFY_SRC_NAME} source code"
 GLIB_SRC_DIR=$(unzip_src ".tar.xz" ${GLIB_SRC_NAME}); echo "unzip ${GLIB_SRC_NAME} source code"
@@ -568,7 +577,6 @@ common_build() {
 # 目前还不支持和 glibc 同时编译，因为如果编译链接 glibc ，可能需要全部依赖都做到源码编译，否则，可能编译过程中有问题
 # 因为 apt install 安装的软件可能依赖系统自带的 glibc，这边指定编译的 glibc ，就会导致链接器工作混乱。导致链接失败
 # 因此编译 xfce 时，一定保证 glibc_install/lib64 目录为空，否则就会出现上面的错误 died with <Signals.SIGSEGV: 11>
-# 高版本的 python 编译此工程也有问题, gtk 很多编译不过，需要手工改动
 #
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -691,8 +699,15 @@ common_build() {
   meson_build fribidi ${FRIBIDI_SRC_DIR}
   # 编译 pango
   meson_build pango ${PANGO_SRC_DIR}
-  # 编译 dbus-1( 我们的系统需要编译，如果在当前系统上运行 xfce4，需要注释掉，否则就会和系统自带的 dbus-1 冲突 )
+  # 编译基础库 ( 这些都是系统库，新系统需要集成 )
   if [ "$1" = "img" ]; then
+    # 编译 libudev
+    common_build libudev ${LIBUDEV_SRC_DIR}
+    # 编译 libpcre
+    common_build libpcre ${LIBPCRE_SRC_DIR}
+    # 编译 libnettle
+    common_build libnettle ${LIBNETTLE_SRC_DIR}
+    # 编译 dbus-1( 我们的系统需要编译，如果在当前系统上运行 xfce4，需要注释掉，否则就会和系统自带的 dbus-1 冲突 )
     common_build dbus-1 ${DBUS1_SRC_DIR} --disable-tests
   fi
   # 编译 libatk
