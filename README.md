@@ -119,7 +119,10 @@ server 版本不包含窗口系统所依赖的大部分包；如果系统自带�
 4. 我们怎么跟踪一个可执行程序的加载那些库，利用 LD_DEBUG=libs ./test  就可以了, 我们预加载库可以利用 LD_PRELOAD 强制预加载库
 
 5. 我们编译 cairo 通常情况下会遇到很多问题，如果 cairo 编译出现问题，怎么办，有些错误信息网上很难搜到   
-一定看它编译时生成的 config.log 文件，错误信息很详细！可以根据提示信息去解决问题
+    一定看它编译时生成的 config.log 文件，错误信息很详细！可以根据提示信息去解决问题
+
+6. 关于 busybox 的 init 系统变量
+    即使利用 grub 的内核参数，传递环境变量也不行，busybox 的 init 会自动生成默认的环境变量 PATH ，因此需要改动源码支持自定制路径。当然 shell 的登录模式，会读取 /etc/profile ，对于非登录模式，此模式失效，所以通过 /etc/profile 有局限性。
 
 # libxcb 的编译，具体详情参见 mk_xorg.sh
 1. 需要安装 apt install -y python-xcbgen 这个库，这个库会根据 xcbproto 提供的 xml 文件生成对应的 h 文件和 c 文件
