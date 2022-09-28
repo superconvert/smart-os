@@ -176,6 +176,12 @@ rm -rf ${diskfs}/init ${diskfs}/lost+found
 if [ "${with_xfce}" = true ]; then
   echo "${RED} ... build xfce desktop${NC}"
   cp ${xfce_install}/* ${diskfs} -r -n
+  # xfce 需要系统内执行下面两句，保证键盘数据存在 Xorg :10 才能执行成功
+  # 1. 键盘数据
+  # rm /usr/local/share/X11/xkb -rf
+  # ln -s /usr/share/X11/xkb /usr/local/share/X11
+  # 2. 需要改动 libpcre.so.1 ---> libpcre.so.3
+  # 3. xfce4-session 需要 libuuid.so
 fi
 
 # 测试用户登陆模式: root/123456
