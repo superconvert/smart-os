@@ -22,7 +22,7 @@ core_num=`nproc`
 with_gcc=true
 
 # 是否开启 xfce
-with_xfce=false
+with_xfce=true
 
 # 开启编译后 xfce 本地测试
 with_xfce_test=true
