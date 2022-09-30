@@ -708,7 +708,7 @@ common_build() {
   # 编译 pango
   meson_build pango ${PANGO_SRC_DIR}
   # 编译基础库 ( 这些都是系统库，新系统需要集成 )
-  if [ "$1" = "img" ]; then
+  if [ "${with_xfce}" = true ] && [ "$1" = "img" ]; then
     # 编译 expat
     common_build expat ${EXPAT_SRC_DIR}
     # 编译 libudev
@@ -923,8 +923,6 @@ if [ "${with_xfce_test}" = true ]; then
   rm /usr/local/share/X11/xkb -rf
   ln -s /usr/share/X11/xkb /usr/local/share/X11
 
-
-
   # xfdesktop 需要库的路径, xfdesktop 不能运行，基本上桌面就是黑屏了，可能有 dock 栏和最上面的状态栏
   libdir=`pwd`"/a/usr"
   libpath="${libdir}/lib:${libdir}/local/lib:${libdir}/lib/x86_64-linux-gnu"
@@ -933,8 +931,13 @@ if [ "${with_xfce_test}" = true ]; then
   echo "LD_LIBRARY_PATH=\"${libpath}:${libjpegdir}\" xfce4-session" > ~/.xsession
   # 不用起服务的方式了，太麻烦
   echo "LD_LIBRARY_PATH=\"${libpath}:${libjpegdir}\" /usr/libexec/upowerd -rd" > ~/.upowerd
-  chmod +x ~/.xsession
-  chmod +x ~/.upowerd
+  chmod +x ~/.xsession ~/.upowerd
+
+  # 你可以直接在虚拟机里面执行 startxfce4.sh，UBUNTU 18.04 Server 就会进入桌面模式了
+  echo "/root/.upowerd &" > ~/xfce.sh
+  echo "/root/.xsession" >> ~/xfce.sh
+  echo "xinit /root/xfce.sh -- /usr/local/bin/Xorg :10" > ~/startxfce4.sh
+  chmod +x ~/xfce.sh ~/startxfce4.sh
 
   # 整个流程说明
   # 0. 运行说明
