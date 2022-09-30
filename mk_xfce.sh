@@ -708,7 +708,7 @@ common_build() {
   # 编译 pango
   meson_build pango ${PANGO_SRC_DIR}
   # 编译基础库 ( 这些都是系统库，新系统需要集成 )
-  if [ "$1" = "img" ]; then
+  if [ "${with_xfce}" = true ]; then
     # 编译 expat
     common_build expat ${EXPAT_SRC_DIR}
     # 编译 libudev
