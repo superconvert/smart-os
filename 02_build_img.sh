@@ -118,6 +118,7 @@ mount --move /sys /mnt/sys
 mount --move /proc /mnt/proc
 mount --move /tmp /mnt/tmp
 # 切换到真正的磁盘系统上 rootfs ---> diskfs
+export LD_LIBRARY_PATH="/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu"
 exec switch_root /mnt /sbin/init
 EOF
 
@@ -175,7 +176,12 @@ rm -rf ${diskfs}/init ${diskfs}/lost+found
 # 带有 xfce 编译器
 if [ "${with_xfce}" = true ]; then
   echo "${RED} ... build xfce desktop${NC}"
+  rm ${xfce_install}/usr/local/share/X11/xkb -rf
+  ln -s /usr/share/X11/xkb ${xfce_install}/usr/local/share/X11
+  mv ${xfce_install}/usr/local/lib/libpcre.so.1 ${xfce_install}/usr/local/lib/libpcre.so.3
   cp ${xfce_install}/* ${diskfs} -r -n
+  echo "xinit /usr/local/bin/xfce4-session -- /usr/local/bin/Xorg :10" > ${diskfs}/xfce.sh
+  chmod +x ${diskfs}/xfce.sh
   # xfce 需要系统内执行下面两句，保证键盘数据存在 Xorg :10 才能执行成功
   # 1. 键盘数据
   # rm /usr/local/share/X11/xkb -rf
@@ -252,12 +258,12 @@ chmod +x  ${diskfs}/etc/init.d/rcS
 if [ "${with_login}" = true ]; then
 cat - > ${diskfs}/etc/profile << EOF
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-export LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/local/lib:/usr/lib/x86_64-linux-gnu
+export LD_LIBRARY_PATH="/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu"
 EOF
 else
 cat - > ${diskfs}/etc/bash.bashrc << EOF
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-export LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/local/lib:/usr/lib/x86_64-linux-gnu
+export LD_LIBRARY_PATH="/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu"
 EOF
 fi
 

@@ -25,13 +25,13 @@ with_gcc=true
 with_xfce=true
 
 # 开启编译后 xfce 本地测试
-with_xfce_test=true
+with_xfce_test=false
 
 # 是否挂载第二块硬盘
 with_sdb=false
 
 # 是否登陆模式
-with_login=false
+with_login=true
 
 #----------------------------------------------
 # 公共目录
