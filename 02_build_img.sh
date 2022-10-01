@@ -167,18 +167,36 @@ echo "${CYAN}--- build diskfs ---${NC}"
 cp rootfs/* ${diskfs} -r
 # 带有 gcc 编译器
 if [ "${with_gcc}" = true ]; then
-  echo "${RED} ... build gcc tools${NC}"
+  echo "${RED} ... build with-gcc${NC}"
   cp ${gcc_install}/* ${diskfs} -r
   cp ${binutils_install}/usr/x86_64-pc-linux-gnu/* ${diskfs} -r
 fi
 rm -rf ${diskfs}/init ${diskfs}/lost+found
 
+# 测试用户登陆模式: root/123456
+if [ "${with_login}" = true ]; then
+  echo "${RED} ... build with-login${NC}"
+  ./mk_login.sh ${diskfs}
+fi
+
 # 带有 xfce 编译器
 if [ "${with_xfce}" = true ]; then
   echo "${RED} ... build xfce desktop${NC}"
+  # 构建 Xorg 的键盘数据
   rm ${xfce_install}/usr/local/share/X11/xkb -rf
   ln -s /usr/share/X11/xkb ${xfce_install}/usr/local/share/X11
-  mv ${xfce_install}/usr/local/lib/libpcre.so.1 ${xfce_install}/usr/local/lib/libpcre.so.3
+  # 依赖版本 3
+  if [ -f "${xfce_install}/usr/local/lib/libpcre.so.1" ]; then
+    mv ${xfce_install}/usr/local/lib/libpcre.so.1 ${xfce_install}/usr/local/lib/libpcre.so.3
+  fi
+  # dbus 用户添加
+  echo "messagebus:x:107:" >> ${diskfs}/etc/group
+  echo "messagebus:x:103:107::/nonexistent:/usr/sbin/nologin" >> ${diskfs}/etc/passwd
+  # dbus 启动脚本
+  # dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+  # dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+  # dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 3
+  # 拷贝 xfce4 到镜像目录
   cp ${xfce_install}/* ${diskfs} -r -n
   echo "xinit /usr/local/bin/xfce4-session -- /usr/local/bin/Xorg :10" > ${diskfs}/xfce.sh
   chmod +x ${diskfs}/xfce.sh
@@ -188,12 +206,6 @@ if [ "${with_xfce}" = true ]; then
   # ln -s /usr/share/X11/xkb /usr/local/share/X11
   # 2. 需要改动 libpcre.so.1 ---> libpcre.so.3
   # 3. xfce4-session 需要 libuuid.so
-fi
-
-# 测试用户登陆模式: root/123456
-if [ "${with_login}" = true ]; then
-  echo "${RED} ... with-login${NC}"
-  ./mk_login.sh ${diskfs}
 fi
 
 # 我们测试驱动, 制作的镜像启动后，我们进入此目录 insmod hello_world.ko 即可 

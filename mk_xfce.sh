@@ -47,6 +47,7 @@ EXPAT_SRC_URL=https://nchc.dl.sourceforge.net/project/expat/expat/2.4.9/expat-2.
 LIBUDEV_SRC_URL=https://dev.gentoo.org/~blueness/eudev/eudev-3.2.9.tar.gz
 LIBNETTLE_SRC_URL=https://ftp.gnu.org/gnu/nettle/nettle-3.8.1.tar.gz
 LIBPCRE_SRC_URL=https://nchc.dl.sourceforge.net/project/pcre/pcre/8.39/pcre-8.39.tar.gz
+LLVM_SRC_URL=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/llvm-10.0.0.src.tar.xz
 NCURSES_SRC_URL=https://invisible-island.net/datafiles/release/ncurses.tar.gz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 
@@ -165,6 +166,7 @@ LIBPCRE_SRC_NAME=$(download_src ${LIBPCRE_SRC_URL})
 LIBPCRE2_SRC_NAME=$(download_src ${LIBPCRE2_SRC_URL})
 LIBNOTIFY_SRC_NAME=$(download_src ${LIBNOTIFY_SRC_URL})
 GLIB_SRC_NAME=$(download_src ${GLIB_SRC_URL})
+LLVM_SRC_NAME=$(download_src ${LLVM_SRC_URL})
 EXPAT_SRC_NAME=$(download_src ${EXPAT_SRC_URL})
 PIXMAN_SRC_NAME=$(download_src ${PIXMAN_SRC_URL})
 FREETYPE_SRC_NAME=$(download_src ${FREETYPE_SRC_URL})
@@ -294,6 +296,7 @@ LIBPCRE_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCRE_SRC_NAME}); echo "unzip ${LIBPCR
 LIBPCRE2_SRC_DIR=$(unzip_src ".tar.gz" ${LIBPCRE2_SRC_NAME}); echo "unzip ${LIBPCRE2_SRC_NAME} source code"
 LIBNOTIFY_SRC_DIR=$(unzip_src ".tar.xz" ${LIBNOTIFY_SRC_NAME}); echo "unzip ${LIBNOTIFY_SRC_NAME} source code"
 GLIB_SRC_DIR=$(unzip_src ".tar.xz" ${GLIB_SRC_NAME}); echo "unzip ${GLIB_SRC_NAME} source code"
+LLVM_SRC_DIR=$(unzip_src ".tar.xz" ${LLVM_SRC_NAME}); echo "unzip ${LLVM_SRC_NAME} source code"
 EXPAT_SRC_DIR=$(unzip_src ".tar.xz" ${EXPAT_SRC_NAME}); echo "unzip ${EXPAT_SRC_NAME} source code"
 PIXMAN_SRC_DIR=$(unzip_src ".tar.gz" ${PIXMAN_SRC_NAME}); echo "unzip ${PIXMAN_SRC_NAME} source code"
 FREETYPE_SRC_DIR=$(unzip_src ".tar.xz" ${FREETYPE_SRC_NAME}); echo "unzip ${FREETYPE_SRC_NAME} source code"
@@ -577,6 +580,27 @@ common_build() {
   fi
 }
 
+#----------------------------------------------------------------------------------------------------------------
+# llvm 编译
+#----------------------------------------------------------------------------------------------------------------
+llvm_build() {
+  local name=$1
+  local srcdir=$2
+  shift
+  shift
+  if [ ! -f .${name} ]; then
+    echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && mkdir -pv build && cd build
+    if [ -f CMakeLists.txt ]; then
+      cmake . -DCMAKE_INSTALL_PREFIX=/usr
+    fi
+    if [ -f ./configure ]; then
+      ./configure ${cfg_opt} "$@" ${xwin_opt}
+    fi
+    make -j8 && make install DESTDIR=${xfce_install} && echo "ok" > ../../.${name} || exit
+    cd ../.. && echo "${GREEN}build ${name} end${NC}"
+  fi
+}
+
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #
 # 编译 harfbuzz 遇到问题: linking of temporary binary failed，关闭 glibc 的链接，问题就解决了，原因推测如下：
@@ -709,6 +733,8 @@ common_build() {
   meson_build pango ${PANGO_SRC_DIR}
   # 编译基础库 ( 这些都是系统库，新系统需要集成 )
   if [ "${with_xfce}" = true ] && [ "$1" = "img" ]; then
+    # 编译 llvm ( swrast 依赖此库 )
+    llvm_build llvm ${LLVM_SRC_DIR}
     # 编译 expat
     common_build expat ${EXPAT_SRC_DIR}
     # 编译 libudev
