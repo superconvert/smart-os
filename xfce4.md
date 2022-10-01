@@ -2,7 +2,7 @@
 1. 利用 wmare 安装 Ubuntu 18.04 Server 版本，安装完毕，配置 apt 源，ssh 等操作，就不要再做过多的操作了，尽量保持系统纯净
 2. 修订 common.sh 文件里面的 with_xfce_test=true
 3. ./mk_xfce.sh 进行 xfce4 的编译，编译完毕会自动生成 startxfce.sh
-4. 在 wmware 虚拟机里面执行 ldconfig，然后再执行 startxfce.sh 就可以成功拉起桌面了
+4. 重启系统，重启完毕。在 wmware 虚拟机里面执行 startxfce.sh 就可以成功拉起桌面了
 
 # xfce4 组件介绍
 * [ Gtk+ ] 这些组件 gtk 最庞大  
