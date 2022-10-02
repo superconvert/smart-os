@@ -590,9 +590,7 @@ llvm_build() {
   shift
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && mkdir -pv build && cd build
-    if [ -f CMakeLists.txt ]; then
-      cmake . -DCMAKE_INSTALL_PREFIX=/usr
-    fi
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr
     if [ -f ./configure ]; then
       ./configure ${cfg_opt} "$@" ${xwin_opt}
     fi
