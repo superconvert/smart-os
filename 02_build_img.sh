@@ -200,6 +200,18 @@ if [ "${with_xfce}" = true ]; then
   cp ${xfce_install}/* ${diskfs} -r -n
   echo "xinit /usr/local/bin/xfce4-session -- /usr/local/bin/Xorg :10" > ${diskfs}/xfce.sh
   chmod +x ${diskfs}/xfce.sh
+  # 添加 machine-id
+  echo "2add25d2f5994832ba171755bc21f9fe" >> ${diskfs}/etc/machine-id
+  echo "2add25d2f5994832ba171755bc21f9fe" >> ${diskfs}/usr/local/var/lib/dbus/machine-id
+  # 这些本来需要编译完成，目前暂且拷贝
+  cp /usr/lib/x86_64-linux-gnu/libLLVM-10.so.1 smart-os/build/xfce_install/usr/lib/x86_64-linux-gnu/
+  cp /usr/lib/x86_64-linux-gnu/libffi.so.6 build/xfce_install/usr/lib/x86_64-linux-gnu/
+  cp /usr/lib/x86_64-linux-gnu/libedit.so.2 build/xfce_install/usr/lib/x86_64-linux-gnu/
+  cp /lib/x86_64-linux-gnu/libtinfo.so.5 build/xfce_install/usr/lib/x86_64-linux-gnu/
+  cp /usr/lib/x86_64-linux-gnu/libsensors.so.4 build/xfce_install/usr/lib/x86_64-linux-gnu/
+  cp /usr/lib/x86_64-linux-gnu/libdrm_radeon.so.1  build/xfce_install/usr/lib/x86_64-linux-gnu/
+  cp /usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1 build/xfce_install/usr/lib/x86_64-linux-gnu/
+  cp /usr/lib/x86_64-linux-gnu/libdrm_nouveau.so.2 build/xfce_install/usr/lib/x86_64-linux-gnu/
   # xfce 需要系统内执行下面两句，保证键盘数据存在 Xorg :10 才能执行成功
   # 1. 键盘数据
   # rm /usr/local/share/X11/xkb -rf
