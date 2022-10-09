@@ -1,6 +1,6 @@
 #!/bin/sh
   
-rm work/kernel_install/ work/glibc_install/ work/busybox_install/ work/libgcc_install work/binutils_install -rf
+# rm work/kernel_install/ work/glibc_install/ work/busybox_install/ work/libgcc_install work/binutils_install -rf
 
 if [ -f "/usr/bin/apt" ]; then
   apt -y install gcc g++ make gawk bison libelf-dev bridge-utils qemu-system docker.io

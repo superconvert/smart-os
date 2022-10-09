@@ -136,6 +136,8 @@ make_init
 # mknod -m 600 dev/console c 5 1
 # mknod -m 644 dev/null c 1 3
 # mknod -m 640 dev/sda1 b 8 1
+# xfce 需要显卡设备
+# mknod -m 664 dev/dri/card0 c 226 0
 
 # 指定了利用 /etc/init.d/rcS 启动
 cat<<"EOF">etc/inittab
@@ -189,29 +191,34 @@ if [ "${with_xfce}" = true ]; then
   if [ -f "${xfce_install}/usr/local/lib/libpcre.so.1" ]; then
     mv ${xfce_install}/usr/local/lib/libpcre.so.1 ${xfce_install}/usr/local/lib/libpcre.so.3
   fi
+  # 依赖版本 libedit2
+  if [ -f "${xfce_install}/usr/local/lib/libedit.so.0" ]; then
+    mv ${xfce_install}/usr/local/lib/libedit.so.0 ${xfce_install}/usr/local/lib/libedit.so.2
+  fi
+  # 依赖版本 libtinfo.so.5
+  if [ -f "${xfce_install}/usr/lib/libtinfo.so.6" ]; then
+    mv ${xfce_install}/usr/lib/libtinfo.so.6 ${xfce_install}/usr/lib/libtinfo.so.5
+  fi
   # dbus 用户添加
+  echo "video:x:44:" >> ${diskfs}/etc/group
   echo "messagebus:x:107:" >> ${diskfs}/etc/group
   echo "messagebus:x:103:107::/nonexistent:/usr/sbin/nologin" >> ${diskfs}/etc/passwd
   # dbus 启动脚本
   # dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
   # dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
   # dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 3
-  # 拷贝 xfce4 到镜像目录
-  cp ${xfce_install}/* ${diskfs} -r -n
-  echo "xinit /usr/local/bin/xfce4-session -- /usr/local/bin/Xorg :10" > ${diskfs}/xfce.sh
+  echo "dbus-daemon --system --nopidfile --systemd-activation" > ${diskfs}/xfce.sh
+  echo "xinit /usr/local/bin/xfce4-session -- /usr/local/bin/Xorg :10" >> ${diskfs}/xfce.sh
   chmod +x ${diskfs}/xfce.sh
   # 添加 machine-id
-  echo "2add25d2f5994832ba171755bc21f9fe" >> ${diskfs}/etc/machine-id
-  echo "2add25d2f5994832ba171755bc21f9fe" >> ${diskfs}/usr/local/var/lib/dbus/machine-id
+  mkdir -p ${diskfs}/usr/local/var/lib/dbus
+  echo "2add25d2f5994832ba171755bc21f9fe" > ${diskfs}/etc/machine-id
+  echo "2add25d2f5994832ba171755bc21f9fe" > ${diskfs}/usr/local/var/lib/dbus/machine-id
   # 这些本来需要编译完成，目前暂且拷贝
-  cp /usr/lib/x86_64-linux-gnu/libLLVM-10.so.1 smart-os/build/xfce_install/usr/lib/x86_64-linux-gnu/
-  cp /usr/lib/x86_64-linux-gnu/libffi.so.6 build/xfce_install/usr/lib/x86_64-linux-gnu/
-  cp /usr/lib/x86_64-linux-gnu/libedit.so.2 build/xfce_install/usr/lib/x86_64-linux-gnu/
-  cp /lib/x86_64-linux-gnu/libtinfo.so.5 build/xfce_install/usr/lib/x86_64-linux-gnu/
-  cp /usr/lib/x86_64-linux-gnu/libsensors.so.4 build/xfce_install/usr/lib/x86_64-linux-gnu/
-  cp /usr/lib/x86_64-linux-gnu/libdrm_radeon.so.1  build/xfce_install/usr/lib/x86_64-linux-gnu/
-  cp /usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1 build/xfce_install/usr/lib/x86_64-linux-gnu/
-  cp /usr/lib/x86_64-linux-gnu/libdrm_nouveau.so.2 build/xfce_install/usr/lib/x86_64-linux-gnu/
+  cp /usr/lib/x86_64-linux-gnu/libLLVM-10.so.1 build/xfce_install/usr/lib/x86_64-linux-gnu/
+  # cp /usr/lib/x86_64-linux-gnu/libffi.so.6 build/xfce_install/usr/lib/x86_64-linux-gnu/
+  # 拷贝 xfce4 到镜像目录
+  cp ${xfce_install}/* ${diskfs} -r -n
   # xfce 需要系统内执行下面两句，保证键盘数据存在 Xorg :10 才能执行成功
   # 1. 键盘数据
   # rm /usr/local/share/X11/xkb -rf

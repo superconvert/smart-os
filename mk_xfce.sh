@@ -42,14 +42,16 @@ DEJAVUFONTS1_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/downl
 DEJAVUFONTS2_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-lgc-fonts-ttf-2.37.tar.bz2
 LIBJPEGTURBO_SRC_URL=https://sourceforge.net/projects/libjpeg-turbo/files/2.1.0/libjpeg-turbo-2.1.0.tar.gz
 XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
-XTERM_SRC_URL=https://invisible-island.net/datafiles/release/xterm.tar.gz
+XTERM_SRC_URL=https://invisible-island.net/archives/xterm/xterm-372.tgz
 EXPAT_SRC_URL=https://nchc.dl.sourceforge.net/project/expat/expat/2.4.9/expat-2.4.9.tar.xz
 LIBUDEV_SRC_URL=https://dev.gentoo.org/~blueness/eudev/eudev-3.2.9.tar.gz
 LIBNETTLE_SRC_URL=https://ftp.gnu.org/gnu/nettle/nettle-3.8.1.tar.gz
 LIBPCRE_SRC_URL=https://nchc.dl.sourceforge.net/project/pcre/pcre/8.39/pcre-8.39.tar.gz
 LLVM_SRC_URL=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/llvm-10.0.0.src.tar.xz
-NCURSES_SRC_URL=https://invisible-island.net/datafiles/release/ncurses.tar.gz
+NCURSES_SRC_URL=https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
+LIBEDIT_SRC_URL=https://thrysoee.dk/editline/libedit-20210910-3.1.tar.gz
+IMSENSORS_SRC_URL=https://ftp.gwdg.de/pub/linux/misc/lm-sensors/lm_sensors-3.4.0.tar.bz2
 
 # download from https://github.com
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
@@ -160,6 +162,7 @@ LIBZIP_SRC_NAME=$(download_src ${LIBZIP_SRC_URL})
 LIBELF_SRC_NAME=$(download_src ${LIBELF_SRC_URL})
 LIBUDEV_SRC_NAME=$(download_src ${LIBUDEV_SRC_URL})
 LIBTHAI_SRC_NAME=$(download_src ${LIBTHAI_SRC_URL})
+LIBEDIT_SRC_NAME=$(download_src ${LIBEDIT_SRC_URL})
 LIBNETTLE_SRC_NAME=$(download_src ${LIBNETTLE_SRC_URL})
 LIBDATRIE_SRC_NAME=$(download_src ${LIBDATRIE_SRC_URL})
 LIBPCRE_SRC_NAME=$(download_src ${LIBPCRE_SRC_URL})
@@ -170,6 +173,7 @@ LLVM_SRC_NAME=$(download_src ${LLVM_SRC_URL})
 EXPAT_SRC_NAME=$(download_src ${EXPAT_SRC_URL})
 PIXMAN_SRC_NAME=$(download_src ${PIXMAN_SRC_URL})
 FREETYPE_SRC_NAME=$(download_src ${FREETYPE_SRC_URL})
+IMSENSORS_SRC_NAME=$(download_src ${IMSENSORS_SRC_URL})
 CAIRO_SRC_NAME=$(download_src ${CAIRO_SRC_URL})
 FONTCFG_SRC_NAME=$(download_src ${FONTCFG_SRC_URL})
 HARFBUZZ_SRC_NAME=$(download_src ${HARFBUZZ_SRC_URL})
@@ -288,6 +292,7 @@ LIBPNG_SRC_DIR=$(unzip_src ".tar.xz" ${LIBPNG_SRC_NAME}); echo "unzip ${LIBPNG_S
 ZLIB_SRC_DIR=$(unzip_src ".tar.xz" ${ZLIB_SRC_NAME}); echo "unzip ${ZLIB_SRC_NAME} source code"
 LIBZIP_SRC_DIR=$(unzip_src ".tar.xz" ${LIBZIP_SRC_NAME}); echo "unzip ${LIBZIP_SRC_NAME} source code"
 LIBELF_SRC_DIR=$(unzip_src ".tar.bz2" ${LIBELF_SRC_NAME}); echo "unzip ${LIBELF_SRC_NAME} source code"
+LIBEDIT_SRC_DIR=$(unzip_src ".tar.gz" ${LIBEDIT_SRC_NAME}); echo "unzip ${LIBEDIT_SRC_NAME} source code"
 LIBUDEV_SRC_DIR=$(unzip_src ".tar.gz" ${LIBUDEV_SRC_NAME}); echo "unzip ${LIBUDEV_SRC_NAME} source code"
 LIBTHAI_SRC_DIR=$(unzip_src ".tar.xz" ${LIBTHAI_SRC_NAME}); echo "unzip ${LIBTHAI_SRC_NAME} source code"
 LIBNETTLE_SRC_DIR=$(unzip_src ".tar.gz" ${LIBNETTLE_SRC_NAME}); echo "unzip ${LIBNETTLE_SRC_NAME} source code"
@@ -300,6 +305,7 @@ LLVM_SRC_DIR=$(unzip_src ".tar.xz" ${LLVM_SRC_NAME}); echo "unzip ${LLVM_SRC_NAM
 EXPAT_SRC_DIR=$(unzip_src ".tar.xz" ${EXPAT_SRC_NAME}); echo "unzip ${EXPAT_SRC_NAME} source code"
 PIXMAN_SRC_DIR=$(unzip_src ".tar.gz" ${PIXMAN_SRC_NAME}); echo "unzip ${PIXMAN_SRC_NAME} source code"
 FREETYPE_SRC_DIR=$(unzip_src ".tar.xz" ${FREETYPE_SRC_NAME}); echo "unzip ${FREETYPE_SRC_NAME} source code"
+IMSENSORS_SRC_DIR=$(unzip_src ".tar.bz2" ${IMSENSORS_SRC_NAME}); echo "unzip ${IMSENSORS_SRC_NAME} source code"
 CAIRO_SRC_DIR=$(unzip_src ".tar.xz" ${CAIRO_SRC_NAME}); echo "unzip ${CAIRO_SRC_NAME} source code"
 FONTCFG_SRC_DIR=$(unzip_src ".tar.xz" ${FONTCFG_SRC_NAME}); echo "unzip ${FONTCFG_SRC_NAME} source code"
 HARFBUZZ_SRC_DIR=$(unzip_src ".tar.xz" ${HARFBUZZ_SRC_NAME}); echo "unzip ${HARFBUZZ_SRC_NAME} source code"
@@ -469,8 +475,8 @@ pkg_cfg7="/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/local/share/pkgconfig:/us
 cfg_opt="--with-sysroot=${xfce_install}"
 xwin_opt="--x-includes=${xfce_loc_inc} --x-libraries=${xfce_loc_lib}"
 
-export CFLAGS="${include_path}"
-export CXXFLAGS="${include_path}"
+export CFLAGS="${include_path} -fPIC"
+export CXXFLAGS="${include_path} -fPIC"
 export LDFLAGS="${library_path}"
 
 export PKG_CONFIG_SYSROOT_DIR="${xfce_install}"
@@ -735,6 +741,10 @@ llvm_build() {
     # llvm_build llvm ${LLVM_SRC_DIR}
     # 编译 expat
     common_build expat ${EXPAT_SRC_DIR}
+    # 编译 ncurses ( libtinfo.so.5 )
+    common_build ncurses ${NCURSES_SRC_DIR} --with-shared --with-termlib
+    # 编译 libedit
+    common_build libedit ${LIBEDIT_SRC_DIR}
     # 编译 libudev
     common_build libudev ${LIBUDEV_SRC_DIR}
     # 编译 libpcre
@@ -743,6 +753,8 @@ llvm_build() {
     common_build libnettle ${LIBNETTLE_SRC_DIR}
     # 编译 dbus-1( 我们的系统需要编译，如果在当前系统上运行 xfce4，需要注释掉，否则就会和系统自带的 dbus-1 冲突 )
     common_build dbus-1 ${DBUS1_SRC_DIR} --disable-tests
+    # 编译 ( libsensors4 )
+    common_build im_sensors ${IMSENSORS_SRC_DIR}
   fi
   # 编译 libatk
   meson_build libatk ${LIBATK_SRC_DIR}
@@ -753,7 +765,7 @@ llvm_build() {
   # 编译 libpciaccess
   common_build libpciaccess ${LIBPCIACCESS_SRC_DIR}
   # 编译 libdrm
-  meson_build libdrm ${LIBDRM_SRC_DIR}
+  meson_build libdrm ${LIBDRM_SRC_DIR} -Dudev=true
   # 编译 graphene
   meson_build graphene ${GRAPHENE_SRC_DIR}
   # 编译 mesa
@@ -808,10 +820,8 @@ llvm_build() {
   common_build gnomeicontheme ${GNOMEICONTHEME_SRC_DIR}
   # 编译 hicolor-icon-theme
   common_build hicoloricontheme ${HICOLORICONTHEME_SRC_DIR}
-  # 编译 ncurses 
-  # common_build ncurses ${NCURSES_SRC_DIR}"-6.3"
   # 编译 xterm
-  # common_build xterm ${XTERM_SRC_DIR}"-372"
+  # common_build xterm ${XTERM_SRC_DIR}
   # fontutil
   common_build fontutil ${FONTUTIL_SRC_DIR}
   # mkfontdir

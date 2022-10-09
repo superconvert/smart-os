@@ -101,8 +101,11 @@ logfile="-serial file:./qemu.log"
 # 网络参数
 network="-netdev tap,id=nd0,ifname=tap0,script=no,downscript=no -device e1000,netdev=nd0"
 
-# 启动镜像 网络对应 run_nat.sh 里面的配置
-qemu-system-x86_64 ${disk} ${sdb_img} ${network} ${logfile}
+# 显卡参数
+display="-vga std"
+
+# 启动镜像 网络对应 run_nat.sh 里面的配置 ( -enable-kvm : vmware 里面 CPU 设置需要支持虚拟化 Intel VT-x/EPT 或 AMD-V/RVI )
+qemu-system-x86_64 -enable-kvm ${disk} ${sdb_img} ${network} ${logfile} ${display}
 
 # stop nat
 stop_nat
