@@ -142,6 +142,7 @@ FONTUTIL_SRC_URL=https://www.x.org/releases/individual/font/font-util-1.3.3.tar.
 FONTMISC_SRC_URL=https://www.x.org/releases/individual/font/font-misc-misc-1.1.2.tar.bz2
 XF86INPUT_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-libinput-1.2.1.tar.xz
 XF86VIDEOVESA_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-vesa-2.5.0.tar.bz2
+XF86VIDEOVMWARE_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-vmware-13.3.0.tar.bz2
 XKBDATA_SRC_URL=https://www.x.org/releases/individual/data/xkbdata-1.0.1.tar.bz2
 XKBDCFG_SRC_URL=https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.36.tar.xz
 
@@ -258,6 +259,7 @@ LIBWACOM_SRC_NAME=$(download_src ${LIBWACOM_SRC_URL})
 LIBINPUT_SRC_NAME=$(download_src ${LIBINPUT_SRC_URL})
 XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
 XF86VIDEOVESA_SRC_NAME=$(download_src ${XF86VIDEOVESA_SRC_URL})
+XF86VIDEOVMWARE_SRC_NAME=$(download_src ${XF86VIDEOVMWARE_SRC_URL})
 DEJAVUFONTS1_SRC_NAME=$(download_src ${DEJAVUFONTS1_SRC_URL})
 DEJAVUFONTS2_SRC_NAME=$(download_src ${DEJAVUFONTS2_SRC_URL})
 GNOMEICONTHEME_SRC_NAME=$(download_src ${GNOMEICONTHEME_SRC_URL})
@@ -382,6 +384,7 @@ LIBEVDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBEVDEV_SRC_NAME}); echo "unzip ${LIBE
 LIBINPUT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBINPUT_SRC_NAME}); echo "unzip ${LIBINPUT_SRC_NAME} source code"
 XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
 XF86VIDEOVESA_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOVESA_SRC_NAME}); echo "unzip ${XF86VIDEOVESA_SRC_NAME} source code"
+XF86VIDEOVMWARE_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOVMWARE_SRC_NAME}); echo "unzip ${XF86VIDEOVMWARE_SRC_NAME} source code"
 DEJAVUFONTS1_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS1_SRC_NAME}); echo "unzip ${DEJAVUFONTS1_SRC_NAME} source code"
 DEJAVUFONTS2_SRC_DIR=$(unzip_src ".tar.bz2" ${DEJAVUFONTS2_SRC_NAME}); echo "unzip ${DEJAVUFONTS2_SRC_NAME} source code"
 GNOMEICONTHEME_SRC_DIR=$(unzip_src ".tar.xz" ${GNOMEICONTHEME_SRC_NAME}); echo "unzip ${GNOMEICONTHEME_SRC_NAME} source code"
@@ -846,6 +849,8 @@ llvm_build() {
   common_build xf86input ${XF86INPUT_SRC_DIR}
   # xf86videovesa ( vesa是一个支持大部分显卡的通用驱动，不提供任何 2D 和 3D 加速功能 也可以 apt install libgl1-mesa-dri )
   common_build xf86videovesa ${XF86VIDEOVESA_SRC_DIR}
+  # xf86videovmware ( qemu 要模拟 vmware 的显卡，需要编译此工程 -vga vmware )
+  common_build xf86videovmware ${XF86VIDEOVMWARE_SRC_DIR}
   # gsetting-desktop-schemas
   meson_build gsetting-desktop-schemas ${GSETDESKTOPSCHEMAS_SRC_DIR}
 

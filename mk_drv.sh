@@ -27,9 +27,9 @@ EOF
 cat<<EOF>Makefile
 obj-m += hello_world.o
 all:
-	make -C ../build/linux-4.14.9 M=`pwd` modules
+	make -C ../build/linux-5.8.6 M=`pwd` modules
 clean:
-	make -C ../build/linux-4.14.9 M=`pwd` clean
+	make -C ../build/linux-5.8.6 M=`pwd` clean
 EOF
 
 echo $1

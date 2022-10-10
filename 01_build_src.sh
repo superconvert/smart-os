@@ -1,22 +1,22 @@
 #!/bin/sh
 
 if [ -f "/usr/bin/apt" ]; then
-  apt -y install gcc g++ make gawk bison libelf-dev bridge-utils
+  apt -y install gcc g++ make gawk flex bison libelf-dev libssl-dev bridge-utils
 fi
 
 if [ -f "/usr/bin/yum" ]; then
-  yum -y install gcc gcc-c++ make gawk bison elfutils-libelf bridge-utils
+  yum -y install gcc gcc-c++ make gawk flex bison elfutils-libelf libssl-dev bridge-utils
 fi
 
 #-----------------------------------------------
 #
-# 导入公共变量
+# 导入公共变量 ( xfce4 需要 5.4.0 的内核 )
 #
 #-----------------------------------------------
 . ./common.sh
 
 #LINUX_SRC_URL=https://kernel.org/pub/linux/kernel/v4.x/linux-4.14.9.tar.xz
-LINUX_SRC_URL=https://mirror.bjtu.edu.cn/kernel/linux/kernel/v4.x/linux-4.14.9.tar.xz
+LINUX_SRC_URL=https://mirror.bjtu.edu.cn/kernel/linux/kernel/v5.x/linux-5.8.6.tar.xz
 #GLIBC_SRC_URL=https://ftp.gnu.org/gnu/glibc/glibc-2.32.tar.bz2
 GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.27.tar.xz
 BUSYBOX_SRC_URL=https://busybox.net/downloads/busybox-1.34.1.tar.bz2
@@ -108,14 +108,41 @@ fi
 #---------------------------------------------
 cd ${build_dir}
 
-# 编译内核, 最终所有模块都装到目录 /lib/modules/4.14.9
+# 编译内核, 最终所有模块都装到目录 /lib/modules/5.8.6
 if [ ! -d "linux_install" ]; then 
   mkdir -pv linux_install && cd ${LINUX_SRC_DIR} && make mrproper && make x86_64_defconfig
   # Enable the VESA framebuffer for graphics support.
   sed -i "s/.*CONFIG_FB_VESA.*/CONFIG_FB_VESA=y/" .config 
+  # xfce4 需要 drm 支持，内核版本尽量大于等于 18.04 的，所以选取了 5.8.6 的内核
+  sed -i "/CONFIG_ARCH_HAS_PTE_SPECIAL=y/a\CONFIG_MAPPING_DIRTY_HELPERS=y" .config
+  sed -i "/# CONFIG_DRM_DP_CEC is not set/a\CONFIG_DRM_TTM=m" .config
+  sed -i "/CONFIG_DRM_TTM=m/a\CONFIG_DRM_TTM_DMA_PAGE_POOL=y" .config
+  sed -i "/CONFIG_DRM_TTM_DMA_PAGE_POOL=y/a\CONFIG_DRM_VRAM_HELPER=m" .config
+  sed -i "/CONFIG_DRM_VRAM_HELPER=m/a\CONFIG_DRM_TTM_HELPER=m" .config
+  sed -i "/CONFIG_DRM_TTM_HELPER=m/a\CONFIG_DRM_GEM_SHMEM_HELPER=y" .config
+  sed -i "/# CONFIG_FIRMWARE_EDID is not set/a\CONFIG_FB_BOOT_VESA_SUPPORT=y" .config
+  sed -i "/CONFIG_FB_DEFERRED_IO=y/a\CONFIG_FB_BACKLIGHT=m" .config
+  sed -i "/CONFIG_HDMI=y/i\CONFIG_VGASTATE=m" .config
+  sed -i "s/# CONFIG_FB_BACKLIGHT is not set/CONFIG_FB_BACKLIGHT=y/" .config
+  sed -i "s/# CONFIG_FB_CIRRUS is not set/CONFIG_FB_CIRRUS=m/" .config
+  sed -i "s/# CONFIG_FB_VGA16 is not set/CONFIG_FB_VGA16=m/" .config
+  sed -i "s/# CONFIG_FB_UVESA is not set/CONFIG_FB_UVESA=m/" .config
+  sed -i "s/# CONFIG_FB_OPENCORES is not set/CONFIG_FB_OPENCORES=m/" .config
+  sed -i "s/# CONFIG_FB_NVIDIA is not set/CONFIG_FB_NVIDIA=m/" .config
+  sed -i "/CONFIG_FB_NVIDIA=m/a\# CONFIG_FB_NVIDIA_I2C is not set" .config
+  sed -i "/# CONFIG_FB_NVIDIA_I2C is not set/a\# CONFIG_FB_NVIDIA_DEBUG is not set" .config
+  sed -i "/# CONFIG_FB_NVIDIA_DEBUG is not set/a\CONFIG_FB_NVIDIA_BACKLIGHT=y" .config
+  sed -i "s/# CONFIG_FB_IBM_GXT4500 is not set/CONFIG_FB_IBM_GXT4500=m/" .config
+  sed -i "s/# CONFIG_FB_SIMPLE is not set/CONFIG_FB_SIMPLE=y/" .config
+  sed -i "s/# CONFIG_VGASTATE is not set/CONFIG_VGASTATE=m/" .config
+  sed -i "s/# CONFIG_DRM_VMWGFX is not set/CONFIG_DRM_VMWGFX=m\nCONFIG_DRM_VMWGFX_FBCON=y/" .config
+  sed -i "s/# CONFIG_DRM_CIRRUS_QEMU is not set/CONFIG_DRM_CIRRUS_QEMU=m/" .config
+  sed -i "s/# CONFIG_DRM_QXL is not set/CONFIG_DRM_QXL=m/" .config
+  sed -i "s/# CONFIG_DRM_BOCHS is not set/CONFIG_DRM_BOCHS=m/" .config
+  sed -i "s/# CONFIG_DRM_HISI_HIBMC is not set/CONFIG_DRM_HISI_HIBMC=m/" .config
   # 网络需要 TUN/TAP 驱动 [ Device Drivers ] ---> [ Network device support ] ---> [ Universal TUN/TAP device driver support ]
   make bzImage -j8
-  #cd linux-4.14.9 && make x86_64_defconfig && make bzImage -j8 && make modules && make modules_install && cd ..
+  #cd linux-5.8.6 && make x86_64_defconfig && make bzImage -j8 && make modules && make modules_install && cd ..
   make INSTALL_HDR_PATH=${linux_install} headers_install -j8 && cp arch/x86_64/boot/bzImage ${linux_install} && cd ..
 fi
 

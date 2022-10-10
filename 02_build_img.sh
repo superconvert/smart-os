@@ -187,7 +187,7 @@ if [ "${with_xfce}" = true ]; then
   # 构建 Xorg 的键盘数据
   rm ${xfce_install}/usr/local/share/X11/xkb -rf
   ln -s /usr/share/X11/xkb ${xfce_install}/usr/local/share/X11
-  # 依赖版本 3
+  # 依赖版本 libpcre.so.3
   if [ -f "${xfce_install}/usr/local/lib/libpcre.so.1" ]; then
     mv ${xfce_install}/usr/local/lib/libpcre.so.1 ${xfce_install}/usr/local/lib/libpcre.so.3
   fi
@@ -198,6 +198,10 @@ if [ "${with_xfce}" = true ]; then
   # 依赖版本 libtinfo.so.5
   if [ -f "${xfce_install}/usr/lib/libtinfo.so.6" ]; then
     mv ${xfce_install}/usr/lib/libtinfo.so.6 ${xfce_install}/usr/lib/libtinfo.so.5
+  fi
+  # 依赖版本 libffi.so.6
+  if [ -f "${xfce_install}/usr/local/lib/libffi.so.8" ]; then
+    cp ${xfce_install}/usr/local/lib/libffi.so.8 ${xfce_install}/usr/local/lib/libffi.so.6
   fi
   # dbus 用户添加
   echo "video:x:44:" >> ${diskfs}/etc/group
@@ -230,7 +234,7 @@ fi
 # 我们测试驱动, 制作的镜像启动后，我们进入此目录 insmod hello_world.ko 即可 
 ./mk_drv.sh $(pwd)/${diskfs}/lib/modules 
 # 编译网卡驱动 ( 目前版本内核已集成 e1000 )
-# cd ${build_dir}/linux-4.14.9 && make M=drivers/net/ethernet/intel/e1000/ && cd ../..
+# cd ${build_dir}/linux-5.8.6 && make M=drivers/net/ethernet/intel/e1000/ && cd ../..
 
 # 生成 grub.cfg 文件, 增加 console=ttyS0 就会让 qemu 输出日志到 qemu.log
 cat - > ${diskfs}/boot/grub/grub.cfg << EOF
