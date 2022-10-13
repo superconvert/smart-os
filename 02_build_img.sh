@@ -31,6 +31,7 @@ losetup -o 1048576 ${loop_dev} disk.img
 # 对磁盘进行格式化
 mkfs.ext3 ${loop_dev} 
 
+# 如果制作的 disk.img 转换为 qemu-img convert disk.img -f raw -O vmdk out.vmdk, vmware 的磁盘类型一定设置为 SATA ，否则，启动失败
 diskfs="diskfs"
 # 挂载磁盘到本地目录
 mkdir -pv ${diskfs} 
@@ -59,6 +60,7 @@ mkdir -pv rootfs/lib/modules
 
 # 拷贝内核镜像
 cp ${linux_install}/bzImage ${diskfs}/boot/bzImage
+cp ${linux_install}/lib ${diskfs}/ -r
 
 # 拷贝 glibc 到 rootfs
 cp ${glibc_install}/* rootfs/ -r
@@ -119,7 +121,7 @@ mount --move /proc /mnt/proc
 mount --move /tmp /mnt/tmp
 # 切换到真正的磁盘系统上 rootfs ---> diskfs
 export LD_LIBRARY_PATH="/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu"
-exec switch_root /mnt /sbin/init
+exec switch_root -c /dev/console /mnt /sbin/init
 EOF
 
 # /sbin/init [switch_root 执行] ---> /etc/inittab [定义了启动顺序] ---> 
@@ -175,6 +177,12 @@ if [ "${with_gcc}" = true ]; then
 fi
 rm -rf ${diskfs}/init ${diskfs}/lost+found
 
+# lspci 显示厂商 ( 下面的是 ubuntu 的 )
+if [ -f "/usr/share/misc/pci.ids" ]; then
+  mkdir -p ${diskfs}/usr/share/misk
+  cp /usr/share/misc/pci.ids ${diskfs}/usr/share/misk/pci.ids
+fi
+
 # 测试用户登陆模式: root/123456
 if [ "${with_login}" = true ]; then
   echo "${RED} ... build with-login${NC}"
@@ -189,15 +197,15 @@ if [ "${with_xfce}" = true ]; then
   ln -s /usr/share/X11/xkb ${xfce_install}/usr/local/share/X11
   # 依赖版本 libpcre.so.3
   if [ -f "${xfce_install}/usr/local/lib/libpcre.so.1" ]; then
-    mv ${xfce_install}/usr/local/lib/libpcre.so.1 ${xfce_install}/usr/local/lib/libpcre.so.3
+    cp ${xfce_install}/usr/local/lib/libpcre.so.1 ${xfce_install}/usr/local/lib/libpcre.so.3
   fi
   # 依赖版本 libedit2
   if [ -f "${xfce_install}/usr/local/lib/libedit.so.0" ]; then
-    mv ${xfce_install}/usr/local/lib/libedit.so.0 ${xfce_install}/usr/local/lib/libedit.so.2
+    cp ${xfce_install}/usr/local/lib/libedit.so.0 ${xfce_install}/usr/local/lib/libedit.so.2
   fi
   # 依赖版本 libtinfo.so.5
   if [ -f "${xfce_install}/usr/lib/libtinfo.so.6" ]; then
-    mv ${xfce_install}/usr/lib/libtinfo.so.6 ${xfce_install}/usr/lib/libtinfo.so.5
+    cp ${xfce_install}/usr/lib/libtinfo.so.6 ${xfce_install}/usr/lib/libtinfo.so.5
   fi
   # 依赖版本 libffi.so.6
   if [ -f "${xfce_install}/usr/local/lib/libffi.so.8" ]; then
