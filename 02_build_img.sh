@@ -95,6 +95,9 @@ echo "${CYAN}--- build initrd ---${NC}"
 # 这种方法也可以 mkinitramfs -k -o ./${diskfs}/boot/initrd 4.14.9
 # 利用 Busybox 采用脚本制作 init 脚本 https://blog.csdn.net/embeddedman/article/details/7721926
 
+# 光驱挂载 : /dev/cdrom 是 /dev/sr0 的软连接，也就是说 /dev/sr0 才是实际意义上的光驱。所以没有软连接，
+# 照样可以挂载光驱。使用命令"mount /dev/sr0 /mnt/cdrom"便可以实现挂载。
+
 make_init() {
 
 cat<<"EOF">init
@@ -110,7 +113,7 @@ mount -t ext3 /dev/sda1 /mnt
 # 关闭内核烦人的输出信息
 echo 0 > /proc/sys/kernel/printk
 # 热插拔处理都交给 mdev
-echo /sbin/mdev > /proc/sys/kernel/hotplug
+# echo /sbin/mdev > /proc/sys/kernel/hotplug
 echo -e "\n\e[0;32mBoot took $(cut -d' ' -f1 /proc/uptime) seconds\e[0m"
 mkdir -p /dev/pts
 mount -t devpts devpts /dev/pts
@@ -121,7 +124,7 @@ mount --move /proc /mnt/proc
 mount --move /tmp /mnt/tmp
 # 切换到真正的磁盘系统上 rootfs ---> diskfs
 export LD_LIBRARY_PATH="/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu"
-exec switch_root -c /dev/console /mnt /sbin/init
+exec switch_root /mnt /sbin/init
 EOF
 
 # /sbin/init [switch_root 执行] ---> /etc/inittab [定义了启动顺序] ---> 
@@ -169,6 +172,14 @@ cd ..
 #--------------------------------------------------------------
 echo "${CYAN}--- build diskfs ---${NC}"
 cp rootfs/* ${diskfs} -r
+
+# 单独的 pciutils
+cp ${pciutils_install}/* ${diskfs} -r
+if [ -f "${diskfs}/usr/share/pci.ids.gz" ]; then
+  mkdir -pv ${diskfs}/usr/local/share
+  mv ${diskfs}/usr/share/pci.ids.gz ${diskfs}/usr/local/share/pci.ids.gz
+fi
+
 # 带有 gcc 编译器
 if [ "${with_gcc}" = true ]; then
   echo "${RED} ... build with-gcc${NC}"
@@ -176,12 +187,6 @@ if [ "${with_gcc}" = true ]; then
   cp ${binutils_install}/usr/x86_64-pc-linux-gnu/* ${diskfs} -r
 fi
 rm -rf ${diskfs}/init ${diskfs}/lost+found
-
-# lspci 显示厂商 ( 下面的是 ubuntu 的 )
-if [ -f "/usr/share/misc/pci.ids" ]; then
-  mkdir -p ${diskfs}/usr/share/misk
-  cp /usr/share/misc/pci.ids ${diskfs}/usr/share/misk/pci.ids
-fi
 
 # 测试用户登陆模式: root/123456
 if [ "${with_login}" = true ]; then

@@ -92,7 +92,7 @@ else
 fi
 
 # 指定内存
-memory="-m 4G"
+memory="-m 8G"
 
 # 主磁盘
 disk="-drive format=raw,file=disk.img"
@@ -105,10 +105,10 @@ logfile="-serial file:./qemu.log"
 network="-netdev tap,id=nd0,ifname=tap0,script=no,downscript=no -device e1000,netdev=nd0"
 
 # 显卡参数 需要编译 xf86-video-vmware, see mk_xfce.sh
-display="-vga vmware"
+display="-vga qxl"
 
 # 启动镜像 网络对应 run_nat.sh 里面的配置 ( -enable-kvm : vmware 里面 CPU 设置需要支持虚拟化 Intel VT-x/EPT 或 AMD-V/RVI )
 # 命令 qemu-system-x86_64 -device help 可以查看支持哪些设备
-qemu-system-x86_64 -enable-kvm ${display} ${memory} ${disk} ${sdb_img} ${network} ${logfile}
+qemu-system-x86_64 ${display} -device qxl ${memory} ${disk} ${sdb_img} ${network} ${logfile}
 # stop nat
 stop_nat

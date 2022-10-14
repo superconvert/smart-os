@@ -20,6 +20,7 @@ LINUX_SRC_URL=https://mirror.bjtu.edu.cn/kernel/linux/kernel/v5.x/linux-5.8.6.ta
 #GLIBC_SRC_URL=https://ftp.gnu.org/gnu/glibc/glibc-2.32.tar.bz2
 GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.27.tar.xz
 BUSYBOX_SRC_URL=https://busybox.net/downloads/busybox-1.34.1.tar.bz2
+PCIUTILS_SRC_URL=http://mj.ucw.cz/download/linux/pci/pciutils-3.8.0.tar.gz
 #GCC_SRC_URL=https://ftpmirror.gnu.org/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 GCC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 #BINUTILS_SRC_URL=https://ftp.gnu.org/gnu/binutils/binutils-2.36.tar.xz
@@ -37,6 +38,7 @@ cd source
 LINUX_SRC_NAME=$(download_src ${LINUX_SRC_URL})
 GLIBC_SRC_NAME=$(download_src ${GLIBC_SRC_URL})
 BUSYBOX_SRC_NAME=$(download_src ${BUSYBOX_SRC_URL})
+PCIUTILS_SRC_NAME=$(download_src ${PCIUTILS_SRC_URL})
 GCC_SRC_NAME=$(download_src ${GCC_SRC_URL})
 BINUTILS_SRC_NAME=$(download_src ${BINUTILS_SRC_URL})
 cd ..
@@ -51,6 +53,7 @@ mkdir -pv ${build_dir}
 LINUX_SRC_DIR=$(unzip_src ".tar.xz" ${LINUX_SRC_NAME}); echo "unzip ${LINUX_SRC_NAME} source code"
 GLIBC_SRC_DIR=$(unzip_src ".tar.xz" ${GLIBC_SRC_NAME}); echo "unzip ${GLIBC_SRC_NAME} source code"
 BUSYBOX_SRC_DIR=$(unzip_src ".tar.bz2" ${BUSYBOX_SRC_NAME}); echo "unzip ${BUSYBOX_SRC_NAME} source code"
+PCIUTILS_SRC_DIR=$(unzip_src ".tar.gz" ${PCIUTILS_SRC_NAME}); echo "unzip ${PCIUTILS_SRC_NAME} source code"
 GCC_SRC_DIR=$(unzip_src ".tar.xz" ${GCC_SRC_NAME}); echo "unzip ${GCC_SRC_NAME} source code"
 BINUTILS_SRC_DIR=$(unzip_src ".tar.xz" ${BINUTILS_SRC_NAME}); echo "unzip ${BINUTILS_SRC_NAME} source code"
 
@@ -297,18 +300,29 @@ if [ ! -d "glibc_install" ]; then
     --disable-werror \
     --disable-werror \
     CFLAGS="$CFLAGS"
-  make -j8 && make install -j8 DESTDIR=${glibc_install} && cd .. && cd ..
+  make -j8 && make install -j8 DESTDIR=${glibc_install}
+  cd .. && cd ..
 fi
 
 # 编译 busybox 
 if [ ! -d "busybox_install" ]; then
   mkdir -pv busybox_install && cd ${BUSYBOX_SRC_DIR} && make distclean && make defconfig
+  # 屏蔽掉 lspci 这个自带的太简单
+  sed -i "s/CONFIG_LSPCI=y/# CONFIG_LSPCI is not set/" .config
   # 静态编译 sed -i "s/# CONFIG_STATIC is not set/CONFIG_STATIC=y/g" .config
   sed -i "s|.*CONFIG_SYSROOT.*|CONFIG_SYSROOT=\"${glibc_install}\"|" .config
   sed -i "s|.*CONFIG_EXTRA_CFLAGS.*|CONFIG_EXTRA_CFLAGS=\"-I${linux_install}/include -I${glibc_install}/include -L${glibc_install}/usr/lib64 $CFLAGS\"|" .config
   # 环境变量 PATH 的设定，因为 busybox 的 init 会覆盖用户设置的 PATH，只能源码进行编译
   sed -i "s|#define BB_ADDITIONAL_PATH \"\"|#define BB_ADDITIONAL_PATH \":/usr/local/sbin:/usr/local/bin\"|" include/libbb.h
-  make busybox -j8 && make CONFIG_PREFIX=${busybox_install} install && cd ..
+  make busybox -j8 && make CONFIG_PREFIX=${busybox_install} install
+  cd ..
+fi
+
+# 编译 pciutils ( busybox 的 lspci 太简单 )
+if [ ! -d "pciutils_install" ]; then
+  mkdir -pv pciutils_install && cd ${PCIUTILS_SRC_DIR}
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${pciutils_install} PREFIX=/usr
+  cd ..
 fi
 
 # 编译 gcc
@@ -323,7 +337,8 @@ fi
 if [ ! -d "binutils_install" ]; then
   mkdir -pv binutils_install && cd ${BINUTILS_SRC_DIR} && make distclean
   ./configure --prefix=/usr
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${binutils_install} && cd ..
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${binutils_install}
+  cd ..
 fi
 
 cd ..
