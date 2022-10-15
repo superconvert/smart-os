@@ -18,9 +18,9 @@
 echo "${CYAN}--- build disk --- ${NC}"
 # 创建磁盘 128M 或 256M
 if [ "${with_gcc}" = false ]; then
-  create_disk disk.img 1024
+  create_disk disk.img 2048
 else
-  create_disk disk.img 1024
+  create_disk disk.img 2048
 fi
 echo "${GREEN}+++ build disk ok +++${NC}"
 
