@@ -142,6 +142,8 @@ XSERVER_SRC_URL=https://www.x.org/releases/individual/xserver/xorg-server-21.1.4
 FONTUTIL_SRC_URL=https://www.x.org/releases/individual/font/font-util-1.3.3.tar.xz
 FONTMISC_SRC_URL=https://www.x.org/releases/individual/font/font-misc-misc-1.1.2.tar.bz2
 XF86INPUT_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-libinput-1.2.1.tar.xz
+XF86INPUTVM_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-vmmouse-13.2.0.tar.xz
+XF86INPUTMM_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-mouse-1.9.3.tar.bz2
 XF86VIDEOATI_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-ati-19.1.0.tar.bz2
 XF86VIDEOVESA_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-vesa-2.5.0.tar.bz2
 XF86VIDEOINTEL_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-intel-2.99.917.tar.bz2
@@ -267,6 +269,8 @@ LIBWACOM_SRC_NAME=$(download_src ${LIBWACOM_SRC_URL})
 LIBINPUT_SRC_NAME=$(download_src ${LIBINPUT_SRC_URL})
 SPICEPROT_SRC_NAME=$(download_src ${SPICEPROT_SRC_URL})
 XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
+XF86INPUTVM_SRC_NAME=$(download_src ${XF86INPUTVM_SRC_URL})
+XF86INPUTMM_SRC_NAME=$(download_src ${XF86INPUTMM_SRC_URL})
 XF86VIDEOATI_SRC_NAME=$(download_src ${XF86VIDEOATI_SRC_URL})
 XF86VIDEOVESA_SRC_NAME=$(download_src ${XF86VIDEOVESA_SRC_URL})
 XF86VIDEOINTEL_SRC_NAME=$(download_src ${XF86VIDEOINTEL_SRC_URL})
@@ -400,6 +404,8 @@ LIBEVDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBEVDEV_SRC_NAME}); echo "unzip ${LIBE
 LIBINPUT_SRC_DIR=$(unzip_src ".tar.xz" ${LIBINPUT_SRC_NAME}); echo "unzip ${LIBINPUT_SRC_NAME} source code"
 SPICEPROT_SRC_DIR=$(unzip_src ".tar.xz" ${SPICEPROT_SRC_NAME}); echo "unzip ${SPICEPROT_SRC_NAME} source code"
 XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
+XF86INPUTVM_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUTVM_SRC_NAME}); echo "unzip ${XF86INPUTVM_SRC_NAME} source code"
+XF86INPUTMM_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86INPUTMM_SRC_NAME}); echo "unzip ${XF86INPUTMM_SRC_NAME} source code"
 XF86VIDEOATI_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOATI_SRC_NAME}); echo "unzip ${XF86VIDEOATI_SRC_NAME} source code"
 XF86VIDEOVESA_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOVESA_SRC_NAME}); echo "unzip ${XF86VIDEOVESA_SRC_NAME} source code"
 XF86VIDEOINTEL_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOINTEL_SRC_NAME}); echo "unzip ${XF86VIDEOINTEL_SRC_NAME} source code"
@@ -873,6 +879,10 @@ llvm_build() {
   meson_build libinput ${LIBINPUT_SRC_DIR}
   # xf86input ( libinput 的封装，使 libinput 用于 X 上的输入设备代替其他用于 X 输入的软件包即以 xf86-input- 为前缀的软件包 )
   common_build xf86input ${XF86INPUT_SRC_DIR}
+  # xf86inputvm
+  common_build xf86inputvm ${XF86INPUTVM_SRC_DIR}
+  # xf86inputmm
+  common_build xf86inputmm ${XF86INPUTMM_SRC_DIR}
   # xf86videoati ( 为了虚拟机上能显示图形，我们把常用的显卡驱动全部编译了 )
   # common_build xf86videoati ${XF86VIDEOATI_SRC_DIR}
   # xf86videovesa ( vesa是一个支持大部分显卡的通用驱动，不提供任何 2D 和 3D 加速功能 也可以 apt install libgl1-mesa-dri )
