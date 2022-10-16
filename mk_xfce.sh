@@ -675,7 +675,7 @@ llvm_build() {
   # 编译 gobject-introspection ( 这个不需要了，用系统的就行 )
   # meson_build gobject-introspection ${GOBJINTROSPE_SRC_DIR}
   # 在编译机上测试 xfce4 是否能正常工作，在这之前编译的有系统组件，不能覆盖系统的组件，否则会导致系统不能正常运行
-  if [ "${with_xfce_test}" = true ] && [ ! -f "tmp.tar.gz" ]; then
+  if [ "$1" = "test" ] && [ ! -f "tmp.tar.gz" ]; then
     tar zcf tmp.tar.gz ${xfce_install}
   fi
   # 编译 wayland-core ( documentation 依赖 graphviz 粘连了图形库 )
@@ -972,7 +972,7 @@ llvm_build() {
 # fi
 
 # 此开关选项可以在编译机器上，体验桌面系统了 ( Ubuntu Server 18.04 )
-if [ "${with_xfce_test}" = true ]; then
+if [ "$1" = "test" ]; then
 
   # gtk+ 之前 compile 的库不能覆盖系统目录，否则可能导致系统启动失败，或者 xfce4 不能正常运行，只能通过 ld.so.conf.d 加载
   rm test/a test/b -rf
