@@ -203,6 +203,7 @@ if [ ! -d "linux_install" ]; then
   sed -i "s/# CONFIG_DRM_I915_GVT is not set/CONFIG_DRM_I915_GVT=y/" .config
   sed -i "s/# CONFIG_DRM_VGEM is not set/CONFIG_DRM_VGEM=y/" .config
 
+  sed -i "s/# CONFIG_DRM_VKMS is not set/CONFIG_DRM_VKMS=y/" .config
   sed -i "s/# CONFIG_DRM_VMWGFX is not set/CONFIG_DRM_VMWGFX=y\nCONFIG_DRM_VMWGFX_FBCON=y/" .config
   sed -i "s/# CONFIG_DRM_GMA500 is not set/CONFIG_DRM_GMA500=y\nCONFIG_DRM_GMA600=y\nCONFIG_DRM_GMA3600=y/" .config
   sed -i "s/# CONFIG_DRM_MGAG200 is not set/CONFIG_DRM_MGAG200=y/" .config
