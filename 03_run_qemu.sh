@@ -92,7 +92,7 @@ else
 fi
 
 # 指定内存
-memory="-m 8G"
+memory="-m 4G"
 
 # 主磁盘
 disk="-drive format=raw,file=disk.img"
@@ -109,6 +109,6 @@ display="-vga vmware"
 
 # 启动镜像 网络对应 run_nat.sh 里面的配置 ( -enable-kvm : vmware 里面 CPU 设置需要支持虚拟化 Intel VT-x/EPT 或 AMD-V/RVI )
 # 命令 qemu-system-x86_64 -device help 可以查看支持哪些设备
-qemu-system-x86_64 -enable-kvm -display sdl,gl=on -vga virtio ${memory} ${disk} ${sdb_img} ${network} ${logfile}
+qemu-system-x86_64 -enable-kvm -device qxl -vga qxl ${memory} ${disk} ${sdb_img} ${network} ${logfile}
 # stop nat
 stop_nat

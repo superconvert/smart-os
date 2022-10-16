@@ -209,6 +209,7 @@ if [ ! -d "linux_install" ]; then
   sed -i "s/# CONFIG_DRM_MGAG200 is not set/CONFIG_DRM_MGAG200=y/" .config
   sed -i "s/# CONFIG_DRM_QXL is not set/CONFIG_DRM_QXL=y/" .config
   sed -i "s/# CONFIG_DRM_BOCHS is not set/CONFIG_DRM_BOCHS=y\n# CONFIG_DRM_VIRTIO_GPU is not set/" .config
+  sed -i "s/# CONFIG_DRM_VIRTIO_GPU is not set/CONFIG_DRM_VIRTIO_GPU=y/" .config
 
   sed -i "s/# CONFIG_DRM_ETNAVIV is not set/CONFIG_DRM_ETNAVIV=y\nCONFIG_DRM_ETNAVIV_THERMAL=y/" .config
   sed -i "s/# CONFIG_DRM_CIRRUS_QEMU is not set/CONFIG_DRM_CIRRUS_QEMU=y/" .config
