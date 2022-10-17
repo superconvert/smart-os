@@ -10,6 +10,7 @@ EOF
 # 用户密码文件
 cat<<EOF>${diskfs}/etc/passwd
 root:x:0:0:root:/:/bin/sh
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
 EOF
 
 # 用户 shadow 文件
@@ -30,12 +31,4 @@ export PS1 HOSTNAME
 EOF
 
 # 重新生成 inittab 文件
-cat<<EOF>${diskfs}/etc/inittab
-::sysinit:/bin/hostname -F /etc/hostname
-::sysinit:/etc/init.d/rcS
-tty0::respawn:-/bin/login
-::restart:/sbin/init
-::ctrlaltdel:/sbin/reboot
-::shutdown:/bin/umount -a -r
-::shutdown:/sbin/swapoff -a
-EOF
+sed -i "/::sysinit:\/etc\/init.d\/rcS/a\::sysinit:\/bin\/hostname -F \/etc\/hostname" ${diskfs}/etc/inittab

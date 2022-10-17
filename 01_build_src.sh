@@ -21,6 +21,8 @@ LINUX_SRC_URL=https://mirror.bjtu.edu.cn/kernel/linux/kernel/v5.x/linux-5.8.6.ta
 GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.27.tar.xz
 BUSYBOX_SRC_URL=https://busybox.net/downloads/busybox-1.34.1.tar.bz2
 PCIUTILS_SRC_URL=http://mj.ucw.cz/download/linux/pci/pciutils-3.8.0.tar.gz
+OPENSSL_SRC_URL=https://www.openssl.org/source/openssl-1.1.1q.tar.gz
+OPENSSH_SRC_URL=https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz
 #GCC_SRC_URL=https://ftpmirror.gnu.org/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 GCC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 #BINUTILS_SRC_URL=https://ftp.gnu.org/gnu/binutils/binutils-2.36.tar.xz
@@ -39,6 +41,8 @@ LINUX_SRC_NAME=$(download_src ${LINUX_SRC_URL})
 GLIBC_SRC_NAME=$(download_src ${GLIBC_SRC_URL})
 BUSYBOX_SRC_NAME=$(download_src ${BUSYBOX_SRC_URL})
 PCIUTILS_SRC_NAME=$(download_src ${PCIUTILS_SRC_URL})
+OPENSSL_SRC_NAME=$(download_src ${OPENSSL_SRC_URL})
+OPENSSH_SRC_NAME=$(download_src ${OPENSSH_SRC_URL})
 GCC_SRC_NAME=$(download_src ${GCC_SRC_URL})
 BINUTILS_SRC_NAME=$(download_src ${BINUTILS_SRC_URL})
 cd ..
@@ -54,6 +58,8 @@ LINUX_SRC_DIR=$(unzip_src ".tar.xz" ${LINUX_SRC_NAME}); echo "unzip ${LINUX_SRC_
 GLIBC_SRC_DIR=$(unzip_src ".tar.xz" ${GLIBC_SRC_NAME}); echo "unzip ${GLIBC_SRC_NAME} source code"
 BUSYBOX_SRC_DIR=$(unzip_src ".tar.bz2" ${BUSYBOX_SRC_NAME}); echo "unzip ${BUSYBOX_SRC_NAME} source code"
 PCIUTILS_SRC_DIR=$(unzip_src ".tar.gz" ${PCIUTILS_SRC_NAME}); echo "unzip ${PCIUTILS_SRC_NAME} source code"
+OPENSSL_SRC_DIR=$(unzip_src ".tar.gz" ${OPENSSL_SRC_NAME}); echo "unzip ${OPENSSL_SRC_NAME} source code"
+OPENSSH_SRC_DIR=$(unzip_src ".tar.gz" ${OPENSSH_SRC_NAME}); echo "unzip ${OPENSSH_SRC_NAME} source code"
 GCC_SRC_DIR=$(unzip_src ".tar.xz" ${GCC_SRC_NAME}); echo "unzip ${GCC_SRC_NAME} source code"
 BINUTILS_SRC_DIR=$(unzip_src ".tar.xz" ${BINUTILS_SRC_NAME}); echo "unzip ${BINUTILS_SRC_NAME} source code"
 
@@ -324,6 +330,40 @@ fi
 if [ ! -d "pciutils_install" ]; then
   mkdir -pv pciutils_install && cd ${PCIUTILS_SRC_DIR}
   CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${pciutils_install} PREFIX=/usr
+  cd ..
+fi
+
+# 编译 openssl
+if [ ! -d "openssl_install" ]; then
+  mkdir -pv openssl_install && cd ${OPENSSL_SRC_DIR}
+  ./config --prefix=/usr shared
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${openssl_install} PREFIX=/usr
+  cd ..
+fi
+
+# 编译 openssh
+if [ ! -d "openssh_install" ]; then
+  mkdir -pv openssh_install && cd ${OPENSSH_SRC_DIR}
+  ./configure --prefix=/usr --sysconfdir=/etc/ssh --with-ssl-dir=${openssl_install}/usr/ --with-pam --without-openssl-header-check
+  CFLAGS="-L${glibc_install}/lib64 -L${openssl_install}/usr/lib $CFLAGS" make -j8 && make install -j8 DESTDIR=${openssh_install} PREFIX=/usr
+  # 修改配置文件
+  sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" ${openssh_install}/etc/ssh/sshd_config
+  echo "HostKeyAlgorithms=ssh-rsa,ssh-dss" >> ${openssh_install}/etc/ssh/sshd_config
+  echo "KexAlgorithms=diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1" >> ${openssh_install}/etc/ssh/sshd_config
+  # 准备环境
+  if [ ! -d "${openssh_install}/var/empty" ]; then
+    mkdir -pv ${openssh_install}/var/empty
+  fi
+  chmod 744 ${openssh_install}/var/empty/
+  chown root ${openssh_install}/var/empty/
+  if [ ! -f "${openssh_install}/etc/ssh/ssh_host_dsa_key" ]; then
+    ssh-keygen -t dsa -P "" -f ${openssh_install}/etc/ssh/ssh_host_dsa_key
+  fi
+  if [ ! -f "${openssh_install}/etc/ssh/ssh_host_rsa_key" ]; then
+    ssh-keygen -t rsa -P "" -f ${openssh_install}/etc/ssh/ssh_host_rsa_key
+  fi
+  # 开启 sftp, 可以进行文件上传
+  sed -i "s/\/usr\/libexec\/sftp-server/internal-sftp/" ${openssh_install}/etc/ssh/sshd_config
   cd ..
 fi
 

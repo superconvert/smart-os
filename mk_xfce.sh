@@ -748,7 +748,7 @@ llvm_build() {
   # 编译 xkbcommon
   meson_build xkbcommon ${XKBCOMMON_SRC_DIR} -Denable-docs=false
   # 编译 gdkpixbuf
-  meson_build gdkpixbuf ${GDKPIXBUF_SRC_DIR} -Dman=false
+  meson_build gdkpixbuf ${GDKPIXBUF_SRC_DIR} -Dman=false -Dbuiltin_loaders=all -Dinstalled_tests=false -Drelocatable=true
   # 编译 pixman
   common_build pixman ${PIXMAN_SRC_DIR} --enable-libpng=yes
   # 编译 freetype
@@ -895,7 +895,7 @@ llvm_build() {
   # common_build xf86videoamd ${XF86VIDEOAMD_SRC_DIR}
   # xf86videoqxl ( 需要: spice_protocol, qemu 要模拟 vmware 的显卡，需要编译此工程 -vga vmware )
   if [ ! -f ".xf86videoqxl" ]; then
-    sed -i "s/value.bool/value.boolean/" ${XF86VIDEOQXL_SRC_DIR}/src/qxl_option_helpers.c
+    sed -i "s/value.bool;/value.boolean;/" ${XF86VIDEOQXL_SRC_DIR}/src/qxl_option_helpers.c
   fi
   common_build xf86videoqxl ${XF86VIDEOQXL_SRC_DIR}
   # xf86videofbdev ( qemu 要模拟 vmware 的显卡，需要编译此工程 -vga vmware )

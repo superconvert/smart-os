@@ -18,9 +18,9 @@
 echo "${CYAN}--- build disk --- ${NC}"
 # 创建磁盘 128M 或 256M
 if [ "${with_gcc}" = false ]; then
-  create_disk disk.img 2048
+  create_disk disk.img 4096
 else
-  create_disk disk.img 2048
+  create_disk disk.img 4096
 fi
 echo "${GREEN}+++ build disk ok +++${NC}"
 
@@ -146,19 +146,42 @@ make_init
 
 # 指定了利用 /etc/init.d/rcS 启动
 cat<<"EOF">etc/inittab
-::restart:/sbin/init
-::ctrlaltdel:/sbin/reboot
-::shutdown:/bin/umount -a -r
-::shutdown:/sbin/swapoff -a
 ::sysinit:echo "sysinit 1++++++++++++++++++++++++++++++++++++++"
 ::sysinit:/etc/init.d/rcS
 ::sysinit:echo "sysinit 2++++++++++++++++++++++++++++++++++++++"
-tty1::once:echo "hello smart-os tty1"
-tty1::respawn:/bin/sh
-tty2::once:echo "hello smart-os tty2"
-tty2::respawn:/bin/sh
-tty3::once:echo "hello smart-os tty3"
-tty3::respawn:/bin/sh
+
+# /bin/sh invocations on selected ttys
+#
+# Note below that we prefix the shell commands with a "-" to indicate to the
+# shell that it is supposed to be a login shell.  Normally this is handled by
+# login, but since we are bypassing login in this case, BusyBox lets you do
+# this yourself...
+#
+# Start an "askfirst" shell on the console (whatever that may be)
+::respawn:-/bin/login
+# Start an "askfirst" shell on /dev/tty2-4
+tty2::respawn:-/bin/sh
+tty3::respawn:-/bin/sh
+tty4::respawn:-/bin/sh
+
+# /sbin/getty invocations for selected ttys
+tty4::respawn:/sbin/getty 38400 tty5
+tty5::respawn:/sbin/getty 38400 tty6
+
+# Example of how to put a getty on a serial line (for a terminal)
+#::respawn:/sbin/getty -L ttyS0 9600 vt100
+#::respawn:/sbin/getty -L ttyS1 9600 vt100
+#
+# Example how to put a getty on a modem line.
+#::respawn:/sbin/getty 57600 ttyS2
+
+# Stuff to do when restarting the init process
+::restart:/sbin/init
+
+# Stuff to do before rebooting
+::ctrlaltdel:/sbin/reboot
+::shutdown:/bin/umount -a -r
+::shutdown:/sbin/swapoff -a
 EOF
 
 find . | cpio -R root:root -H newc -o | gzip -9 > ../${diskfs}/boot/initrd
@@ -179,6 +202,12 @@ if [ -f "${diskfs}/usr/share/pci.ids.gz" ]; then
   mkdir -pv ${diskfs}/usr/local/share
   mv ${diskfs}/usr/share/pci.ids.gz ${diskfs}/usr/local/share/pci.ids.gz
 fi
+
+# 带有 openssl
+cp ${openssl_install}/* ${diskfs} -r
+
+# 带有 openssh
+cp ${openssh_install}/* ${diskfs} -r
 
 # 带有 gcc 编译器
 if [ "${with_gcc}" = true ]; then
@@ -224,7 +253,10 @@ if [ "${with_xfce}" = true ]; then
   # dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
   # dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
   # dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 3
-  echo "dbus-daemon --system --nopidfile --systemd-activation" > ${diskfs}/xfce.sh
+  echo "dd if=/dev/zero of=/swapfile bs=1M count=2048" > ${diskfs}/xfce.sh
+  echo "mkswap /swapfile" >> ${diskfs}/xfce.sh
+  echo "swapon /swapfile" >> ${diskfs}/xfce.sh
+  echo "dbus-daemon --system --nopidfile --systemd-activation" >> ${diskfs}/xfce.sh
   echo "xinit /usr/local/bin/xfce4-session -- /usr/local/bin/Xorg :10" >> ${diskfs}/xfce.sh
   chmod +x ${diskfs}/xfce.sh
   # 添加 machine-id
@@ -294,13 +326,18 @@ echo -e "\n“${title}”\n"
 cd /lib/modules && insmod hello_world.ko
 
 # dns 测试 busybox 必须动态编译 动态编译 glibc 已经集成 dns 功能
-ifconfig eth0 192.168.100.6 && ifconfig eth0 up
-route add default gw 192.168.100.1
+# qemu
+# ifconfig eth0 192.168.100.6 && ifconfig eth0 up
+# route add default gw 192.168.100.1
+# vmware
+ifconfig eth0 192.168.222.195 && ifconfig eth0 up
+route add default gw 192.168.222.2
 
 # exec 执行 /etc/init.d/rc.local 脚本
+/usr/sbin/sshd
+
 EOF
 chmod +x  ${diskfs}/etc/init.d/rcS
-
 
 # 登陆 login shell ，非 non-login shell
 if [ "${with_login}" = true ]; then
@@ -327,5 +364,12 @@ losetup -d ${loop_dev}
 #
 #---------------------------------------------------------------
 ./ls_img.sh
+
+#---------------------------------------------------------------
+#
+# 转换为 vmware 格式
+#
+#---------------------------------------------------------------
+qemu-img convert disk.img -f raw -O vmdk disk.vmdk
 
 echo "Run the next script: 03_run_qemu.sh or 04_run_docker.sh"
