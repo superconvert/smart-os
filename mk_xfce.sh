@@ -69,6 +69,8 @@ WAYLANDCORE_SRC_URL=https://wayland.freedesktop.org/releases/wayland-1.20.0.tar.
 WAYLANDPROT_SRC_URL=https://wayland.freedesktop.org/releases/wayland-protocols-1.25.tar.xz
 UPOWER_SRC_URL=https://gitlab.freedesktop.org/upower/upower/-/archive/v1.90.0/upower-v1.90.0.tar.gz
 MESA_SRC_URL=https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.0.0-rc3/mesa-mesa-20.0.0-rc3.tar.gz
+SHAREDMIMEINFO_SRC_URL=https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.gz
+DESKTOPFILEUTILS_SRC_URL=https://gitlab.freedesktop.org/xdg/desktop-file-utils/-/archive/0.26/desktop-file-utils-0.26.tar.gz
 SPICEPROT_SRC_URL=https://gitlab.freedesktop.org/spice/spice-protocol/uploads/cf23e217768affaca44896598bd50f3e/spice-protocol-0.14.2.tar.xz
 LIBDRM_SRC_URL=https://dri.freedesktop.org/libdrm/libdrm-2.4.110.tar.xz
 DBUS1_SRC_URL=https://dbus.freedesktop.org/releases/dbus/dbus-1.12.12.tar.gz
@@ -144,6 +146,7 @@ FONTMISC_SRC_URL=https://www.x.org/releases/individual/font/font-misc-misc-1.1.2
 XF86INPUT_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-libinput-1.2.1.tar.xz
 XF86INPUTVM_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-vmmouse-13.2.0.tar.xz
 XF86INPUTMM_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-mouse-1.9.3.tar.bz2
+XF86INPUTEVDEV_SRC_URL=https://www.x.org/releases/individual/driver/xf86-input-evdev-2.10.6.tar.bz2
 XF86VIDEOATI_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-ati-19.1.0.tar.bz2
 XF86VIDEOVESA_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-vesa-2.5.0.tar.bz2
 XF86VIDEOINTEL_SRC_URL=https://www.x.org/releases/individual/driver/xf86-video-intel-2.99.917.tar.bz2
@@ -191,6 +194,8 @@ HARFBUZZ_SRC_NAME=$(download_src ${HARFBUZZ_SRC_URL})
 FRIBIDI_SRC_NAME=$(download_src ${FRIBIDI_SRC_URL})
 PANGO_SRC_NAME=$(download_src ${PANGO_SRC_URL})
 GDKPIXBUF_SRC_NAME=$(download_src ${GDKPIXBUF_SRC_URL})
+SHAREDMIMEINFO_SRC_NAME=$(download_src ${SHAREDMIMEINFO_SRC_URL})
+DESKTOPFILEUTILS_SRC_NAME=$(download_src ${DESKTOPFILEUTILS_SRC_URL})
 LIBATK_SRC_NAME=$(download_src ${LIBATK_SRC_URL})
 GETTEXT_SRC_NAME=$(download_src ${GETTEXT_SRC_URL})
 WAYLANDCORE_SRC_NAME=$(download_src ${WAYLANDCORE_SRC_URL})
@@ -271,6 +276,7 @@ SPICEPROT_SRC_NAME=$(download_src ${SPICEPROT_SRC_URL})
 XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
 XF86INPUTVM_SRC_NAME=$(download_src ${XF86INPUTVM_SRC_URL})
 XF86INPUTMM_SRC_NAME=$(download_src ${XF86INPUTMM_SRC_URL})
+XF86INPUTEVDEV_SRC_NAME=$(download_src ${XF86INPUTEVDEV_SRC_URL})
 XF86VIDEOATI_SRC_NAME=$(download_src ${XF86VIDEOATI_SRC_URL})
 XF86VIDEOVESA_SRC_NAME=$(download_src ${XF86VIDEOVESA_SRC_URL})
 XF86VIDEOINTEL_SRC_NAME=$(download_src ${XF86VIDEOINTEL_SRC_URL})
@@ -339,6 +345,8 @@ LIBATK_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_SRC_NAME}); echo "unzip ${LIBATK_S
 LIBEPOXY_SRC_DIR=$(unzip_src ".tar.xz" ${LIBEPOXY_SRC_NAME}); echo "unzip ${LIBEPOXY_SRC_NAME} source code"
 LIBATK_CORE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_CORE_SRC_NAME}); echo "unzip ${LIBATK_CORE_SRC_NAME} source code"
 LIBATK_BRIDGE_SRC_DIR=$(unzip_src ".tar.xz" ${LIBATK_BRIDGE_SRC_NAME}); echo "unzip ${LIBATK_BRIDGE_SRC_NAME} source code"
+SHAREDMIMEINFO_SRC_DIR=$(unzip_src ".tar.gz" ${SHAREDMIMEINFO_SRC_NAME}); echo "unzip ${SHAREDMIMEINFO_SRC_NAME} source code"
+DESKTOPFILEUTILS_SRC_DIR=$(unzip_src ".tar.gz" ${DESKTOPFILEUTILS_SRC_NAME}); echo "unzip ${DESKTOPFILEUTILS_SRC_NAME} source code"
 GRAPHENE_SRC_DIR=$(unzip_src ".tar.xz" ${GRAPHENE_SRC_NAME}); echo "unzip ${GRAPHENE_SRC_NAME} source code"
 GETTEXT_SRC_DIR=$(unzip_src ".tar.gz" ${GETTEXT_SRC_NAME}); echo "unzip ${GETTEXT_SRC_NAME} source code"
 WAYLANDCORE_SRC_DIR=$(unzip_src ".tar.xz" ${WAYLANDCORE_SRC_NAME}); echo "unzip ${WAYLANDCORE_SRC_NAME} source code"
@@ -406,6 +414,7 @@ SPICEPROT_SRC_DIR=$(unzip_src ".tar.xz" ${SPICEPROT_SRC_NAME}); echo "unzip ${SP
 XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF86INPUT_SRC_NAME} source code"
 XF86INPUTVM_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUTVM_SRC_NAME}); echo "unzip ${XF86INPUTVM_SRC_NAME} source code"
 XF86INPUTMM_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86INPUTMM_SRC_NAME}); echo "unzip ${XF86INPUTMM_SRC_NAME} source code"
+XF86INPUTEVDEV_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86INPUTEVDEV_SRC_NAME}); echo "unzip ${XF86INPUTEVDEV_SRC_NAME} source code"
 XF86VIDEOATI_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOATI_SRC_NAME}); echo "unzip ${XF86VIDEOATI_SRC_NAME} source code"
 XF86VIDEOVESA_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOVESA_SRC_NAME}); echo "unzip ${XF86VIDEOVESA_SRC_NAME} source code"
 XF86VIDEOINTEL_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOINTEL_SRC_NAME}); echo "unzip ${XF86VIDEOINTEL_SRC_NAME} source code"
@@ -788,6 +797,12 @@ llvm_build() {
     common_build dbus-1 ${DBUS1_SRC_DIR} --disable-tests
     # 编译 ( libsensors4 )
     common_build im_sensors ${IMSENSORS_SRC_DIR}
+    # 编译 shared-mime-info ( GNOME 需要这个 ) 并更新 mime 数据库
+    meson_build sharedmimeinfo ${SHAREDMIMEINFO_SRC_DIR}
+    ${xfce_install}/usr/bin/update-mime-database ${xfce_install}/usr/share/mime
+    # 编译 desktop-file-utils ( GNOME 需要这个 ) 并更新 applications 数据库
+    meson_build desktopfileutils ${DESKTOPFILEUTILS_SRC_DIR}
+    ${xfce_install}/usr/bin/update-desktop-database ${xfce_install}/usr/share/applications
   fi
   # 编译 libatk
   meson_build libatk ${LIBATK_SRC_DIR}
@@ -883,6 +898,8 @@ llvm_build() {
   common_build xf86inputvm ${XF86INPUTVM_SRC_DIR}
   # xf86inputmm
   common_build xf86inputmm ${XF86INPUTMM_SRC_DIR}
+  # xf86inputevdev
+  common_build xf86inputevdev ${XF86INPUTEVDEV_SRC_DIR}
   # xf86videoati ( 为了虚拟机上能显示图形，我们把常用的显卡驱动全部编译了 )
   # common_build xf86videoati ${XF86VIDEOATI_SRC_DIR}
   # xf86videovesa ( vesa是一个支持大部分显卡的通用驱动，不提供任何 2D 和 3D 加速功能 也可以 apt install libgl1-mesa-dri )
@@ -948,7 +965,6 @@ llvm_build() {
   cd ${XFCE_SRC_DIR}
 
   echo "${CYAN}build xfce4 utils${NC}"
-  sleep 3
 
   # 必须去掉这个，否则 xfce 编译不过，做的还是有点差，和 gtk+ 的编译还是差一个档次
   #unset PKG_CONFIG_SYSROOT_DIR

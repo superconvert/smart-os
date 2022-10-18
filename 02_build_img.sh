@@ -157,8 +157,8 @@ cat<<"EOF">etc/inittab
 # login, but since we are bypassing login in this case, BusyBox lets you do
 # this yourself...
 #
-# Start an "askfirst" shell on the console (whatever that may be)
-::respawn:-/bin/login
+# Start an "askfirst" shell on the console (whatever that may be) -f root 自动登录
+::respawn:-/bin/login -f root
 # Start an "askfirst" shell on /dev/tty2-4
 tty2::respawn:-/bin/sh
 tty3::respawn:-/bin/sh
@@ -195,6 +195,9 @@ cd ..
 #--------------------------------------------------------------
 echo "${CYAN}--- build diskfs ---${NC}"
 cp rootfs/* ${diskfs} -r
+
+# 单独的 lshw
+cp ${lshw_install}/* ${diskfs} -r
 
 # 单独的 pciutils
 cp ${pciutils_install}/* ${diskfs} -r
@@ -253,8 +256,10 @@ if [ "${with_xfce}" = true ]; then
   # dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
   # dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
   # dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 3
-  echo "dd if=/dev/zero of=/swapfile bs=1M count=2048" > ${diskfs}/xfce.sh
-  echo "mkswap /swapfile" >> ${diskfs}/xfce.sh
+  echo "if [ -f "/swapfile" ]; then" > ${diskfs}/xfce.sh
+  echo "  dd if=/dev/zero of=/swapfile bs=1M count=2048" >> ${diskfs}/xfce.sh
+  echo "  mkswap /swapfile" >> ${diskfs}/xfce.sh
+  echo "fi" >> ${diskfs}/xfce.sh
   echo "swapon /swapfile" >> ${diskfs}/xfce.sh
   echo "dbus-daemon --system --nopidfile --systemd-activation" >> ${diskfs}/xfce.sh
   echo "xinit /usr/local/bin/xfce4-session -- /usr/local/bin/Xorg :10" >> ${diskfs}/xfce.sh
@@ -274,6 +279,23 @@ if [ "${with_xfce}" = true ]; then
   # ln -s /usr/share/X11/xkb /usr/local/share/X11
   # 2. 需要改动 libpcre.so.1 ---> libpcre.so.3
   # 3. xfce4-session 需要 libuuid.so
+
+  # 依赖版本 libpcre.so.3
+  if [ -f "${xfce_install}/usr/local/lib/libpcre.so.1" ]; then
+    rm ${xfce_install}/usr/local/lib/libpcre.so.3 -rf
+  fi
+  # 依赖版本 libedit2
+  if [ -f "${xfce_install}/usr/local/lib/libedit.so.0" ]; then
+    rm ${xfce_install}/usr/local/lib/libedit.so.2 -rf
+  fi
+  # 依赖版本 libtinfo.so.5
+  if [ -f "${xfce_install}/usr/lib/libtinfo.so.6" ]; then
+    rm ${xfce_install}/usr/lib/libtinfo.so.5 -rf
+  fi
+  # 依赖版本 libffi.so.6
+  if [ -f "${xfce_install}/usr/local/lib/libffi.so.8" ]; then
+    rm ${xfce_install}/usr/local/lib/libffi.so.6 -rf
+  fi
 fi
 
 # 我们测试驱动, 制作的镜像启动后，我们进入此目录 insmod hello_world.ko 即可 
@@ -341,15 +363,11 @@ chmod +x  ${diskfs}/etc/init.d/rcS
 
 # 登陆 login shell ，非 non-login shell
 if [ "${with_login}" = true ]; then
-cat - > ${diskfs}/etc/profile << EOF
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-export LD_LIBRARY_PATH="/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu"
-EOF
+  echo "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" >> ${diskfs}/etc/profile
+  echo "export LD_LIBRARY_PATH=/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu" >> ${diskfs}/etc/profile
 else
-cat - > ${diskfs}/etc/bash.bashrc << EOF
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-export LD_LIBRARY_PATH="/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu"
-EOF
+  echo "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" >> ${diskfs}/etc/bash.bashrc
+  echo "export LD_LIBRARY_PATH=/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu" >> ${diskfs}/etc/bash.bashrc
 fi
 
 echo "${GREEN}+++ build diskfs ok +++${NC}"
@@ -357,6 +375,25 @@ echo "${GREEN}+++ build diskfs ok +++${NC}"
 # 卸载映射
 umount ${loop_dev} 
 losetup -d ${loop_dev}
+
+#----------------------------------------------------------------
+#
+# 常用命令
+#
+#----------------------------------------------------------------
+# 查看CPU信息：cat /proc/cpuinfo
+# 查看板卡信息：cat /proc/pci
+# 查看PCI信息：lspci (相比cat /proc/pci更直观)
+# 查看内存信息：cat /proc/meminfo
+# 查看USB设备：cat /proc/bus/usb/devices
+# 查看键盘和鼠标:cat /proc/bus/input/devices
+# 查看系统硬盘信息和使用情况：fdisk & disk - l & df
+# 查看各设备的中断请求(IRQ):cat /proc/interrupts
+# 查看系统体系结构：uname -a
+# dmidecode查看硬件信息，包括bios、cpu、内存等信息
+# dmesg | more 查看硬件信息
+# modinfo命令可以单看指定的模块/驱动的信息
+# linux为什么访问设备数据先要mount?  https://www.zhihu.com/question/524667726
 
 #---------------------------------------------------------------
 #

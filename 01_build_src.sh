@@ -20,6 +20,7 @@ LINUX_SRC_URL=https://mirror.bjtu.edu.cn/kernel/linux/kernel/v5.x/linux-5.8.6.ta
 #GLIBC_SRC_URL=https://ftp.gnu.org/gnu/glibc/glibc-2.32.tar.bz2
 GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.27.tar.xz
 BUSYBOX_SRC_URL=https://busybox.net/downloads/busybox-1.34.1.tar.bz2
+LSHW_SRC_URL=https://www.ezix.org/software/files/lshw-B.02.19.2.tar.gz
 PCIUTILS_SRC_URL=http://mj.ucw.cz/download/linux/pci/pciutils-3.8.0.tar.gz
 OPENSSL_SRC_URL=https://www.openssl.org/source/openssl-1.1.1q.tar.gz
 OPENSSH_SRC_URL=https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz
@@ -40,6 +41,7 @@ cd source
 LINUX_SRC_NAME=$(download_src ${LINUX_SRC_URL})
 GLIBC_SRC_NAME=$(download_src ${GLIBC_SRC_URL})
 BUSYBOX_SRC_NAME=$(download_src ${BUSYBOX_SRC_URL})
+LSHW_SRC_NAME=$(download_src ${LSHW_SRC_URL})
 PCIUTILS_SRC_NAME=$(download_src ${PCIUTILS_SRC_URL})
 OPENSSL_SRC_NAME=$(download_src ${OPENSSL_SRC_URL})
 OPENSSH_SRC_NAME=$(download_src ${OPENSSH_SRC_URL})
@@ -57,6 +59,7 @@ mkdir -pv ${build_dir}
 LINUX_SRC_DIR=$(unzip_src ".tar.xz" ${LINUX_SRC_NAME}); echo "unzip ${LINUX_SRC_NAME} source code"
 GLIBC_SRC_DIR=$(unzip_src ".tar.xz" ${GLIBC_SRC_NAME}); echo "unzip ${GLIBC_SRC_NAME} source code"
 BUSYBOX_SRC_DIR=$(unzip_src ".tar.bz2" ${BUSYBOX_SRC_NAME}); echo "unzip ${BUSYBOX_SRC_NAME} source code"
+LSHW_SRC_DIR=$(unzip_src ".tar.gz" ${LSHW_SRC_NAME}); echo "unzip ${LSHW_SRC_NAME} source code"
 PCIUTILS_SRC_DIR=$(unzip_src ".tar.gz" ${PCIUTILS_SRC_NAME}); echo "unzip ${PCIUTILS_SRC_NAME} source code"
 OPENSSL_SRC_DIR=$(unzip_src ".tar.gz" ${OPENSSL_SRC_NAME}); echo "unzip ${OPENSSL_SRC_NAME} source code"
 OPENSSH_SRC_DIR=$(unzip_src ".tar.gz" ${OPENSSH_SRC_NAME}); echo "unzip ${OPENSSH_SRC_NAME} source code"
@@ -68,47 +71,12 @@ BINUTILS_SRC_DIR=$(unzip_src ".tar.xz" ${BINUTILS_SRC_NAME}); echo "unzip ${BINU
 # 重新生成目标文件
 #
 #----------------------------------------------- 
-if [ "$1" != "" ]; then
-  if [ $1 != "rebuild" ]; then
-    exit
-  fi
+if [ "$1" = "rebuild" ]; then
   echo "rebuild"
   cd ${build_dir} 
-  rm -rf linux_install glibc_install busybox_install gcc_install binutils_install
-  # 编译内核, 最终所有模块都装到目录 /lib/modules/4.14.9
-  if [ ! -d "linux_install" ]; then
-    mkdir -pv linux_install && cd ${LINUX_SRC_DIR} 
-    make INSTALL_HDR_PATH=${linux_install} headers_install -j8 && cp arch/x86_64/boot/bzImage ${linux_install} && cd ..
-  fi
-
-  # 编译glibc
-  if [ ! -d "glibc_install" ]; then
-    mkdir -pv glibc_install && cd ${GLIBC_SRC_DIR} 
-    mkdir -pv build && cd build
-    make install -j8 DESTDIR=${glibc_install} && cd .. && cd ..
-  fi
-
-  # 编译 busybox 
-  if [ ! -d "busybox_install" ]; then
-    mkdir -pv busybox_install && cd ${BUSYBOX_SRC_DIR}
-    make CONFIG_PREFIX=${busybox_install} install && cd ..
-  fi
-
-  # 编译 libgcc
-  if [ ! -d "gcc_install" ]; then
-    mkdir -pv gcc_install && cd ${GCC_SRC_DIR}
-    make install -j8 DESTDIR=${gcc_install} && cd ..
-  fi
-
-  # 编译 binutils
-  if [ ! -d "binutils_install" ]; then
-    mkdir -pv binutils_install && cd ${BINUTILS_SRC_DIR}
-    make install -j8 DESTDIR=${binutils_install} && cd ..
-  fi  
+  rm -rf linux_install glibc_install busybox_install pciutils_install openssl_install openssh_install gcc_install binutils_install
   cd ..
-  exit
 fi
-
 
 #---------------------------------------------
 #
@@ -120,10 +88,9 @@ cd ${build_dir}
 # 编译内核, 最终所有模块都装到目录 /lib/modules/5.8.6
 if [ ! -d "linux_install" ]; then 
   mkdir -pv linux_install && cd ${LINUX_SRC_DIR} && make mrproper && make x86_64_defconfig
-  # Enable the VESA framebuffer for graphics support.
-  # 内核 3d 加速 https://wiki.gentoo.org/wiki/Xorg/Hardware_3D_acceleration_guide
-  # xfce4 需要 drm 支持，内核版本尽量大于等于 18.04 的，所以选取了 5.8.6 的内核
 
+  # 下面的配置主要显卡相关的配置，必须开启, 内核 3d 加速 https://wiki.gentoo.org/wiki/Xorg/Hardware_3D_acceleration_guide
+  # xfce4 需要 drm 支持，内核版本尽量大于等于 18.04 的，所以选取了 5.8.6 的内核
   sed -i "s/# CONFIG_X86_SYSFB is not set/CONFIG_X86_SYSFB=y/" .config
 
   sed -i "/CONFIG_VIRTUALIZATION=y/i\CONFIG_HAVE_KVM_IRQCHIP=y" .config
@@ -289,6 +256,12 @@ if [ ! -d "linux_install" ]; then
   sed -i "/# CONFIG_DMA_API_DEBUG is not set/i\# CONFIG_CMA_SIZE_SEL_MAX is not set" .config
   sed -i "/# CONFIG_DMA_API_DEBUG is not set/i\CONFIG_CMA_ALIGNMENT=8" .config
 
+  # 鼠标的配置 ( 否则 xfce4 界面上鼠标不能操作 /dev/input/mice, 上层需要 xf86-input-evdev, libevdev )
+  sed -i "/# CONFIG_INPUT_MOUSEDEV is not set/a\CONFIG_INPUT_MOUSEDEV_SCREEN_Y=768" .config
+  sed -i "/# CONFIG_INPUT_MOUSEDEV is not set/a\CONFIG_INPUT_MOUSEDEV_SCREEN_X=1024" .config
+  sed -i "/# CONFIG_INPUT_MOUSEDEV is not set/a\CONFIG_INPUT_MOUSEDEV_PSAUX=y" .config
+  sed -i "s/# CONFIG_INPUT_MOUSEDEV is not set/CONFIG_INPUT_MOUSEDEV=y/" .config
+
   # 网络需要 TUN/TAP 驱动 [ Device Drivers ] ---> [ Network device support ] ---> [ Universal TUN/TAP device driver support ]
   make bzImage -j8
   make modules -j8
@@ -326,6 +299,13 @@ if [ ! -d "busybox_install" ]; then
   cd ..
 fi
 
+# 编译 lshw ( 调试方便 )
+if [ ! -d "lshw_install" ]; then
+  mkdir -pv lshw_install && cd ${LSHW_SRC_DIR}
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${lshw_install} PREFIX=/usr
+  cd ..
+fi
+
 # 编译 pciutils ( busybox 的 lspci 太简单 )
 if [ ! -d "pciutils_install" ]; then
   mkdir -pv pciutils_install && cd ${PCIUTILS_SRC_DIR}
@@ -344,7 +324,7 @@ fi
 # 编译 openssh
 if [ ! -d "openssh_install" ]; then
   mkdir -pv openssh_install && cd ${OPENSSH_SRC_DIR}
-  ./configure --prefix=/usr --sysconfdir=/etc/ssh --with-ssl-dir=${openssl_install}/usr/ --with-pam --without-openssl-header-check
+  ./configure --prefix=/usr --sysconfdir=/etc/ssh --with-ssl-dir=${openssl_install}/usr/ --without-openssl-header-check
   CFLAGS="-L${glibc_install}/lib64 -L${openssl_install}/usr/lib $CFLAGS" make -j8 && make install -j8 DESTDIR=${openssh_install} PREFIX=/usr
   # 修改配置文件
   sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" ${openssh_install}/etc/ssh/sshd_config
@@ -363,13 +343,18 @@ if [ ! -d "openssh_install" ]; then
     ssh-keygen -t rsa -P "" -f ${openssh_install}/etc/ssh/ssh_host_rsa_key
   fi
   # 开启 sftp, 可以进行文件上传
-  sed -i "s/\/usr\/libexec\/sftp-server/internal-sftp/" ${openssh_install}/etc/ssh/sshd_config
+  if [ -f "${openssh_install}/etc/ssh/sshd_config" ]; then
+    sed -i "s/\/usr\/libexec\/sftp-server/internal-sftp/" ${openssh_install}/etc/ssh/sshd_config
+  fi
   cd ..
 fi
 
 # 编译 gcc
 if [ ! -d "gcc_install" ]; then 
-  mkdir -pv gcc_install && cd ${GCC_SRC_DIR} && make distclean && rm ./config.cache
+  mkdir -pv gcc_install && cd ${GCC_SRC_DIR}
+  if [ -f "config.cache" ]; then
+    rm ./config.cache
+  fi
   ./contrib/download_prerequisites
   ./configure --prefix=/usr --enable-languages=c,c++ --disable-multilib --disable-static --disable-libquadmath --enable-shared
   CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${gcc_install} && cd ..
