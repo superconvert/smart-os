@@ -38,8 +38,6 @@ PIXMAN_SRC_URL=https://www.cairographics.org/releases/pixman-0.40.0.tar.gz
 ZLIB_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.xz
 LIBPNG_SRC_URL=https://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.37/libpng-1.6.37.tar.xz
 FREETYPE_SRC_URL=https://nchc.dl.sourceforge.net/project/freetype/freetype2/2.12.0/freetype-2.12.0.tar.xz
-DEJAVUFONTS1_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.tar.bz2
-DEJAVUFONTS2_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-lgc-fonts-ttf-2.37.tar.bz2
 LIBJPEGTURBO_SRC_URL=https://sourceforge.net/projects/libjpeg-turbo/files/2.1.0/libjpeg-turbo-2.1.0.tar.gz
 XKBCOMMON_SRC_URL=https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz
 XTERM_SRC_URL=https://invisible-island.net/archives/xterm/xterm-372.tgz
@@ -47,13 +45,13 @@ EXPAT_SRC_URL=https://nchc.dl.sourceforge.net/project/expat/expat/2.4.9/expat-2.
 LIBUDEV_SRC_URL=https://dev.gentoo.org/~blueness/eudev/eudev-3.2.9.tar.gz
 LIBNETTLE_SRC_URL=https://ftp.gnu.org/gnu/nettle/nettle-3.8.1.tar.gz
 LIBPCRE_SRC_URL=https://nchc.dl.sourceforge.net/project/pcre/pcre/8.39/pcre-8.39.tar.gz
-LLVM_SRC_URL=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/llvm-10.0.0.src.tar.xz
 NCURSES_SRC_URL=https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
 XFCE_SRC_URL=https://archive.xfce.org/xfce/4.16/fat_tarballs/xfce-4.16.tar.bz2
 LIBEDIT_SRC_URL=https://thrysoee.dk/editline/libedit-20210910-3.1.tar.gz
 IMSENSORS_SRC_URL=https://ftp.gwdg.de/pub/linux/misc/lm-sensors/lm_sensors-3.4.0.tar.bz2
 
 # download from https://github.com
+LIBUSB_SRC_URL=https://github.com/libusb/libusb/releases/download/v1.0.26/libusb-1.0.26.tar.bz2
 LIBFFI_SRC_URL=https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 LIBTHAI_SRC_URL=https://github.com/tlwg/libthai/releases/download/v0.1.29/libthai-0.1.29.tar.xz
 LIBDATRIE_SRC_URL=https://github.com/tlwg/libdatrie/releases/download/v0.2.13/libdatrie-0.2.13.tar.xz
@@ -62,7 +60,10 @@ XRDP_SRC_URL=https://github.com/neutrinolabs/xrdp/releases/download/v0.9.19/xrdp
 FRIBIDI_SRC_URL=https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz
 HARFBUZZ_SRC_URL=https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz
 LIBPAM_SRC_URL=https://github.com/linux-pam/linux-pam/releases/download/v1.5.2/Linux-PAM-1.5.2.tar.xz
+LLVM_SRC_URL=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/llvm-10.0.0.src.tar.xz
 LIBWACOM_SRC_URL=https://github.com/linuxwacom/libwacom/releases/download/libwacom-2.4.0/libwacom-2.4.0.tar.xz
+DEJAVUFONTS1_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.tar.bz2
+DEJAVUFONTS2_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-lgc-fonts-ttf-2.37.tar.bz2
 
 # download from https://gitlab.freedesktop.org
 WAYLANDCORE_SRC_URL=https://wayland.freedesktop.org/releases/wayland-1.20.0.tar.xz
@@ -203,6 +204,7 @@ WAYLANDPROT_SRC_NAME=$(download_src ${WAYLANDPROT_SRC_URL})
 STARTUPNOTI_SRC_NAME=$(download_src ${STARTUPNOTI_SRC_URL})
 LIBGUDEV_SRC_NAME=$(download_src ${LIBGUDEV_SRC_URL})
 UPOWER_SRC_NAME=$(download_src ${UPOWER_SRC_URL})
+LIBUSB_SRC_NAME=$(download_src ${LIBUSB_SRC_URL})
 LIBWNCK_SRC_NAME=$(download_src ${LIBWNCK_SRC_URL})
 LIBATK_CORE_SRC_NAME=$(download_src ${LIBATK_CORE_SRC_URL})
 LIBATK_BRIDGE_SRC_NAME=$(download_src ${LIBATK_BRIDGE_SRC_URL})
@@ -354,6 +356,7 @@ WAYLANDPROT_SRC_DIR=$(unzip_src ".tar.xz" ${WAYLANDPROT_SRC_NAME}); echo "unzip 
 STARTUPNOTI_SRC_DIR=$(unzip_src ".tar.gz" ${STARTUPNOTI_SRC_NAME}); echo "unzip ${STARTUPNOTI_SRC_NAME} source code"
 LIBGUDEV_SRC_DIR=$(unzip_src ".tar.xz" ${LIBGUDEV_SRC_NAME}); echo "unzip ${LIBGUDEV_SRC_NAME} source code"
 UPOWER_SRC_DIR=$(unzip_src ".tar.gz" ${UPOWER_SRC_NAME}); echo "unzip ${UPOWER_SRC_NAME} source code"
+LIBUSB_SRC_DIR=$(unzip_src ".tar.bz2" ${LIBUSB_SRC_NAME}); echo "unzip ${LIBUSB_SRC_NAME} source code"
 GOBJINTROSPE_SRC_DIR=$(unzip_src ".tar.xz" ${GOBJINTROSPE_SRC_NAME}); echo "unzip ${GOBJINTROSPE_SRC_NAME} source code"
 LIBWNCK_SRC_DIR=$(unzip_src ".tar.xz" ${LIBWNCK_SRC_NAME}); echo "unzip ${LIBWNCK_SRC_NAME} source code"
 GSTREAMER_SRC_DIR=$(unzip_src ".tar.xz" ${GSTREAMER_SRC_NAME}); echo "unzip ${GSTREAMER_SRC_NAME} source code"
@@ -870,6 +873,8 @@ llvm_build() {
   common_build hicoloricontheme ${HICOLORICONTHEME_SRC_DIR}
   # 编译 xterm
   # common_build xterm ${XTERM_SRC_DIR}
+  # 编译 libusb
+  # common_build libusb ${LIBUSB_SRC_DIR}
   # fontutil
   common_build fontutil ${FONTUTIL_SRC_DIR}
   # mkfontdir

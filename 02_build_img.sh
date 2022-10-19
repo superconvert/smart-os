@@ -41,7 +41,7 @@ grub-install --boot-directory=${diskfs}/boot/ --target=i386-pc --modules=part_ms
 
 #---------------------------------------------
 #
-# 制作内核和 rootfs
+# 制作内核和 rootfs ( run 目录下 udev 被服务 udevd 使用，否则 xfce 鼠标不能使用 )
 #
 #---------------------------------------------
 rm -rf rootfs
@@ -50,6 +50,7 @@ mkdir -pv rootfs/dev
 mkdir -pv rootfs/etc
 mkdir -pv rootfs/sys
 mkdir -pv rootfs/mnt
+mkdir -pv rootfs/run
 mkdir -pv rootfs/tmp
 mkdir -pv rootfs/lib
 mkdir -pv rootfs/sbin
@@ -198,6 +199,9 @@ cp rootfs/* ${diskfs} -r
 
 # 单独的 lshw
 cp ${lshw_install}/* ${diskfs} -r
+
+# 单独的 lsof
+cp ${lsof_install}/* ${diskfs} -r
 
 # 单独的 pciutils
 cp ${pciutils_install}/* ${diskfs} -r
@@ -356,6 +360,9 @@ ifconfig eth0 192.168.222.195 && ifconfig eth0 up
 route add default gw 192.168.222.2
 
 # exec 执行 /etc/init.d/rc.local 脚本
+# 启动 udevd 服务，保证鼠标设备能正常监视
+/usr/sbin/udevd -d
+# 启动 sshd 服务，保证远程连接，调试跟踪非常方便
 /usr/sbin/sshd
 
 EOF
@@ -393,6 +400,7 @@ losetup -d ${loop_dev}
 # dmidecode查看硬件信息，包括bios、cpu、内存等信息
 # dmesg | more 查看硬件信息
 # modinfo命令可以单看指定的模块/驱动的信息
+# 查看设备名称 cat /sys/class/input/mouse2/device/name
 # linux为什么访问设备数据先要mount?  https://www.zhihu.com/question/524667726
 
 #---------------------------------------------------------------
