@@ -39,6 +39,7 @@ glibc_install=${build_dir}"/glibc_install"
 busybox_install=${build_dir}"/busybox_install"
 lshw_install=${build_dir}"/lshw_install"
 lsof_install=${build_dir}"/lsof_install"
+strace_install=${build_dir}"/strace_install"
 pciutils_install=${build_dir}"/pciutils_install"
 openssl_install=${build_dir}"/openssl_install"
 openssh_install=${build_dir}"/openssh_install"
@@ -70,7 +71,7 @@ file_dirname() {
 download_src() {
   SRC_NAME=$2$(file_name $1)
   if [ ! -f ${SRC_NAME} ]; then
-    wget -c -t 0 $1 -O $SRC_NAME || (echo "download $1 failed" && exit)
+    wget -c -t 0 $1 -O $SRC_NAME --no-check-certificate || (echo "download $1 failed" && exit)
   fi
   echo $SRC_NAME
 }

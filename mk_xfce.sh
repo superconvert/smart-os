@@ -62,6 +62,7 @@ HARFBUZZ_SRC_URL=https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/ha
 LIBPAM_SRC_URL=https://github.com/linux-pam/linux-pam/releases/download/v1.5.2/Linux-PAM-1.5.2.tar.xz
 LLVM_SRC_URL=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/llvm-10.0.0.src.tar.xz
 LIBWACOM_SRC_URL=https://github.com/linuxwacom/libwacom/releases/download/libwacom-2.4.0/libwacom-2.4.0.tar.xz
+XF86INPUTWACOM_SRC_URL=https://github.com/linuxwacom/xf86-input-wacom/releases/download/xf86-input-wacom-0.40.0/xf86-input-wacom-0.40.0.tar.bz2
 DEJAVUFONTS1_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.tar.bz2
 DEJAVUFONTS2_SRC_URL=https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-lgc-fonts-ttf-2.37.tar.bz2
 
@@ -130,6 +131,7 @@ XSHMFENCE_SRC_URL=https://www.x.org/releases/individual/lib/libxshmfence-1.3.tar
 XINERAMA_SRC_URL=https://www.x.org/releases/individual/lib/libXinerama-1.1.4.tar.gz
 LIBPCIACCESS_SRC_URL=https://www.x.org/releases/individual/lib/libpciaccess-0.16.tar.gz
 XORGMACROS_SRC_URL=https://www.x.org/releases/individual/util/util-macros-1.19.3.tar.gz
+XINPUT_SRC_URL=https://www.x.org/releases/individual/app/xinput-1.6.3.tar.gz
 ICEAUTH_SRC_URL=https://www.x.org/releases/individual/app/iceauth-1.0.9.tar.xz
 XKBCOMP_SRC_URL=https://www.x.org/releases/individual/app/xkbcomp-1.4.5.tar.gz
 BDFTOPCF_SRC_URL=https://www.x.org/releases/individual/app/bdftopcf-1.1.tar.bz2
@@ -213,6 +215,7 @@ LIBXPROTO_SRC_NAME=$(download_src ${LIBXPROTO_SRC_URL})
 XTRANS_SRC_NAME=$(download_src ${XTRANS_SRC_URL})
 XINIT_SRC_NAME=$(download_src ${XINIT_SRC_URL})
 LIBSM_SRC_NAME=$(download_src ${LIBSM_SRC_URL})
+XINPUT_SRC_NAME=$(download_src ${XINPUT_SRC_URL})
 LIBICE_SRC_NAME=$(download_src ${LIBICE_SRC_URL})
 LIBX11_SRC_NAME=$(download_src ${LIBX11_SRC_URL})
 XRANDR_SRC_NAME=$(download_src ${XRANDR_SRC_URL})
@@ -279,6 +282,7 @@ XF86INPUT_SRC_NAME=$(download_src ${XF86INPUT_SRC_URL})
 XF86INPUTVM_SRC_NAME=$(download_src ${XF86INPUTVM_SRC_URL})
 XF86INPUTMM_SRC_NAME=$(download_src ${XF86INPUTMM_SRC_URL})
 XF86INPUTEVDEV_SRC_NAME=$(download_src ${XF86INPUTEVDEV_SRC_URL})
+XF86INPUTWACOM_SRC_NAME=$(download_src ${XF86INPUTWACOM_SRC_URL})
 XF86VIDEOATI_SRC_NAME=$(download_src ${XF86VIDEOATI_SRC_URL})
 XF86VIDEOVESA_SRC_NAME=$(download_src ${XF86VIDEOVESA_SRC_URL})
 XF86VIDEOINTEL_SRC_NAME=$(download_src ${XF86VIDEOINTEL_SRC_URL})
@@ -374,6 +378,7 @@ XKBCOMMON_SRC_DIR=$(unzip_src ".tar.xz" ${XKBCOMMON_SRC_NAME}); echo "unzip ${XK
 XEXT_SRC_DIR=$(unzip_src ".tar.gz" ${XEXT_SRC_NAME}); echo "unzip ${XEXT_SRC_NAME} source code"
 XEXTPROTO_SRC_DIR=$(unzip_src ".tar.gz" ${XEXTPROTO_SRC_NAME}); echo "unzip ${XEXTPROTO_SRC_NAME} source code"
 XINIT_SRC_DIR=$(unzip_src ".tar.gz" ${XINIT_SRC_NAME}); echo "unzip ${XINIT_SRC_NAME} source code"
+XINPUT_SRC_DIR=$(unzip_src ".tar.gz" ${XINPUT_SRC_NAME}); echo "unzip ${XINPUT_SRC_NAME} source code"
 XTRANS_SRC_DIR=$(unzip_src ".tar.gz" ${XTRANS_SRC_NAME}); echo "unzip ${XTRANS_SRC_NAME} source code"
 XCBPROTO_SRC_DIR=$(unzip_src ".tar.gz" ${XCBPROTO_SRC_NAME}); echo "unzip ${XCBPROTO_SRC_NAME} source code"
 LIBXCB_SRC_DIR=$(unzip_src ".tar.xz" ${LIBXCB_SRC_NAME}); echo "unzip ${LIBXCB_SRC_NAME} source code"
@@ -418,6 +423,7 @@ XF86INPUT_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUT_SRC_NAME}); echo "unzip ${XF
 XF86INPUTVM_SRC_DIR=$(unzip_src ".tar.xz" ${XF86INPUTVM_SRC_NAME}); echo "unzip ${XF86INPUTVM_SRC_NAME} source code"
 XF86INPUTMM_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86INPUTMM_SRC_NAME}); echo "unzip ${XF86INPUTMM_SRC_NAME} source code"
 XF86INPUTEVDEV_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86INPUTEVDEV_SRC_NAME}); echo "unzip ${XF86INPUTEVDEV_SRC_NAME} source code"
+XF86INPUTWACOM_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86INPUTWACOM_SRC_NAME}); echo "unzip ${XF86INPUTWACOM_SRC_NAME} source code"
 XF86VIDEOATI_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOATI_SRC_NAME}); echo "unzip ${XF86VIDEOATI_SRC_NAME} source code"
 XF86VIDEOVESA_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOVESA_SRC_NAME}); echo "unzip ${XF86VIDEOVESA_SRC_NAME} source code"
 XF86VIDEOINTEL_SRC_DIR=$(unzip_src ".tar.bz2" ${XF86VIDEOINTEL_SRC_NAME}); echo "unzip ${XF86VIDEOINTEL_SRC_NAME} source code"
@@ -657,6 +663,22 @@ llvm_build() {
 # 因为 apt install 安装的软件可能依赖系统自带的 glibc，这边指定编译的 glibc ，就会导致链接器工作混乱。导致链接失败
 # 因此编译 xfce 时，一定保证 glibc_install/lib64 目录为空，否则就会出现上面的错误 died with <Signals.SIGSEGV: 11>
 #
+# 有关 xorg 驱动相关的介绍，参考 https://linuxfromscratch.org/blfs/view/11.0/x/x7driver.html
+#
+# libevdev 介绍 ---
+# The libevdev package contains common functions for Xorg input drivers.
+# 需要内核支持
+# Device Drivers  --->
+# Input device support --->
+#   <*> Generic input layer (needed for keyboard, mouse, ...) [CONFIG_INPUT]
+#   <*>   Event interface                   [CONFIG_INPUT_EVDEV]
+#   [*]   Miscellaneous devices  --->       [CONFIG_INPUT_MISC]
+#     <*>    User level driver support      [CONFIG_INPUT_UINPUT]
+#
+# xf86-input-evdev 介绍 ---
+# The Xorg Evdev Driver package contains a Generic Linux input driver for the Xorg X server. It handles keyboard, mouse,
+# touchpads and wacom devices, though for touchpad and wacom advanced handling, additional drivers are required.
+#
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # if [ ! -d "xfce_install" ]; then
@@ -753,6 +775,8 @@ llvm_build() {
   common_build xxf86vm ${XXF86VM_SRC_DIR}
   # 编译 xinit
   common_build xinit ${XINIT_SRC_DIR}
+  # 编译 xinput ( 输入设备探测 )
+  common_build xinput ${XINPUT_SRC_DIR}
   # 编译 xi ( 问题解决见上面的注释 )
   common_build xi ${XI_SRC_DIR}
   # 编译 xtst
@@ -790,8 +814,8 @@ llvm_build() {
     common_build ncurses ${NCURSES_SRC_DIR} --with-shared --with-termlib
     # 编译 libedit
     common_build libedit ${LIBEDIT_SRC_DIR}
-    # 编译 libudev
-    common_build libudev ${LIBUDEV_SRC_DIR}
+    # 编译 libudev ( xkbcli interactive-evdev 可以测试键盘输入，xorg 就是不加载成功 )
+    common_build libudev ${LIBUDEV_SRC_DIR} --enable-hwdb --enable-rule-generator --enable-mtd_probe
     # 编译 libpcre
     common_build libpcre ${LIBPCRE_SRC_DIR}
     # 编译 libnettle
@@ -903,6 +927,8 @@ llvm_build() {
   common_build xf86inputvm ${XF86INPUTVM_SRC_DIR}
   # xf86inputmm
   common_build xf86inputmm ${XF86INPUTMM_SRC_DIR}
+  # xf86inputwacom
+  common_build xf86inputwacom ${XF86INPUTWACOM_SRC_DIR}
   # xf86inputevdev
   common_build xf86inputevdev ${XF86INPUTEVDEV_SRC_DIR}
   # xf86videoati ( 为了虚拟机上能显示图形，我们把常用的显卡驱动全部编译了 )

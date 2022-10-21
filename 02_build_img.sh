@@ -147,9 +147,16 @@ make_init
 
 # 指定了利用 /etc/init.d/rcS 启动
 cat<<"EOF">etc/inittab
-::sysinit:echo "sysinit 1++++++++++++++++++++++++++++++++++++++"
+
+# 启动 udevd 服务，保证鼠标设备能正常监视，否则键盘不能使用
+::sysinit:/bin/echo "starting udevd ... ..."
+::sysinit:/usr/sbin/udevd --daemon
+::sysinit:/usr/sbin/udevadm trigger
+::sysinit:/usr/sbin/udevadm settle
+
+::sysinit:echo "sysinit ++++++++++++++++++++++++++++++++++++++"
 ::sysinit:/etc/init.d/rcS
-::sysinit:echo "sysinit 2++++++++++++++++++++++++++++++++++++++"
+::sysinit:echo "sysinit ++++++++++++++++++++++++++++++++++++++"
 
 # /bin/sh invocations on selected ttys
 #
@@ -209,6 +216,9 @@ if [ -f "${diskfs}/usr/share/pci.ids.gz" ]; then
   mkdir -pv ${diskfs}/usr/local/share
   mv ${diskfs}/usr/share/pci.ids.gz ${diskfs}/usr/local/share/pci.ids.gz
 fi
+
+# 单独的 strace
+cp ${strace_install}/* ${diskfs} -r
 
 # 带有 openssl
 cp ${openssl_install}/* ${diskfs} -r
@@ -360,8 +370,6 @@ ifconfig eth0 192.168.222.195 && ifconfig eth0 up
 route add default gw 192.168.222.2
 
 # exec 执行 /etc/init.d/rc.local 脚本
-# 启动 udevd 服务，保证鼠标设备能正常监视
-/usr/sbin/udevd -d
 # 启动 sshd 服务，保证远程连接，调试跟踪非常方便
 /usr/sbin/sshd
 

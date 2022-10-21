@@ -22,6 +22,7 @@ GLIBC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/glibc/glibc-2.27.tar.xz
 BUSYBOX_SRC_URL=https://busybox.net/downloads/busybox-1.34.1.tar.bz2
 LSHW_SRC_URL=https://www.ezix.org/software/files/lshw-B.02.19.2.tar.gz
 LSOF_SRC_URL=https://github.com/lsof-org/lsof/releases/download/4.95.0/lsof_4.95.0.linux.tar.bz2
+STRACE_SRC_URL=https://github.com/strace/strace/releases/download/v5.19/strace-5.19.tar.xz
 PCIUTILS_SRC_URL=http://mj.ucw.cz/download/linux/pci/pciutils-3.8.0.tar.gz
 OPENSSL_SRC_URL=https://www.openssl.org/source/openssl-1.1.1q.tar.gz
 OPENSSH_SRC_URL=https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz
@@ -44,6 +45,7 @@ GLIBC_SRC_NAME=$(download_src ${GLIBC_SRC_URL})
 BUSYBOX_SRC_NAME=$(download_src ${BUSYBOX_SRC_URL})
 LSHW_SRC_NAME=$(download_src ${LSHW_SRC_URL})
 LSOF_SRC_NAME=$(download_src ${LSOF_SRC_URL})
+STRACE_SRC_NAME=$(download_src ${STRACE_SRC_URL})
 PCIUTILS_SRC_NAME=$(download_src ${PCIUTILS_SRC_URL})
 OPENSSL_SRC_NAME=$(download_src ${OPENSSL_SRC_URL})
 OPENSSH_SRC_NAME=$(download_src ${OPENSSH_SRC_URL})
@@ -63,6 +65,7 @@ GLIBC_SRC_DIR=$(unzip_src ".tar.xz" ${GLIBC_SRC_NAME}); echo "unzip ${GLIBC_SRC_
 BUSYBOX_SRC_DIR=$(unzip_src ".tar.bz2" ${BUSYBOX_SRC_NAME}); echo "unzip ${BUSYBOX_SRC_NAME} source code"
 LSHW_SRC_DIR=$(unzip_src ".tar.gz" ${LSHW_SRC_NAME}); echo "unzip ${LSHW_SRC_NAME} source code"
 LSOF_SRC_DIR=$(unzip_src ".tar.bz2" ${LSOF_SRC_NAME}); echo "unzip ${LSOF_SRC_NAME} source code"
+STRACE_SRC_DIR=$(unzip_src ".tar.xz" ${STRACE_SRC_NAME}); echo "unzip ${STRACE_SRC_NAME} source code"
 PCIUTILS_SRC_DIR=$(unzip_src ".tar.gz" ${PCIUTILS_SRC_NAME}); echo "unzip ${PCIUTILS_SRC_NAME} source code"
 OPENSSL_SRC_DIR=$(unzip_src ".tar.gz" ${OPENSSL_SRC_NAME}); echo "unzip ${OPENSSL_SRC_NAME} source code"
 OPENSSH_SRC_DIR=$(unzip_src ".tar.gz" ${OPENSSH_SRC_NAME}); echo "unzip ${OPENSSH_SRC_NAME} source code"
@@ -272,6 +275,12 @@ if [ ! -d "linux_install" ]; then
   sed -i "s/# CONFIG_USB_EHCI_HCD_PLATFORM is not set/CONFIG_USB_EHCI_HCD_PLATFORM=y/" .config
   sed -i "s/# CONFIG_USB_OHCI_HCD_PLATFORM is not set/CONFIG_USB_OHCI_HCD_PLATFORM=y/" .config
 
+  # 键盘驱动 ( libevdev https://linuxfromscratch.org/blfs/view/11.0/x/x7driver.html )
+  sed -i "s/# CONFIG_INPUT_UINPUT is not set/CONFIG_INPUT_UINPUT=y/" .config
+
+  # wacom 驱动支持 ( xf86-input-wacom )
+  sed -i "s/# CONFIG_HID_WACOM is not set/CONFIG_HID_WACOM=y/" .config
+
   # 网络需要 TUN/TAP 驱动 [ Device Drivers ] ---> [ Network device support ] ---> [ Universal TUN/TAP device driver support ]
   make bzImage -j8
   make modules -j8
@@ -331,6 +340,14 @@ if [ ! -d "lsof_install" ]; then
   ./Configure linux -n
   CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8
   mkdir -pv ${lsof_install}/usr/bin && cp ./lsof ${lsof_install}/usr/bin
+  cd ..
+fi
+
+# 编译 strace ( 方便调试 )
+if [ ! -d "strace_install" ]; then
+  mkdir -pv strace_install && cd ${STRACE_SRC_DIR}
+  ./configure --prefix=/usr --enable-mpers=no
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${strace_install} PREFIX=/usr
   cd ..
 fi
 
