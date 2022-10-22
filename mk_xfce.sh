@@ -775,10 +775,10 @@ llvm_build() {
   common_build xxf86vm ${XXF86VM_SRC_DIR}
   # 编译 xinit
   common_build xinit ${XINIT_SRC_DIR}
-  # 编译 xinput ( 输入设备探测 )
-  common_build xinput ${XINPUT_SRC_DIR}
   # 编译 xi ( 问题解决见上面的注释 )
   common_build xi ${XI_SRC_DIR}
+  # 编译 xinput ( 输入设备探测 )
+  common_build xinput ${XINPUT_SRC_DIR}
   # 编译 xtst
   common_build xtst ${XTST_SRC_DIR}
   # 编译 xkbcommon

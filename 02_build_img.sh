@@ -358,6 +358,9 @@ cat - > ${diskfs}/etc/init.d/rcS << EOF
 #!/bin/sh
 echo -e "\n“${title}”\n"
 
+# 必须设置这个 /usr/libexe/upowerd 才能启动，否则，就会提示 "name lost, exiting"
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/usr/local/var/run/dbus/system_bus_socket
+
 # 测试驱动加载 
 cd /lib/modules && insmod hello_world.ko
 
