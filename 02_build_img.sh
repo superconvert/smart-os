@@ -124,7 +124,9 @@ mount --move /sys /mnt/sys
 mount --move /proc /mnt/proc
 mount --move /tmp /mnt/tmp
 # 切换到真正的磁盘系统上 rootfs ---> diskfs
+# 因为 busybox 的 init 会重置环境变量，因此需要加动这里
 export LD_LIBRARY_PATH="/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu"
+# 切换到真正的文件系统
 exec switch_root /mnt /sbin/init
 EOF
 
@@ -266,18 +268,27 @@ if [ "${with_xfce}" = true ]; then
   echo "video:x:44:" >> ${diskfs}/etc/group
   echo "messagebus:x:107:" >> ${diskfs}/etc/group
   echo "messagebus:x:103:107::/nonexistent:/usr/sbin/nologin" >> ${diskfs}/etc/passwd
+  # dbus 启动需要这个，否则 upowerd 就不能正常工作
+  cp ${xfce_install}/usr/share/dbus-1/* ${xfce_install}/usr/local/share/dbus-1/ -r
   # dbus 启动脚本
   # dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
   # dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
   # dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 3
+  # 常用的 dbus 命令
+  # 列出所有的dbus服务 :
+  # dbus-send --system --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus.ListActivatableNames
+  # UPower 的dbus服务 :
+  # dbus-send --print-reply --system --dest=org.freedesktop.UPower /org/freedesktop/UPower org.freedesktop.UPower.EnumerateDevices
   echo "if [ -f "/swapfile" ]; then" > ${diskfs}/xfce.sh
   echo "  dd if=/dev/zero of=/swapfile bs=1M count=2048" >> ${diskfs}/xfce.sh
   echo "  mkswap /swapfile" >> ${diskfs}/xfce.sh
   echo "fi" >> ${diskfs}/xfce.sh
   echo "swapon /swapfile" >> ${diskfs}/xfce.sh
+  echo "/usr/libexec/upowerd &" >> ${diskfs}/xinitrc
+  echo "/usr/local/bin/xfce4-session" >> ${diskfs}/xinitrc
   echo "dbus-daemon --system --nopidfile --systemd-activation" >> ${diskfs}/xfce.sh
-  echo "xinit /usr/local/bin/xfce4-session -- /usr/local/bin/Xorg :10" >> ${diskfs}/xfce.sh
-  chmod +x ${diskfs}/xfce.sh
+  echo "xinit /xinitrc -- /usr/local/bin/Xorg :10" >> ${diskfs}/xfce.sh
+  chmod +x ${diskfs}/xfce.sh ${diskfs}/xinitrc
   # 添加 machine-id
   mkdir -p ${diskfs}/usr/local/var/lib/dbus
   echo "2add25d2f5994832ba171755bc21f9fe" > ${diskfs}/etc/machine-id
@@ -358,9 +369,6 @@ cat - > ${diskfs}/etc/init.d/rcS << EOF
 #!/bin/sh
 echo -e "\n“${title}”\n"
 
-# 必须设置这个 /usr/libexe/upowerd 才能启动，否则，就会提示 "name lost, exiting"
-export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/usr/local/var/run/dbus/system_bus_socket
-
 # 测试驱动加载 
 cd /lib/modules && insmod hello_world.ko
 
@@ -381,9 +389,13 @@ chmod +x  ${diskfs}/etc/init.d/rcS
 
 # 登陆 login shell ，非 non-login shell
 if [ "${with_login}" = true ]; then
+  # 必须设置这个 /usr/libexe/upowerd 才能启动，否则，就会提示 "name lost, exiting"
+  echo "export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/usr/local/var/run/dbus/system_bus_socket" >> ${diskfs}/etc/profile
   echo "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" >> ${diskfs}/etc/profile
   echo "export LD_LIBRARY_PATH=/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu" >> ${diskfs}/etc/profile
 else
+  # 必须设置这个 /usr/libexe/upowerd 才能启动，否则，就会提示 "name lost, exiting"
+  echo "export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/usr/local/var/run/dbus/system_bus_socket" >> ${diskfs}/etc/profile
   echo "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" >> ${diskfs}/etc/bash.bashrc
   echo "export LD_LIBRARY_PATH=/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu" >> ${diskfs}/etc/bash.bashrc
 fi
