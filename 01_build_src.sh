@@ -80,7 +80,8 @@ BINUTILS_SRC_DIR=$(unzip_src ".tar.xz" ${BINUTILS_SRC_NAME}); echo "unzip ${BINU
 if [ "$1" = "rebuild" ]; then
   echo "rebuild"
   cd ${build_dir} 
-  rm -rf linux_install glibc_install busybox_install pciutils_install openssl_install openssh_install gcc_install binutils_install
+  rm -rf linux_install glibc_install busybox_install lshw_install lsof_install pciutils_install strace_install \
+	  openssl_install openssh_install gcc_install binutils_install
   cd ..
 fi
 

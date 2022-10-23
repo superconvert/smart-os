@@ -150,6 +150,11 @@ make_init
 # 指定了利用 /etc/init.d/rcS 启动
 cat<<"EOF">etc/inittab
 
+# 启动 syslogd
+::sysinit:/bin/echo "starting syslogd ... ..."
+::sysinit:/sbin/syslogd
+::sysinit:/sbin/klogd
+
 # 启动 udevd 服务，保证鼠标设备能正常监视，否则键盘不能使用
 ::sysinit:/bin/echo "starting udevd ... ..."
 ::sysinit:/usr/sbin/udevd --daemon
