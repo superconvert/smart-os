@@ -9,7 +9,10 @@
 5. 支持 docker 启动
 6. 系统最精简模式 64 M大小
 7. 支持驱动制作相关演示
-8. 支持 smart_rtmpd 流媒体服务器运行 https://github.com/superconvert/smart_rtmpd
+8. 支持远程服务 openssh-server
+9. 支持桌面系统 xfce4 desktop
+10. 支持常用工具集 lshw，lspci，lsof，strace 等
+11. 支持 smart_rtmpd 流媒体服务器运行 https://github.com/superconvert/smart_rtmpd
 
 # 用途与场景
 1. 操作系统原理教学
