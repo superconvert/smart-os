@@ -173,7 +173,8 @@ cat<<"EOF">etc/inittab
 # this yourself...
 #
 # Start an "askfirst" shell on the console (whatever that may be) -f root 自动登录
-::respawn:-/bin/login -f root
+# 一定要加 tty1 ，否则登录时，会提示 : root login on 'UNKNOWN'
+tty1::respawn:-/bin/login -f root
 # Start an "askfirst" shell on /dev/tty2-4
 tty2::respawn:-/bin/sh
 tty3::respawn:-/bin/sh
