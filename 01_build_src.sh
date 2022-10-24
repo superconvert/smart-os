@@ -10,11 +10,10 @@ fi
 
 #-----------------------------------------------
 #
-# 导入公共变量 ( xfce4 需要 5.4.0 的内核 )
+# 导入公共变量 ( xfce4 需要 5.4.0 的内核, glibc 必须为 2.27 否则 xfce4 相关的编译有问题 )
 #
 #-----------------------------------------------
 . ./common.sh
-
 #LINUX_SRC_URL=https://kernel.org/pub/linux/kernel/v4.x/linux-4.14.9.tar.xz
 LINUX_SRC_URL=https://mirror.bjtu.edu.cn/kernel/linux/kernel/v5.x/linux-5.8.6.tar.xz
 #GLIBC_SRC_URL=https://ftp.gnu.org/gnu/glibc/glibc-2.32.tar.bz2
@@ -30,8 +29,6 @@ OPENSSH_SRC_URL=https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8
 GCC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 #BINUTILS_SRC_URL=https://ftp.gnu.org/gnu/binutils/binutils-2.36.tar.xz
 BINUTILS_SRC_URL=https://mirrors.ustc.edu.cn/gnu/binutils/binutils-2.36.tar.xz
-
-export CFLAGS="-Os -s -fno-stack-protector -fomit-frame-pointer -U_FORTIFY_SOURCE"
 
 #----------------------------------------------
 #
@@ -59,7 +56,6 @@ cd ..
 #
 #---------------------------------------------
 mkdir -pv ${build_dir} 
-
 LINUX_SRC_DIR=$(unzip_src ".tar.xz" ${LINUX_SRC_NAME}); echo "unzip ${LINUX_SRC_NAME} source code"
 GLIBC_SRC_DIR=$(unzip_src ".tar.xz" ${GLIBC_SRC_NAME}); echo "unzip ${GLIBC_SRC_NAME} source code"
 BUSYBOX_SRC_DIR=$(unzip_src ".tar.bz2" ${BUSYBOX_SRC_NAME}); echo "unzip ${BUSYBOX_SRC_NAME} source code"
@@ -90,6 +86,8 @@ fi
 # 编译源码 
 #
 #---------------------------------------------
+export CFLAGS="-Os -s -fno-stack-protector -fomit-frame-pointer -U_FORTIFY_SOURCE"
+
 cd ${build_dir}
 
 # 编译内核, 最终所有模块都装到目录 /lib/modules/5.8.6
@@ -287,7 +285,8 @@ if [ ! -d "linux_install" ]; then
   make modules -j8
   #cd linux-5.8.6 && make x86_64_defconfig && make bzImage -j8 && make modules && make modules_install && cd ..
   make INSTALL_HDR_PATH=${linux_install} headers_install -j8
-  make modules_install INSTALL_MOD_PATH=${linux_install} -j8 && cp arch/x86_64/boot/bzImage ${linux_install} && cd ..
+  make modules_install INSTALL_MOD_PATH=${linux_install} -j8 && cp arch/x86_64/boot/bzImage ${linux_install} || exit
+  cd ..
 fi
 
 # 编译glibc
@@ -301,7 +300,7 @@ if [ ! -d "glibc_install" ]; then
     --disable-werror \
     --disable-werror \
     CFLAGS="$CFLAGS"
-  make -j8 && make install -j8 DESTDIR=${glibc_install}
+  make -j8 && make install -j8 DESTDIR=${glibc_install} || exit
   cd .. && cd ..
 fi
 
@@ -317,21 +316,21 @@ if [ ! -d "busybox_install" ]; then
   sed -i "s|.*CONFIG_EXTRA_CFLAGS.*|CONFIG_EXTRA_CFLAGS=\"-I${linux_install}/include -I${glibc_install}/include -L${glibc_install}/usr/lib64 $CFLAGS\"|" .config
   # 环境变量 PATH 的设定，因为 busybox 的 init 会覆盖用户设置的 PATH，只能源码进行编译
   sed -i "s|#define BB_ADDITIONAL_PATH \"\"|#define BB_ADDITIONAL_PATH \":/usr/local/sbin:/usr/local/bin\"|" include/libbb.h
-  make busybox -j8 && make CONFIG_PREFIX=${busybox_install} install
+  make busybox -j8 && make CONFIG_PREFIX=${busybox_install} install || exit
   cd ..
 fi
 
 # 编译 lshw ( 调试方便 )
 if [ ! -d "lshw_install" ]; then
   mkdir -pv lshw_install && cd ${LSHW_SRC_DIR}
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${lshw_install} PREFIX=/usr
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${lshw_install} PREFIX=/usr || exit
   cd ..
 fi
 
 # 编译 pciutils ( busybox 的 lspci 太简单 )
 if [ ! -d "pciutils_install" ]; then
   mkdir -pv pciutils_install && cd ${PCIUTILS_SRC_DIR}
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${pciutils_install} PREFIX=/usr
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${pciutils_install} PREFIX=/usr || exit
   cd ..
 fi
 
@@ -339,8 +338,7 @@ fi
 if [ ! -d "lsof_install" ]; then
   mkdir -pv lsof_install && cd ${LSOF_SRC_DIR}
   ./Configure linux -n
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8
-  mkdir -pv ${lsof_install}/usr/bin && cp ./lsof ${lsof_install}/usr/bin
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && mkdir -pv ${lsof_install}/usr/bin && cp ./lsof ${lsof_install}/usr/bin || exit
   cd ..
 fi
 
@@ -348,7 +346,7 @@ fi
 if [ ! -d "strace_install" ]; then
   mkdir -pv strace_install && cd ${STRACE_SRC_DIR}
   ./configure --prefix=/usr --enable-mpers=no
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${strace_install} PREFIX=/usr
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${strace_install} PREFIX=/usr || exit
   cd ..
 fi
 
@@ -356,11 +354,11 @@ fi
 if [ ! -d "openssl_install" ]; then
   mkdir -pv openssl_install && cd ${OPENSSL_SRC_DIR}
   ./config --prefix=/usr shared
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${openssl_install} PREFIX=/usr
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${openssl_install} PREFIX=/usr || exit
   cd ..
 fi
 
-# 编译 openssh
+# 编译 openssh ( 需要 openssl )
 if [ ! -d "openssh_install" ]; then
   mkdir -pv openssh_install && cd ${OPENSSH_SRC_DIR}
   ./configure --prefix=/usr --sysconfdir=/etc/ssh --with-ssl-dir=${openssl_install}/usr/ --without-openssl-header-check
@@ -403,7 +401,7 @@ fi
 if [ ! -d "binutils_install" ]; then
   mkdir -pv binutils_install && cd ${BINUTILS_SRC_DIR} && make distclean
   ./configure --prefix=/usr
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${binutils_install}
+  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${binutils_install} || exit
   cd ..
 fi
 

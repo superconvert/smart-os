@@ -806,7 +806,7 @@ llvm_build() {
   meson_build pango ${PANGO_SRC_DIR}
   # 编译基础库 ( 这些都是系统库，新系统需要集成 )
   if [ "${with_xfce}" = true ] && [ "$1" = "img" ]; then
-    # 编译 llvm ( swrast 依赖此库 )
+    # 编译 llvm ( swrast 依赖此库，可以加大 swap 分区，编译时对内存要求极高 ) 
     # llvm_build llvm ${LLVM_SRC_DIR}
     # 编译 expat
     common_build expat ${EXPAT_SRC_DIR}

@@ -1,6 +1,10 @@
 #!/bin/sh
 
+#----------------------------------------------
+#
 # 导入公共环境
+#
+#----------------------------------------------
 . ./common.sh
 
 #----------------------------------------------
@@ -31,7 +35,7 @@ losetup -o 1048576 ${loop_dev} disk.img
 # 对磁盘进行格式化
 mkfs.ext3 ${loop_dev} 
 
-# 如果制作的 disk.img 转换为 qemu-img convert disk.img -f raw -O vmdk out.vmdk, vmware 的磁盘类型一定设置为 SATA ，否则，启动失败
+# 如果制作的 disk.img
 diskfs="diskfs"
 # 挂载磁盘到本地目录
 mkdir -pv ${diskfs} 
@@ -57,6 +61,7 @@ mkdir -pv rootfs/sbin
 mkdir -pv rootfs/proc
 mkdir -pv rootfs/root
 mkdir -pv rootfs/lib64
+mkdir -pv rootfs/var/run
 mkdir -pv rootfs/lib/modules
 
 # 拷贝内核镜像
@@ -69,6 +74,7 @@ rm -rf rootfs/var/db
 rm -rf rootfs/share
 rm -rf rootfs/usr/share
 find rootfs/ -name "*.a" -exec rm -rf {} \;
+
 # 编译的镜像带有 gcc 编译器
 if [ "${with_gcc}" = false ]; then
   rm -rf rootfs/usr/include
@@ -103,18 +109,23 @@ make_init() {
 
 cat<<"EOF">init
 #!/bin/sh
+
 # 必须首先挂载，否则 mdev 不能正常工作
 mount -t sysfs sysfs /sys
 mount -t proc proc /proc
 mount -t devtmpfs udev /dev
 mount -t tmpfs tmpfs /tmp -o mode=1777
+
 # 必须挂载一下，否则下面的 mount 不上
 mdev -s
 mount -t ext3 /dev/sda1 /mnt
+
 # 关闭内核烦人的输出信息
 echo 0 > /proc/sys/kernel/printk
+
 # 热插拔处理都交给 mdev
 # echo /sbin/mdev > /proc/sys/kernel/hotplug
+
 echo -e "\n\e[0;32mBoot took $(cut -d' ' -f1 /proc/uptime) seconds\e[0m"
 mkdir -p /dev/pts
 mount -t devpts devpts /dev/pts
@@ -123,10 +134,11 @@ mount --move /dev /mnt/dev
 mount --move /sys /mnt/sys
 mount --move /proc /mnt/proc
 mount --move /tmp /mnt/tmp
-# 切换到真正的磁盘系统上 rootfs ---> diskfs
-# 因为 busybox 的 init 会重置环境变量，因此需要加动这里
+
+# 因为 busybox 的 init 会重置环境变量 PATH 等，因此需要放到这里加载
 export LD_LIBRARY_PATH="/lib:/lib64:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib/x86_64-linux-gnu"
-# 切换到真正的文件系统
+
+# 切换到真正的磁盘系统上 rootfs ---> diskfs， 切换到真正的文件系统
 exec switch_root /mnt /sbin/init
 EOF
 
@@ -144,23 +156,22 @@ make_init
 # mknod -m 600 dev/console c 5 1
 # mknod -m 644 dev/null c 1 3
 # mknod -m 640 dev/sda1 b 8 1
-# xfce 需要显卡设备
-# mknod -m 664 dev/dri/card0 c 226 0
 
 # 指定了利用 /etc/init.d/rcS 启动
 cat<<"EOF">etc/inittab
 
-# 启动 syslogd
+# 启动 syslogd ( 日志系统 )
 ::sysinit:/bin/echo "starting syslogd ... ..."
 ::sysinit:/sbin/syslogd
 ::sysinit:/sbin/klogd
 
-# 启动 udevd 服务，保证鼠标设备能正常监视，否则键盘不能使用
+# 启动 udevd 服务，保证鼠标设备能正常监视，否则桌面系统下键盘不能使用
 ::sysinit:/bin/echo "starting udevd ... ..."
 ::sysinit:/usr/sbin/udevd --daemon
 ::sysinit:/usr/sbin/udevadm trigger
 ::sysinit:/usr/sbin/udevadm settle
 
+# 基本启动信息都放到这个脚本里
 ::sysinit:echo "sysinit ++++++++++++++++++++++++++++++++++++++"
 ::sysinit:/etc/init.d/rcS
 ::sysinit:echo "sysinit ++++++++++++++++++++++++++++++++++++++"
@@ -173,6 +184,7 @@ cat<<"EOF">etc/inittab
 # this yourself...
 #
 # Start an "askfirst" shell on the console (whatever that may be) -f root 自动登录
+
 # 一定要加 tty1 ，否则登录时，会提示 : root login on 'UNKNOWN'
 tty1::respawn:-/bin/login -f root
 # Start an "askfirst" shell on /dev/tty2-4
@@ -200,6 +212,7 @@ tty5::respawn:/sbin/getty 38400 tty6
 ::shutdown:/sbin/swapoff -a
 EOF
 
+# 制作 initrd 文件系统
 find . | cpio -R root:root -H newc -o | gzip -9 > ../${diskfs}/boot/initrd
 echo "${GREEN}+++ build initrd ok +++${NC}"
 cd ..
@@ -270,21 +283,25 @@ if [ "${with_xfce}" = true ]; then
   if [ -f "${xfce_install}/usr/local/lib/libffi.so.8" ]; then
     cp ${xfce_install}/usr/local/lib/libffi.so.8 ${xfce_install}/usr/local/lib/libffi.so.6
   fi
+
   # dbus 用户添加
   echo "video:x:44:" >> ${diskfs}/etc/group
   echo "messagebus:x:107:" >> ${diskfs}/etc/group
   echo "messagebus:x:103:107::/nonexistent:/usr/sbin/nologin" >> ${diskfs}/etc/passwd
   # dbus 启动需要这个，否则 upowerd 就不能正常工作
   cp ${xfce_install}/usr/share/dbus-1/* ${xfce_install}/usr/local/share/dbus-1/ -r
+
   # dbus 启动脚本
-  # dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
-  # dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
-  # dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 3
+  #   dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+  #   dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+  #   dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 3
   # 常用的 dbus 命令
-  # 列出所有的dbus服务 :
-  # dbus-send --system --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus.ListActivatableNames
-  # UPower 的dbus服务 :
-  # dbus-send --print-reply --system --dest=org.freedesktop.UPower /org/freedesktop/UPower org.freedesktop.UPower.EnumerateDevices
+  #   列出所有的dbus服务 :
+  #   dbus-send --system --print-reply --dest=org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus.ListActivatableNames
+  #   UPower 的dbus服务 :
+  #   dbus-send --print-reply --system --dest=org.freedesktop.UPower /org/freedesktop/UPower org.freedesktop.UPower.EnumerateDevices
+
+  # 产生 xfce 启动脚本，进入系统后，手工执行这个就能拉起桌面
   echo "if [ -f "/swapfile" ]; then" > ${diskfs}/xfce.sh
   echo "  dd if=/dev/zero of=/swapfile bs=1M count=2048" >> ${diskfs}/xfce.sh
   echo "  mkswap /swapfile" >> ${diskfs}/xfce.sh
@@ -295,22 +312,18 @@ if [ "${with_xfce}" = true ]; then
   echo "dbus-daemon --system --nopidfile --systemd-activation" >> ${diskfs}/xfce.sh
   echo "xinit /xinitrc -- /usr/local/bin/Xorg :10" >> ${diskfs}/xfce.sh
   chmod +x ${diskfs}/xfce.sh ${diskfs}/xinitrc
+
   # 添加 machine-id
   mkdir -p ${diskfs}/usr/local/var/lib/dbus
   echo "2add25d2f5994832ba171755bc21f9fe" > ${diskfs}/etc/machine-id
   echo "2add25d2f5994832ba171755bc21f9fe" > ${diskfs}/usr/local/var/lib/dbus/machine-id
+
   # 这些本来需要编译完成，目前暂且拷贝
   cp /usr/lib/x86_64-linux-gnu/libLLVM-10.so.1 build/xfce_install/usr/lib/x86_64-linux-gnu/
-  # cp /usr/lib/x86_64-linux-gnu/libffi.so.6 build/xfce_install/usr/lib/x86_64-linux-gnu/
   # 拷贝 xfce4 到镜像目录
   cp ${xfce_install}/* ${diskfs} -r -n
-  # xfce 需要系统内执行下面两句，保证键盘数据存在 Xorg :10 才能执行成功
-  # 1. 键盘数据
-  # rm /usr/local/share/X11/xkb -rf
-  # ln -s /usr/share/X11/xkb /usr/local/share/X11
-  # 2. 需要改动 libpcre.so.1 ---> libpcre.so.3
-  # 3. xfce4-session 需要 libuuid.so
 
+  # 删除冗余文件，防止后续编译很多警告
   # 依赖版本 libpcre.so.3
   if [ -f "${xfce_install}/usr/local/lib/libpcre.so.1" ]; then
     rm ${xfce_install}/usr/local/lib/libpcre.so.3 -rf
@@ -350,6 +363,7 @@ nameserver 8.8.8.8
 nameserver 114.114.114.114
 EOF
 
+# 生成 /etc/fstab 挂载文件
 cat -> ${diskfs}/etc/fstab << EOF
 # <file system>        <dir>         <type>    <options>             <dump> <pass>
 proc                   /proc         proc      defaults              0      0
@@ -370,6 +384,8 @@ title=$(cat<<EOF
 \e[0m
 EOF
 )
+
+# 生成 /etc/init.d/rcS 脚本
 mkdir -pv ${diskfs}/etc/init.d
 cat - > ${diskfs}/etc/init.d/rcS << EOF
 #!/bin/sh
@@ -379,10 +395,11 @@ echo -e "\n“${title}”\n"
 cd /lib/modules && insmod hello_world.ko
 
 # dns 测试 busybox 必须动态编译 动态编译 glibc 已经集成 dns 功能
-# qemu
+# qemu 网卡设置（调试方便）
 # ifconfig eth0 192.168.100.6 && ifconfig eth0 up
 # route add default gw 192.168.100.1
-# vmware
+
+# vmware 网卡设置 ( 调试方便 )
 ifconfig eth0 192.168.222.195 && ifconfig eth0 up
 route add default gw 192.168.222.2
 
@@ -441,7 +458,7 @@ losetup -d ${loop_dev}
 
 #---------------------------------------------------------------
 #
-# 转换为 vmware 格式
+# 转换为 vmware 格式, 虚拟机的磁盘类型一定设置为 SATA ，否则启动失败
 #
 #---------------------------------------------------------------
 qemu-img convert disk.img -f raw -O vmdk disk.vmdk

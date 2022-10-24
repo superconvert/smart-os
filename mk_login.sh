@@ -31,4 +31,5 @@ export PS1 HOSTNAME
 EOF
 
 # 重新生成 inittab 文件
-sed -i "/::sysinit:\/etc\/init.d\/rcS/a\::sysinit:\/bin\/hostname -F \/etc\/hostname" ${diskfs}/etc/inittab
+sed -i "1i\::sysinit:\/bin\/hostname -F \/etc\/hostname" ${diskfs}/etc/inittab
+sed -i "1i\# 加载主机名称" ${diskfs}/etc/inittab
