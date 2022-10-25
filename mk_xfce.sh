@@ -638,7 +638,7 @@ common_build() {
 }
 
 #----------------------------------------------------------------------------------------------------------------
-# llvm 编译
+# llvm 编译，debug 对编译太挑剔，目前改成 release ，即使 swap 改成 32G ，还是经常被 kill
 #----------------------------------------------------------------------------------------------------------------
 llvm_build() {
   local name=$1
@@ -647,7 +647,7 @@ llvm_build() {
   shift
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && mkdir -pv build && cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr  -DCMAKE_BUILD_TYPE=Release -DLLVM_BUILD_LLVM_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON -G "Unix Makefiles"
     if [ -f ./configure ]; then
       ./configure ${cfg_opt} "$@" ${xwin_opt}
     fi
@@ -807,7 +807,7 @@ llvm_build() {
   # 编译基础库 ( 这些都是系统库，新系统需要集成 )
   if [ "${with_xfce}" = true ] && [ "$1" = "img" ]; then
     # 编译 llvm ( swrast 依赖此库，可以加大 swap 分区，编译时对内存要求极高 ) 
-    # llvm_build llvm ${LLVM_SRC_DIR}
+    llvm_build llvm ${LLVM_SRC_DIR}
     # 编译 expat
     common_build expat ${EXPAT_SRC_DIR}
     # 编译 ncurses ( libtinfo.so.5 )

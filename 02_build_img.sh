@@ -319,7 +319,7 @@ if [ "${with_xfce}" = true ]; then
   echo "2add25d2f5994832ba171755bc21f9fe" > ${diskfs}/usr/local/var/lib/dbus/machine-id
 
   # 这些本来需要编译完成，目前暂且拷贝
-  cp /usr/lib/x86_64-linux-gnu/libLLVM-10.so.1 build/xfce_install/usr/lib/x86_64-linux-gnu/
+  # cp /usr/lib/x86_64-linux-gnu/libLLVM-10.so.1 build/xfce_install/usr/lib/x86_64-linux-gnu/
   # 拷贝 xfce4 到镜像目录
   cp ${xfce_install}/* ${diskfs} -r -n
 
@@ -459,8 +459,10 @@ losetup -d ${loop_dev}
 #---------------------------------------------------------------
 #
 # 转换为 vmware 格式, 虚拟机的磁盘类型一定设置为 SATA ，否则启动失败
+# SCSI 格式转换, 命令查询 : qemu-img convert -O vmdk -o ?
+# 需要二次转换 vmkfstools -i 11.vmdk esxi-compatible.vmdk
 #
 #---------------------------------------------------------------
-qemu-img convert disk.img -f raw -O vmdk disk.vmdk
+qemu-img convert disk.img -f raw -O vmdk disk_ide.vmdk
 
 echo "Run the next script: 03_run_qemu.sh or 04_run_docker.sh"
