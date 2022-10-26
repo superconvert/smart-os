@@ -347,12 +347,12 @@ fi
 # 编译网卡驱动 ( 目前版本内核已集成 e1000 )
 # cd ${build_dir}/linux-5.8.6 && make M=drivers/net/ethernet/intel/e1000/ && cd ../..
 
-# 生成 grub.cfg 文件, 增加 console=ttyS0 就会让 qemu 输出日志到 qemu.log
+# 生成 grub.cfg 文件, 增加 console=ttyS0 就会让 qemu 输出日志到 qemu.log, quiet 屏蔽内核过多的信息输出
 cat - > ${diskfs}/boot/grub/grub.cfg << EOF
 set timeout=3
 menuentry "smart-os" {
     root=(hd0,msdos1)
-    linux /boot/bzImage console=tty0
+    linux /boot/bzImage console=tty0 quiet
     initrd /boot/initrd
 }
 EOF
@@ -463,6 +463,6 @@ losetup -d ${loop_dev}
 # 需要二次转换 vmkfstools -i 11.vmdk esxi-compatible.vmdk
 #
 #---------------------------------------------------------------
-qemu-img convert disk.img -f raw -O vmdk disk_ide.vmdk
+qemu-img convert disk.img -f raw -O vmdk disk_sata.vmdk
 
 echo "Run the next script: 03_run_qemu.sh or 04_run_docker.sh"

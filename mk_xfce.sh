@@ -5,7 +5,8 @@
 
 # 预装工具
 if [ -f "/usr/bin/apt" ]; then
-  apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config llvm-10 clang-10 intltool -y || exit
+  # 暂且屏蔽掉 llvm-10 clang-10
+  apt install autoconf autoconf-archive automake libtool make nasm cmake m4 pkg-config intltool -y || exit
   apt install check bison flex python3-pip libpython-dev gperf gtk-doc-tools xsltproc -y || exit
   apt install libssl-dev libcurl4-openssl-dev libsqlite3-dev libmicrohttpd-dev libarchive-dev libgirepository1.0-dev -y || exit
   # 需要安装, 安装主题, 显卡驱动, 安装字库否则不能正常显示, gsettings-desktop-schemas 保证 xfdesktop-settings 能运行
@@ -647,7 +648,7 @@ llvm_build() {
   shift
   if [ ! -f .${name} ]; then
     echo "${CYAN}build ${name} begin${NC}" && cd ${srcdir} && mkdir -pv build && cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX=/usr  -DCMAKE_BUILD_TYPE=Release -DLLVM_BUILD_LLVM_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON -G "Unix Makefiles"
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLLVM_BUILD_LLVM_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON -DLLVM_ENABLE_RTTI=ON -G "Unix Makefiles"
     if [ -f ./configure ]; then
       ./configure ${cfg_opt} "$@" ${xwin_opt}
     fi
@@ -806,13 +807,11 @@ llvm_build() {
   meson_build pango ${PANGO_SRC_DIR}
   # 编译基础库 ( 这些都是系统库，新系统需要集成 )
   if [ "${with_xfce}" = true ] && [ "$1" = "img" ]; then
-    # 编译 llvm ( swrast 依赖此库，可以加大 swap 分区，编译时对内存要求极高 ) 
-    llvm_build llvm ${LLVM_SRC_DIR}
     # 编译 expat
     common_build expat ${EXPAT_SRC_DIR}
     # 编译 ncurses ( libtinfo.so.5 )
     common_build ncurses ${NCURSES_SRC_DIR} --with-shared --with-termlib
-    # 编译 libedit
+    # 编译 libedit ( 系统需要此库，llvm 的编译也需要此库 )
     common_build libedit ${LIBEDIT_SRC_DIR}
     # 编译 libudev ( xkbcli interactive-evdev 可以测试键盘输入，xorg 就是不加载成功 )
     common_build libudev ${LIBUDEV_SRC_DIR} --enable-hwdb --enable-rule-generator --enable-mtd_probe
@@ -820,6 +819,8 @@ llvm_build() {
     common_build libpcre ${LIBPCRE_SRC_DIR}
     # 编译 libnettle
     common_build libnettle ${LIBNETTLE_SRC_DIR}
+    # 编译 llvm ( swrast 依赖此库，可以加大 swap 分区，编译时对内存要求极高，依赖: libedit )
+    llvm_build llvm ${LLVM_SRC_DIR}
     # 编译 dbus-1( 我们的系统需要编译，如果在当前系统上运行 xfce4，需要注释掉，否则就会和系统自带的 dbus-1 冲突 )
     common_build dbus-1 ${DBUS1_SRC_DIR} --disable-tests
     # 编译 ( libsensors4 )
