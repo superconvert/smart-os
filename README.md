@@ -1,18 +1,19 @@
 # smart-os 一个小巧的 linux 系统
-本项目给大家演示了怎么样快速制作一个小巧切功能齐全的 linux 操作系统, 项目地址 https://github.com/superconvert/smart-os
+本项目给大家演示了怎么样快速制作一个小巧且功能齐全的 linux 操作系统, 项目地址 https://github.com/superconvert/smart-os
 
 # 功能与特点
 1. 支持挂载多硬盘挂载
 2. 支持网络功能，DNS 解析
 3. 支持 GCC 编译器，c，c++
-4. 支持 qemu 启动
-5. 支持 docker 启动
+4. 支持 qemu 方式启动
+5. 支持 docker 方式启动
 6. 系统最精简模式 64 M大小
 7. 支持驱动制作相关演示
-8. 支持远程服务 openssh-server
-9. 支持桌面系统 xfce4 desktop
-10. 支持常用工具集 lshw，lspci，lsof，strace 等
-11. 支持 smart_rtmpd 流媒体服务器运行 https://github.com/superconvert/smart_rtmpd
+8. 支持防火墙 iptables
+9. 支持远程服务 openssh-server
+10. 支持桌面系统 xfce4 desktop
+11. 支持常用工具集 lshw，lspci，lsof，strace 等
+12. 支持 smart_rtmpd 流媒体服务器运行 https://github.com/superconvert/smart_rtmpd
 
 # 用途与场景
 1. 操作系统原理教学
@@ -25,8 +26,7 @@
 1. 增加 arm 版本
 2. 增加图形界面演示  
 3. 支持 ISO 制作
-4. 防火墙
-5. 时区
+4. 时区
 
 # 整体思路演进
 
