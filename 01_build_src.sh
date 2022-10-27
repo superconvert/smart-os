@@ -428,7 +428,9 @@ if [ "${with_ufw}" = true ]; then
   # 编译 libnftnl
   if [ ! -d "libnftnl_install" ]; then
     mkdir -pv libnftnl_install && cd ${LIBNFTNL_SRC_DIR}
-    CFLAGS="${ufw_include} ${ufw_library} $CFLAGS" ./configure --prefix=/usr
+    export LIBMNL_CFLAGS="-I${libmnl_install}/usr/include"
+    export LIBMNL_LIBS="-L${libmnl_install}/usr/lib -lmnl"
+    ./configure --prefix=/usr
     CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${libnftnl_install} PREFIX=/usr || exit
     cd ..
   fi
@@ -436,8 +438,12 @@ if [ "${with_ufw}" = true ]; then
   # 编译 iptables ( 需要 libmnl, libnftnl )
   if [ ! -d "iptables_install" ]; then
     mkdir -pv iptables_install && cd ${IPTABLES_SRC_DIR}
-    CFLAGS="${ufw_include} ${ufw_library} $CFLAGS" ./configure --prefix=/usr
-    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${iptables_install} PREFIX=/usr || exit
+    export libmnl_CFLAGS="-I${libmnl_install}/usr/include"
+    export libmnl_LIBS="-L${libmnl_install}/usr/lib -lmnl"
+    export libnftnl_CFLAGS="-I${libnftnl_install}/usr/include"
+    export libnftnl_LIBS="-L${libnftnl_install}/usr/lib -lnftnl"
+    ./configure --prefix=/usr
+    CFLAGS="-L${glibc_install}/lib64 ${ufw_include} $CFLAGS" make -j8 && make install -j8 DESTDIR=${iptables_install} PREFIX=/usr || exit
     cd ..
   fi
 fi
