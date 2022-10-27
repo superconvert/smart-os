@@ -18,10 +18,19 @@ NC='\e[0m' # 没有颜色
 # 处理器
 core_num=`nproc`
 
+# 是否开启 ssh
+with_ssh=true
+
+# 是否开启 ufw
+with_ufw=true
+
 # 是否开启 gcc
 with_gcc=true
 
-# 是否开启 xfce
+# 是否带有工具
+with_util=true
+
+# 是否开启 xfce ( 需要开启 gcc )
 with_xfce=true
 
 # 是否挂载第二块硬盘
@@ -43,6 +52,9 @@ strace_install=${build_dir}"/strace_install"
 pciutils_install=${build_dir}"/pciutils_install"
 openssl_install=${build_dir}"/openssl_install"
 openssh_install=${build_dir}"/openssh_install"
+libmnl_install=${build_dir}"/libmnl_install"
+libnftnl_install=${build_dir}"/libnftnl_install"
+iptables_install=${build_dir}"/iptables_install"
 gcc_install=${build_dir}"/gcc_install"
 binutils_install=${build_dir}"/binutils_install"
 xorg_install=${build_dir}"/xorg_install"

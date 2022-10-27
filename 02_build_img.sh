@@ -225,29 +225,44 @@ cd ..
 echo "${CYAN}--- build diskfs ---${NC}"
 cp rootfs/* ${diskfs} -r
 
-# 单独的 lshw
-cp ${lshw_install}/* ${diskfs} -r
-
-# 单独的 lsof
-cp ${lsof_install}/* ${diskfs} -r
-
-# 单独的 pciutils
-cp ${pciutils_install}/* ${diskfs} -r
-if [ -f "${diskfs}/usr/share/pci.ids.gz" ]; then
-  mkdir -pv ${diskfs}/usr/local/share
-  mv ${diskfs}/usr/share/pci.ids.gz ${diskfs}/usr/local/share/pci.ids.gz
+# +++ 通用工具 +++
+if [ "${with_util}" = true ]; then
+  echo "${RED} ... build with-util${NC}"
+  # 单独的 lshw
+  cp ${lshw_install}/* ${diskfs} -r
+  # 单独的 lsof
+  cp ${lsof_install}/* ${diskfs} -r
+  # 单独的 pciutils
+  cp ${pciutils_install}/* ${diskfs} -r
+  if [ -f "${diskfs}/usr/share/pci.ids.gz" ]; then
+    mkdir -pv ${diskfs}/usr/local/share
+    mv ${diskfs}/usr/share/pci.ids.gz ${diskfs}/usr/local/share/pci.ids.gz
+  fi
+  # 单独的 strace
+  cp ${strace_install}/* ${diskfs} -r
 fi
 
-# 单独的 strace
-cp ${strace_install}/* ${diskfs} -r
+# +++ ufw +++
+if [ "${with_ufw}" = true ]; then
+  echo "${RED} ... build with-ufw${NC}"
+  # 拷贝 libmnl
+  cp ${libmnl_install}/* ${diskfs} -r
+  # 拷贝 libnftnl
+  cp ${libnftnl_install}/* ${diskfs} -r
+  # 拷贝 iptables
+  cp ${iptables_install}/* ${diskfs} -r
+fi
 
-# 带有 openssl
-cp ${openssl_install}/* ${diskfs} -r
+# +++ openssh +++
+if [ "${with_ssh}" = true ]; then
+  echo "${RED} ... build with-ssh${NC}"
+  # 带有 openssl
+  cp ${openssl_install}/* ${diskfs} -r
+  # 带有 openssh
+  cp ${openssh_install}/* ${diskfs} -r
+fi
 
-# 带有 openssh
-cp ${openssh_install}/* ${diskfs} -r
-
-# 带有 gcc 编译器
+# +++ gcc +++
 if [ "${with_gcc}" = true ]; then
   echo "${RED} ... build with-gcc${NC}"
   cp ${gcc_install}/* ${diskfs} -r
@@ -261,7 +276,7 @@ if [ "${with_login}" = true ]; then
   ./mk_login.sh ${diskfs}
 fi
 
-# 带有 xfce 编译器
+# +++ xfce desktop +++
 if [ "${with_xfce}" = true ]; then
   echo "${RED} ... build xfce desktop${NC}"
   # 构建 Xorg 的键盘数据
@@ -320,7 +335,11 @@ if [ "${with_xfce}" = true ]; then
 
   # 这些本来需要编译完成，目前暂且拷贝
   # cp /usr/lib/x86_64-linux-gnu/libLLVM-10.so.1 build/xfce_install/usr/lib/x86_64-linux-gnu/
-  # 拷贝 xfce4 到镜像目录
+
+  # 拷贝 xfce4 到镜像目录，删除 .a 文件减少体积，其实编译选型不编译文档和测试代码会更小
+  find ${xfce_install}/ -name "*.a" -exec rm -rf {} \;
+  find ${xfce_install}/ -name "man" -exec rm -rf {} \;
+  find ${xfce_install}/ -name "*doc" -exec rm -rf {} \;
   cp ${xfce_install}/* ${diskfs} -r -n
 
   # 删除冗余文件，防止后续编译很多警告

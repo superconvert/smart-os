@@ -25,6 +25,9 @@ STRACE_SRC_URL=https://github.com/strace/strace/releases/download/v5.19/strace-5
 PCIUTILS_SRC_URL=http://mj.ucw.cz/download/linux/pci/pciutils-3.8.0.tar.gz
 OPENSSL_SRC_URL=https://www.openssl.org/source/openssl-1.1.1q.tar.gz
 OPENSSH_SRC_URL=https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz
+LIBMNL_SRC_URL=https://netfilter.org/projects/libmnl/files/libmnl-1.0.5.tar.bz2
+LIBNFTNL_SRC_URL=https://netfilter.org/projects/libnftnl/files/libnftnl-1.2.3.tar.bz2
+IPTABLES_SRC_URL=https://www.netfilter.org/projects/iptables/files/iptables-1.8.8.tar.bz2
 #GCC_SRC_URL=https://ftpmirror.gnu.org/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 GCC_SRC_URL=https://mirrors.ustc.edu.cn/gnu/gcc/gcc-7.5.0/gcc-7.5.0.tar.xz
 #BINUTILS_SRC_URL=https://ftp.gnu.org/gnu/binutils/binutils-2.36.tar.xz
@@ -46,6 +49,9 @@ STRACE_SRC_NAME=$(download_src ${STRACE_SRC_URL})
 PCIUTILS_SRC_NAME=$(download_src ${PCIUTILS_SRC_URL})
 OPENSSL_SRC_NAME=$(download_src ${OPENSSL_SRC_URL})
 OPENSSH_SRC_NAME=$(download_src ${OPENSSH_SRC_URL})
+LIBMNL_SRC_NAME=$(download_src ${LIBMNL_SRC_URL})
+LIBNFTNL_SRC_NAME=$(download_src ${LIBNFTNL_SRC_URL})
+IPTABLES_SRC_NAME=$(download_src ${IPTABLES_SRC_URL})
 GCC_SRC_NAME=$(download_src ${GCC_SRC_URL})
 BINUTILS_SRC_NAME=$(download_src ${BINUTILS_SRC_URL})
 cd ..
@@ -65,6 +71,9 @@ STRACE_SRC_DIR=$(unzip_src ".tar.xz" ${STRACE_SRC_NAME}); echo "unzip ${STRACE_S
 PCIUTILS_SRC_DIR=$(unzip_src ".tar.gz" ${PCIUTILS_SRC_NAME}); echo "unzip ${PCIUTILS_SRC_NAME} source code"
 OPENSSL_SRC_DIR=$(unzip_src ".tar.gz" ${OPENSSL_SRC_NAME}); echo "unzip ${OPENSSL_SRC_NAME} source code"
 OPENSSH_SRC_DIR=$(unzip_src ".tar.gz" ${OPENSSH_SRC_NAME}); echo "unzip ${OPENSSH_SRC_NAME} source code"
+LIBMNL_SRC_DIR=$(unzip_src ".tar.bz2" ${LIBMNL_SRC_NAME}); echo "unzip ${LIBMNL_SRC_NAME} source code"
+LIBNFTNL_SRC_DIR=$(unzip_src ".tar.bz2" ${LIBNFTNL_SRC_NAME}); echo "unzip ${LIBNFTNL_SRC_NAME} source code"
+IPTABLES_SRC_DIR=$(unzip_src ".tar.bz2" ${IPTABLES_SRC_NAME}); echo "unzip ${IPTABLES_SRC_NAME} source code"
 GCC_SRC_DIR=$(unzip_src ".tar.xz" ${GCC_SRC_NAME}); echo "unzip ${GCC_SRC_NAME} source code"
 BINUTILS_SRC_DIR=$(unzip_src ".tar.xz" ${BINUTILS_SRC_NAME}); echo "unzip ${BINUTILS_SRC_NAME} source code"
 
@@ -320,95 +329,147 @@ if [ ! -d "busybox_install" ]; then
   cd ..
 fi
 
-# 编译 lshw ( 调试方便 )
-if [ ! -d "lshw_install" ]; then
-  mkdir -pv lshw_install && cd ${LSHW_SRC_DIR}
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${lshw_install} PREFIX=/usr || exit
-  cd ..
-fi
-
-# 编译 pciutils ( busybox 的 lspci 太简单 )
-if [ ! -d "pciutils_install" ]; then
-  mkdir -pv pciutils_install && cd ${PCIUTILS_SRC_DIR}
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${pciutils_install} PREFIX=/usr || exit
-  cd ..
-fi
-
-# 编译 lsof ( busybox 的太简单 )
-if [ ! -d "lsof_install" ]; then
-  mkdir -pv lsof_install && cd ${LSOF_SRC_DIR}
-  ./Configure linux -n
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && mkdir -pv ${lsof_install}/usr/bin && cp ./lsof ${lsof_install}/usr/bin || exit
-  cd ..
-fi
-
-# 编译 strace ( 方便调试 )
-if [ ! -d "strace_install" ]; then
-  mkdir -pv strace_install && cd ${STRACE_SRC_DIR}
-  ./configure --prefix=/usr --enable-mpers=no
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${strace_install} PREFIX=/usr || exit
-  cd ..
-fi
-
-# 编译 openssl
-if [ ! -d "openssl_install" ]; then
-  mkdir -pv openssl_install && cd ${OPENSSL_SRC_DIR}
-  ./config --prefix=/usr shared
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${openssl_install} PREFIX=/usr || exit
-  cd ..
-fi
-
-# 编译 openssh ( 需要 openssl )
-if [ ! -d "openssh_install" ]; then
-  mkdir -pv openssh_install && cd ${OPENSSH_SRC_DIR}
-  ./configure --prefix=/usr --sysconfdir=/etc/ssh --with-ssl-dir=${openssl_install}/usr/ --without-openssl-header-check
-  CFLAGS="-L${glibc_install}/lib64 -L${openssl_install}/usr/lib $CFLAGS" make -j8 && make install -j8 DESTDIR=${openssh_install} PREFIX=/usr
-  # 修改配置文件
-  sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" ${openssh_install}/etc/ssh/sshd_config
-  echo "HostKeyAlgorithms=ssh-rsa,ssh-dss" >> ${openssh_install}/etc/ssh/sshd_config
-  echo "KexAlgorithms=diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1" >> ${openssh_install}/etc/ssh/sshd_config
-  # 准备环境
-  if [ ! -d "${openssh_install}/var/empty" ]; then
-    mkdir -pv ${openssh_install}/var/empty
+#------------------------------------------------------------------
+# 编译通用工具
+#------------------------------------------------------------------
+if [ "${with_util}" = true ]; then
+  # 编译 lshw ( 调试方便 )
+  if [ ! -d "lshw_install" ]; then
+    mkdir -pv lshw_install && cd ${LSHW_SRC_DIR}
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${lshw_install} PREFIX=/usr || exit
+    cd ..
   fi
-  chmod 744 ${openssh_install}/var/empty/
-  chown root ${openssh_install}/var/empty/
-  if [ ! -f "${openssh_install}/etc/ssh/ssh_host_dsa_key" ]; then
-    ssh-keygen -t dsa -P "" -f ${openssh_install}/etc/ssh/ssh_host_dsa_key
+
+  # 编译 pciutils ( busybox 的 lspci 太简单 )
+  if [ ! -d "pciutils_install" ]; then
+    mkdir -pv pciutils_install && cd ${PCIUTILS_SRC_DIR}
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${pciutils_install} PREFIX=/usr || exit
+    cd ..
   fi
-  if [ ! -f "${openssh_install}/etc/ssh/ssh_host_rsa_key" ]; then
-    ssh-keygen -t rsa -P "" -f ${openssh_install}/etc/ssh/ssh_host_rsa_key
+
+  # 编译 lsof ( busybox 的太简单 )
+  if [ ! -d "lsof_install" ]; then
+    mkdir -pv lsof_install && cd ${LSOF_SRC_DIR}
+    ./Configure linux -n
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && mkdir -pv ${lsof_install}/usr/bin && cp ./lsof ${lsof_install}/usr/bin || exit
+    cd ..
   fi
-  # 开启 sftp, 可以进行文件上传
-  if [ -f "${openssh_install}/etc/ssh/sshd_config" ]; then
-    sed -i "s/\/usr\/libexec\/sftp-server/internal-sftp/" ${openssh_install}/etc/ssh/sshd_config
+
+  # 编译 strace ( 方便调试 )
+  if [ ! -d "strace_install" ]; then
+    mkdir -pv strace_install && cd ${STRACE_SRC_DIR}
+    ./configure --prefix=/usr --enable-mpers=no
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${strace_install} PREFIX=/usr || exit
+    cd ..
   fi
-  cd ..
 fi
 
-# 编译 gcc
-if [ ! -d "gcc_install" ]; then 
-  mkdir -pv gcc_install && cd ${GCC_SRC_DIR}
-  if [ -f "config.cache" ]; then
-    rm ./config.cache
+#------------------------------------------------------------------
+# 编译 openssh
+#------------------------------------------------------------------
+if [ "${with_ssh}" = true ]; then
+  # 编译 openssl
+  if [ ! -d "openssl_install" ]; then
+    mkdir -pv openssl_install && cd ${OPENSSL_SRC_DIR}
+    ./config --prefix=/usr shared
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${openssl_install} PREFIX=/usr || exit
+    cd ..
   fi
-  ./contrib/download_prerequisites
-  ./configure --prefix=/usr --enable-languages=c,c++ --disable-multilib --disable-static --disable-libquadmath --enable-shared
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${gcc_install} && cd ..
+
+  # 编译 openssh ( 需要 openssl )
+  if [ ! -d "openssh_install" ]; then
+    mkdir -pv openssh_install && cd ${OPENSSH_SRC_DIR}
+    ./configure --prefix=/usr --sysconfdir=/etc/ssh --with-ssl-dir=${openssl_install}/usr/ --without-openssl-header-check
+    CFLAGS="-L${glibc_install}/lib64 -L${openssl_install}/usr/lib $CFLAGS" make -j8 && make install -j8 DESTDIR=${openssh_install} PREFIX=/usr
+    # 修改配置文件
+    sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" ${openssh_install}/etc/ssh/sshd_config
+    echo "HostKeyAlgorithms=ssh-rsa,ssh-dss" >> ${openssh_install}/etc/ssh/sshd_config
+    echo "KexAlgorithms=diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1" >> ${openssh_install}/etc/ssh/sshd_config
+    # 准备环境
+    if [ ! -d "${openssh_install}/var/empty" ]; then
+      mkdir -pv ${openssh_install}/var/empty
+    fi
+    chmod 744 ${openssh_install}/var/empty/
+    chown root ${openssh_install}/var/empty/
+    if [ ! -f "${openssh_install}/etc/ssh/ssh_host_dsa_key" ]; then
+      ssh-keygen -t dsa -P "" -f ${openssh_install}/etc/ssh/ssh_host_dsa_key
+    fi
+    if [ ! -f "${openssh_install}/etc/ssh/ssh_host_rsa_key" ]; then
+      ssh-keygen -t rsa -P "" -f ${openssh_install}/etc/ssh/ssh_host_rsa_key
+    fi
+    # 开启 sftp, 可以进行文件上传
+    if [ -f "${openssh_install}/etc/ssh/sshd_config" ]; then
+      sed -i "s/\/usr\/libexec\/sftp-server/internal-sftp/" ${openssh_install}/etc/ssh/sshd_config
+    fi
+    cd ..
+  fi
 fi
 
-# 编译 binutils
-if [ ! -d "binutils_install" ]; then
-  mkdir -pv binutils_install && cd ${BINUTILS_SRC_DIR} && make distclean
-  ./configure --prefix=/usr
-  CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${binutils_install} || exit
-  cd ..
+#------------------------------------------------------------------
+# 编译防火墙
+#------------------------------------------------------------------
+if [ "${with_ufw}" = true ]; then
+  ufw_include=" \
+    -I${libmnl_install}/usr/include \
+    -I${libnftnl_install}/usr/include"
+
+  ufw_library=" \
+    -L${libmnl_install}/usr/lib -lmnl \
+    -L${libnftnl_install}/usr/lib -lnftnl"
+
+  # 编译 libmnl
+  if [ ! -d "libmnl_install" ]; then
+    mkdir -pv libmnl_install && cd ${LIBMNL_SRC_DIR}
+    ./configure --prefix=/usr
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${libmnl_install} PREFIX=/usr || exit
+    cd ..
+  fi
+
+  # 编译 libnftnl
+  if [ ! -d "libnftnl_install" ]; then
+    mkdir -pv libnftnl_install && cd ${LIBNFTNL_SRC_DIR}
+    CFLAGS="${ufw_include} ${ufw_library} $CFLAGS" ./configure --prefix=/usr
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${libnftnl_install} PREFIX=/usr || exit
+    cd ..
+  fi
+
+  # 编译 iptables ( 需要 libmnl, libnftnl )
+  if [ ! -d "iptables_install" ]; then
+    mkdir -pv iptables_install && cd ${IPTABLES_SRC_DIR}
+    CFLAGS="${ufw_include} ${ufw_library} $CFLAGS" ./configure --prefix=/usr
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${iptables_install} PREFIX=/usr || exit
+    cd ..
+  fi
+fi
+
+#------------------------------------------------------------------
+# 编译 gcc ( xfce 需要开启这个 )
+#------------------------------------------------------------------
+if [ "${with_gcc}" = true ]; then
+  # 编译 gcc
+  if [ ! -d "gcc_install" ]; then
+    mkdir -pv gcc_install && cd ${GCC_SRC_DIR}
+    if [ -f "config.cache" ]; then
+      rm ./config.cache
+    fi
+    ./contrib/download_prerequisites
+    ./configure --prefix=/usr --enable-languages=c,c++ --disable-multilib --disable-static --disable-libquadmath --enable-shared
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${gcc_install} && cd ..
+  fi
+
+  # 编译 binutils
+  if [ ! -d "binutils_install" ]; then
+    mkdir -pv binutils_install && cd ${BINUTILS_SRC_DIR} && make distclean
+    ./configure --prefix=/usr
+    CFLAGS="-L${glibc_install}/lib64 $CFLAGS" make -j8 && make install -j8 DESTDIR=${binutils_install} || exit
+    cd ..
+  fi
 fi
 
 cd ..
 
-# 编译 xfce [ no same time with xorg ]
-if [ "${with_xfce}" = true ]; then
+# 编译 xfce ( 需要 gcc 的支持 )
+if [ "${with_xfce}" = true ] && [ "${with_gcc}" = true ]; then
   ./mk_xfce.sh img
 fi
 
