@@ -12,6 +12,7 @@
 8. 支持防火墙 iptables
 9. 支持远程服务 openssh-server
 10. 支持桌面系统 xfce4 desktop
+![avatar](xfce4.png)
 11. 支持常用工具集 lshw，lspci，lsof，strace 等
 12. 支持 smart_rtmpd 流媒体服务器运行 https://github.com/superconvert/smart_rtmpd
 
